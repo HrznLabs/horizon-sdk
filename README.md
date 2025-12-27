@@ -1,6 +1,6 @@
 # Horizon Protocol SDK
 
-[![npm version](https://img.shields.io/npm/v/@horizon-protocol/sdk.svg)](https://www.npmjs.com/package/@horizon-protocol/sdk)
+[![npm version](https://img.shields.io/npm/v/horizon-protocol-sdk.svg)](https://www.npmjs.com/package/horizon-protocol-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 TypeScript SDK for integrating with **Horizon Protocol** - decentralized mission coordination on Base.
@@ -9,10 +9,10 @@ TypeScript SDK for integrating with **Horizon Protocol** - decentralized mission
 
 ```bash
 # Using yarn
-yarn add @horizon-protocol/sdk viem
+yarn add horizon-protocol-sdk viem
 
 # Using npm
-npm install @horizon-protocol/sdk viem
+npm install horizon-protocol-sdk viem
 ```
 
 ## Quick Start
@@ -26,7 +26,7 @@ import {
   parseUSDC,
   formatUSDC,
   calculateFeeSplit,
-} from '@horizon-protocol/sdk';
+} from 'horizon-protocol-sdk';
 
 // Create viem client
 const client = createPublicClient({
@@ -72,13 +72,13 @@ import {
   ReputationAttestationsABI,  // Ratings
   HorizonAchievementsABI,     // Achievement NFTs
   ERC20ABI,             // USDC interactions
-} from '@horizon-protocol/sdk';
+} from 'horizon-protocol-sdk';
 ```
 
 ## Network Configuration
 
 ```typescript
-import { BASE_SEPOLIA, BASE_MAINNET, getContracts } from '@horizon-protocol/sdk';
+import { BASE_SEPOLIA, BASE_MAINNET, getContracts } from 'horizon-protocol-sdk';
 
 // Pre-configured networks
 console.log(BASE_SEPOLIA.contracts.missionFactory);
@@ -93,7 +93,7 @@ const contracts = getContracts(84532); // Base Sepolia
 ### USDC Parsing
 
 ```typescript
-import { parseUSDC, formatUSDC } from '@horizon-protocol/sdk';
+import { parseUSDC, formatUSDC } from 'horizon-protocol-sdk';
 
 const amount = parseUSDC('10.50'); // => 10500000n
 const display = formatUSDC(10500000n); // => '10.500000'
@@ -102,7 +102,7 @@ const display = formatUSDC(10500000n); // => '10.500000'
 ### Fee Calculations
 
 ```typescript
-import { calculateFeeSplit, calculateDDR, FEES } from '@horizon-protocol/sdk';
+import { calculateFeeSplit, calculateDDR, FEES } from 'horizon-protocol-sdk';
 
 // Calculate fee split for 100 USDC with 3% guild fee
 const fees = calculateFeeSplit(parseUSDC(100), 300);
@@ -115,7 +115,7 @@ const ddr = calculateDDR(parseUSDC(100)); // => 5000000n (5 USDC)
 ### Mission Utilities
 
 ```typescript
-import { calculateExpiresAt, isMissionExpired, toBytes32 } from '@horizon-protocol/sdk';
+import { calculateExpiresAt, isMissionExpired, toBytes32 } from 'horizon-protocol-sdk';
 
 // Create expiration timestamp (24 hours from now)
 const expiresAt = calculateExpiresAt(24 * 3600);
@@ -139,7 +139,7 @@ import {
   type MissionParams,
   type GuildConfig,
   type FeeSplit,
-} from '@horizon-protocol/sdk';
+} from 'horizon-protocol-sdk';
 
 // Mission states
 if (mission.runtime.state === MissionState.Submitted) {
@@ -159,7 +159,7 @@ import {
   FEES,               // { PROTOCOL_BPS, LABS_BPS, ... }
   APPEAL_PERIOD,      // 48 hours
   ZERO_ADDRESS,
-} from '@horizon-protocol/sdk';
+} from 'horizon-protocol-sdk';
 ```
 
 ## Example: Create Mission
@@ -176,7 +176,7 @@ import {
   calculateExpiresAt,
   toBytes32,
   ZERO_ADDRESS,
-} from '@horizon-protocol/sdk';
+} from 'horizon-protocol-sdk';
 
 const account = privateKeyToAccount('0x...');
 
