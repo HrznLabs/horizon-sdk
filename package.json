@@ -1,0 +1,64 @@
+{
+  "name": "@horizon-protocol/sdk",
+  "version": "0.1.0",
+  "description": "SDK for integrating with Horizon Protocol - decentralized mission coordination on Base",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./abis": {
+      "import": "./dist/abis/index.mjs",
+      "require": "./dist/abis/index.js",
+      "types": "./dist/abis/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "horizon",
+    "protocol",
+    "base",
+    "blockchain",
+    "ethereum",
+    "usdc",
+    "missions",
+    "escrow",
+    "web3",
+    "sdk"
+  ],
+  "author": "Horizon Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/horizon-labs/horizon-sdk.git"
+  },
+  "homepage": "https://horizon.xyz",
+  "bugs": {
+    "url": "https://github.com/horizon-labs/horizon-sdk/issues"
+  },
+  "peerDependencies": {
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0",
+    "viem": "^2.21.0"
+  }
+}
+
+
