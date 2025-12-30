@@ -559,6 +559,21 @@ export const HorizonAchievementsABI = [
   },
   {
     type: 'function',
+    name: 'createAchievementType',
+    inputs: [
+      { name: 'name', type: 'string' },
+      { name: 'description', type: 'string' },
+      { name: 'category', type: 'uint8' },
+      { name: 'isSoulbound', type: 'bool' },
+      { name: 'maxSupply', type: 'uint256' },
+      { name: 'tokenURI', type: 'string' },
+      { name: 'xpReward', type: 'uint256' },
+    ],
+    outputs: [{ name: 'typeId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'getAchievementType',
     inputs: [{ name: 'typeId', type: 'uint256' }],
     outputs: [
@@ -623,6 +638,15 @@ export const HorizonAchievementsABI = [
       { name: 'typeId', type: 'uint256', indexed: true },
       { name: 'recipient', type: 'address', indexed: true },
       { name: 'proofHash', type: 'bytes32', indexed: false },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'AchievementTypeCreated',
+    inputs: [
+      { name: 'typeId', type: 'uint256', indexed: true },
+      { name: 'name', type: 'string', indexed: false },
+      { name: 'category', type: 'uint8', indexed: false },
     ],
   },
 ] as const;
