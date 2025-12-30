@@ -1,18 +1,31 @@
 # Horizon Protocol SDK
 
-[![npm version](https://img.shields.io/npm/v/horizon-protocol-sdk.svg)](https://www.npmjs.com/package/horizon-protocol-sdk)
+[![npm version](https://img.shields.io/npm/v/@horizon-protocol/sdk.svg)](https://www.npmjs.com/package/@horizon-protocol/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Base](https://img.shields.io/badge/Built%20for-Base-0052FF)](https://base.org)
 
-TypeScript SDK for integrating with **Horizon Protocol** - decentralized mission coordination on Base.
+TypeScript SDK for integrating with **Horizon Protocol** - decentralized mission coordination on Base (Optimism L2).
+
+## ✨ Features
+
+- 📦 **Contract ABIs** - Type-safe ABIs for all 8 Horizon Protocol contracts
+- 🔧 **Utility Functions** - USDC parsing, fee calculations, address formatting
+- 🌐 **Network Configs** - Pre-configured for Base Sepolia and Base Mainnet
+- 📝 **TypeScript Types** - Full type definitions for all protocol entities
+- 🪶 **Lightweight** - Zero dependencies except peer dependency on `viem`
 
 ## Installation
 
 ```bash
 # Using yarn
-yarn add horizon-protocol-sdk viem
+yarn add @horizon-protocol/sdk viem
 
 # Using npm
-npm install horizon-protocol-sdk viem
+npm install @horizon-protocol/sdk viem
+
+# Using pnpm
+pnpm add @horizon-protocol/sdk viem
 ```
 
 ## Quick Start
@@ -26,7 +39,7 @@ import {
   parseUSDC,
   formatUSDC,
   calculateFeeSplit,
-} from 'horizon-protocol-sdk';
+} from '@horizon-protocol/sdk';
 
 // Create viem client
 const client = createPublicClient({
@@ -53,39 +66,38 @@ console.log(`  Protocol: ${formatUSDC(fees.protocolAmount)} USDC`);
 console.log(`  Guild: ${formatUSDC(fees.guildAmount)} USDC`);
 ```
 
-## Features
-
-- 📦 **Contract ABIs** - Type-safe ABIs for all Horizon Protocol contracts
-- 🔧 **Utility Functions** - USDC parsing, fee calculations, address formatting
-- 🌐 **Network Configs** - Pre-configured for Base Sepolia and Base Mainnet
-- 📝 **TypeScript Types** - Full type definitions for all protocol entities
-
 ## Contract ABIs
+
+All 8 Horizon Protocol contract ABIs are included:
 
 ```typescript
 import {
-  MissionFactoryABI,    // Mission creation and lookup
-  MissionEscrowABI,     // Individual mission escrow
-  GuildFactoryABI,      // Guild creation
-  GuildDAOABI,          // Guild governance
-  PaymentRouterABI,     // Fee distribution
-  ReputationAttestationsABI,  // Ratings
-  HorizonAchievementsABI,     // Achievement NFTs
-  ERC20ABI,             // USDC interactions
-} from 'horizon-protocol-sdk';
+  MissionFactoryABI,         // Mission creation and lookup
+  MissionEscrowABI,          // Individual mission escrow lifecycle
+  GuildFactoryABI,           // Guild creation
+  GuildDAOABI,               // Guild governance and membership
+  PaymentRouterABI,          // Fee distribution
+  ReputationAttestationsABI, // On-chain ratings
+  HorizonAchievementsABI,    // Achievement NFTs (soulbound + tradable)
+  ERC20ABI,                  // USDC interactions
+} from '@horizon-protocol/sdk';
 ```
 
 ## Network Configuration
 
 ```typescript
-import { BASE_SEPOLIA, BASE_MAINNET, getContracts } from 'horizon-protocol-sdk';
+import { BASE_SEPOLIA, BASE_MAINNET, getContracts, getNetwork } from '@horizon-protocol/sdk';
 
-// Pre-configured networks
+// Pre-configured networks with all contract addresses
 console.log(BASE_SEPOLIA.contracts.missionFactory);
 // => '0xee9234954b134c39c17a75482da78e46b16f466c'
 
 // Get contracts by chain ID
-const contracts = getContracts(84532); // Base Sepolia
+const contracts = getContracts(84532); // Base Sepolia chain ID
+
+// Get full network config
+const network = getNetwork(84532);
+console.log(network.name); // => 'Base Sepolia'
 ```
 
 ## Utility Functions
@@ -93,29 +105,49 @@ const contracts = getContracts(84532); // Base Sepolia
 ### USDC Parsing
 
 ```typescript
-import { parseUSDC, formatUSDC } from 'horizon-protocol-sdk';
+import { parseUSDC, formatUSDC, USDC_DECIMALS } from '@horizon-protocol/sdk';
 
-const amount = parseUSDC('10.50'); // => 10500000n
+// Parse human-readable to on-chain format
+const amount = parseUSDC('10.50'); // => 10500000n (BigInt)
+const amount2 = parseUSDC(10.5);   // => 10500000n
+
+// Format on-chain to human-readable
 const display = formatUSDC(10500000n); // => '10.500000'
 ```
 
 ### Fee Calculations
 
 ```typescript
-import { calculateFeeSplit, calculateDDR, FEES } from 'horizon-protocol-sdk';
+import { calculateFeeSplit, calculateDDR, calculateLPP, FEES } from '@horizon-protocol/sdk';
 
 // Calculate fee split for 100 USDC with 3% guild fee
 const fees = calculateFeeSplit(parseUSDC(100), 300);
-// => { performerAmount, protocolAmount, guildAmount, resolverAmount, labsAmount }
+console.log(fees);
+// => {
+//   performerAmount: 87000000n,  // 87 USDC
+//   protocolAmount: 4000000n,    // 4 USDC
+//   labsAmount: 4000000n,        // 4 USDC
+//   resolverAmount: 2000000n,    // 2 USDC
+//   guildAmount: 3000000n,       // 3 USDC
+// }
 
 // Calculate DDR deposit (5% of reward)
 const ddr = calculateDDR(parseUSDC(100)); // => 5000000n (5 USDC)
+
+// Calculate LPP penalty (2% of reward)
+const lpp = calculateLPP(parseUSDC(100)); // => 2000000n (2 USDC)
 ```
 
 ### Mission Utilities
 
 ```typescript
-import { calculateExpiresAt, isMissionExpired, toBytes32 } from 'horizon-protocol-sdk';
+import { 
+  calculateExpiresAt, 
+  isMissionExpired, 
+  toBytes32, 
+  randomBytes32,
+  formatAddress 
+} from '@horizon-protocol/sdk';
 
 // Create expiration timestamp (24 hours from now)
 const expiresAt = calculateExpiresAt(24 * 3600);
@@ -123,27 +155,48 @@ const expiresAt = calculateExpiresAt(24 * 3600);
 // Check if mission expired
 const expired = isMissionExpired(expiresAt);
 
-// Convert IPFS hash to bytes32
-const metadataHash = toBytes32('QmXoypizj...');
+// Convert string to bytes32 (for IPFS hashes, etc.)
+const metadataHash = toBytes32('QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco');
+
+// Generate random bytes32 (for proofs, etc.)
+const proofHash = randomBytes32();
+
+// Format address for display
+const short = formatAddress('0x1234...5678'); // => '0x1234...5678'
 ```
 
 ## Types
 
 ```typescript
 import {
+  // Enums
   MissionState,
   DisputeState,
   DisputeOutcome,
   AchievementCategory,
+  
+  // Types
   type Mission,
   type MissionParams,
+  type MissionRuntime,
   type GuildConfig,
   type FeeSplit,
-} from 'horizon-protocol-sdk';
+  type Rating,
+  type AchievementType,
+  type NetworkConfig,
+  type ContractAddresses,
+  type CreateMissionParams,
+  type CreateGuildParams,
+} from '@horizon-protocol/sdk';
 
 // Mission states
 if (mission.runtime.state === MissionState.Submitted) {
-  // Ready for approval
+  console.log('Ready for approval');
+}
+
+// Dispute outcomes
+if (dispute.outcome === DisputeOutcome.PerformerWins) {
+  console.log('Performer won the dispute');
 }
 ```
 
@@ -152,20 +205,20 @@ if (mission.runtime.state === MissionState.Submitted) {
 ```typescript
 import {
   USDC_DECIMALS,      // 6
-  MIN_REWARD,         // 1 USDC
+  MIN_REWARD,         // 1 USDC (1000000n)
   MAX_REWARD,         // 100,000 USDC
-  MIN_DURATION,       // 1 hour
+  MIN_DURATION,       // 1 hour (3600)
   MAX_DURATION,       // 30 days
-  FEES,               // { PROTOCOL_BPS, LABS_BPS, ... }
-  APPEAL_PERIOD,      // 48 hours
-  ZERO_ADDRESS,
-} from 'horizon-protocol-sdk';
+  FEES,               // { PROTOCOL_BPS: 400, LABS_BPS: 400, RESOLVER_BPS: 200 }
+  APPEAL_PERIOD,      // 48 hours (172800)
+  ZERO_ADDRESS,       // 0x0000...0000
+} from '@horizon-protocol/sdk';
 ```
 
 ## Example: Create Mission
 
 ```typescript
-import { createWalletClient, http, parseUnits } from 'viem';
+import { createWalletClient, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
 import {
@@ -176,7 +229,7 @@ import {
   calculateExpiresAt,
   toBytes32,
   ZERO_ADDRESS,
-} from 'horizon-protocol-sdk';
+} from '@horizon-protocol/sdk';
 
 const account = privateKeyToAccount('0x...');
 
@@ -213,6 +266,38 @@ const hash = await walletClient.writeContract({
 console.log('Mission created:', hash);
 ```
 
+## Example: Accept and Complete Mission
+
+```typescript
+import { 
+  MissionEscrowABI, 
+  MissionState,
+  toBytes32,
+} from '@horizon-protocol/sdk';
+
+// Accept mission (as performer)
+await walletClient.writeContract({
+  address: escrowAddress,
+  abi: MissionEscrowABI,
+  functionName: 'acceptMission',
+});
+
+// Submit proof of completion
+await walletClient.writeContract({
+  address: escrowAddress,
+  abi: MissionEscrowABI,
+  functionName: 'submitProof',
+  args: [toBytes32('QmProofHash...')],
+});
+
+// Approve completion (as poster) - triggers payment
+await walletClient.writeContract({
+  address: escrowAddress,
+  abi: MissionEscrowABI,
+  functionName: 'approveCompletion',
+});
+```
+
 ## Contract Addresses
 
 ### Base Sepolia (Testnet)
@@ -229,11 +314,16 @@ console.log('Mission created:', hash);
 
 ## Related Packages
 
-- [horizon-contracts](https://github.com/horizon-labs/horizon-contracts) - Solidity smart contracts
-- [horizon-docs](https://docs.horizon.xyz) - Protocol documentation
+- [horizon-contracts](https://github.com/HrznLabs/horizon-contracts) - Solidity smart contracts
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT
+MIT License - see [LICENSE](./LICENSE)
 
+---
 
+Built with ❤️ by Horizon Labs | Powered by Base (Optimism L2)
