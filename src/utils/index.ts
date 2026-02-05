@@ -5,6 +5,9 @@
 import { USDC_DECIMALS, FEES } from '../constants';
 import type { FeeSplit } from '../types';
 
+const BPS_DIVISOR = BigInt(10000);
+const USDC_DIVISOR = BigInt(10 ** USDC_DECIMALS);
+
 /**
  * Parse USDC amount from human-readable string to bigint
  * @param amount Human-readable amount (e.g., "10.50")
@@ -21,9 +24,8 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const divisor = BigInt(10 ** USDC_DECIMALS);
-  const whole = amount / divisor;
-  const fraction = amount % divisor;
+  const whole = amount / USDC_DIVISOR;
+  const fraction = amount % USDC_DIVISOR;
   const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
   return `${whole}.${fractionStr}`;
 }
@@ -48,12 +50,10 @@ export function calculateFeeSplit(
     throw new Error(`Guild fee exceeds maximum allowed (${FEES.MAX_GUILD_BPS} basis points)`);
   }
 
-  const bpsDivisor = BigInt(10000);
-
-  const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / bpsDivisor;
-  const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / bpsDivisor;
-  const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / bpsDivisor;
-  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / bpsDivisor;
+  const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / BPS_DIVISOR;
+  const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / BPS_DIVISOR;
+  const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / BPS_DIVISOR;
+  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / BPS_DIVISOR;
   const performerAmount =
     rewardAmount - protocolAmount - labsAmount - resolverAmount - guildAmount;
 
@@ -72,7 +72,7 @@ export function calculateFeeSplit(
  * @returns DDR amount each party must deposit
  */
 export function calculateDDR(rewardAmount: bigint): bigint {
-  return (rewardAmount * BigInt(FEES.DDR_BPS)) / BigInt(10000);
+  return (rewardAmount * BigInt(FEES.DDR_BPS)) / BPS_DIVISOR;
 }
 
 /**
@@ -81,7 +81,7 @@ export function calculateDDR(rewardAmount: bigint): bigint {
  * @returns LPP amount
  */
 export function calculateLPP(rewardAmount: bigint): bigint {
-  return (rewardAmount * BigInt(FEES.LPP_BPS)) / BigInt(10000);
+  return (rewardAmount * BigInt(FEES.LPP_BPS)) / BPS_DIVISOR;
 }
 
 /**
