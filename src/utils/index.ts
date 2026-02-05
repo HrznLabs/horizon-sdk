@@ -38,7 +38,9 @@ export function calculateFeeSplit(
   rewardAmount: bigint,
   guildFeeBps: number = 0
 ): FeeSplit {
-  // Validate guild fee
+  if (rewardAmount < 0n) {
+    throw new Error('Reward amount cannot be negative');
+  }
   if (guildFeeBps < 0) {
     throw new Error('Guild fee cannot be negative');
   }
