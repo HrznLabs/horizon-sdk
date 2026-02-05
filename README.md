@@ -1,6 +1,15 @@
 # Horizon Protocol SDK
 
-TypeScript SDK for integrating with Horizon Protocol on Base.
+**TypeScript SDK** for developers integrating Horizon Protocol into applications on Base L2.
+
+## When to Use This SDK
+
+Use this SDK if you're building:
+- **Custom frontends** that interact with Horizon smart contracts
+- **Verticals or dApps** leveraging Horizon for mission/task management
+- **Wallets, dashboards, or tools** that need to parse Horizon data or calculate fees
+
+The SDK provides contract ABIs, type definitions, network helpers, and utility functions to simplify protocol integration.
 
 ## Features
 
