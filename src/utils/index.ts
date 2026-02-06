@@ -5,6 +5,11 @@
 import { USDC_DECIMALS, FEES } from '../constants';
 import type { FeeSplit } from '../types';
 
+// Constants to avoid re-creation on every function call
+const BPS_DIVISOR = BigInt(10000);
+const USDC_MULTIPLIER = 10 ** USDC_DECIMALS;
+const USDC_DIVISOR = BigInt(USDC_MULTIPLIER);
+
 /**
  * Parse USDC amount from human-readable string to bigint
  * @param amount Human-readable amount (e.g., "10.50")
@@ -12,7 +17,7 @@ import type { FeeSplit } from '../types';
  */
 export function parseUSDC(amount: string | number): bigint {
   const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return BigInt(Math.round(numAmount * 10 ** USDC_DECIMALS));
+  return BigInt(Math.round(numAmount * USDC_MULTIPLIER));
 }
 
 /**
@@ -21,9 +26,8 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const divisor = BigInt(10 ** USDC_DECIMALS);
-  const whole = amount / divisor;
-  const fraction = amount % divisor;
+  const whole = amount / USDC_DIVISOR;
+  const fraction = amount % USDC_DIVISOR;
   const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
   return `${whole}.${fractionStr}`;
 }
@@ -38,12 +42,10 @@ export function calculateFeeSplit(
   rewardAmount: bigint,
   guildFeeBps: number = 0
 ): FeeSplit {
-  const bpsDivisor = BigInt(10000);
-
-  const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / bpsDivisor;
-  const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / bpsDivisor;
-  const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / bpsDivisor;
-  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / bpsDivisor;
+  const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / BPS_DIVISOR;
+  const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / BPS_DIVISOR;
+  const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / BPS_DIVISOR;
+  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / BPS_DIVISOR;
   const performerAmount =
     rewardAmount - protocolAmount - labsAmount - resolverAmount - guildAmount;
 
@@ -62,7 +64,7 @@ export function calculateFeeSplit(
  * @returns DDR amount each party must deposit
  */
 export function calculateDDR(rewardAmount: bigint): bigint {
-  return (rewardAmount * BigInt(FEES.DDR_BPS)) / BigInt(10000);
+  return (rewardAmount * BigInt(FEES.DDR_BPS)) / BPS_DIVISOR;
 }
 
 /**
@@ -71,7 +73,7 @@ export function calculateDDR(rewardAmount: bigint): bigint {
  * @returns LPP amount
  */
 export function calculateLPP(rewardAmount: bigint): bigint {
-  return (rewardAmount * BigInt(FEES.LPP_BPS)) / BigInt(10000);
+  return (rewardAmount * BigInt(FEES.LPP_BPS)) / BPS_DIVISOR;
 }
 
 /**
