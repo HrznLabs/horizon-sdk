@@ -38,6 +38,12 @@ export function calculateFeeSplit(
   rewardAmount: bigint,
   guildFeeBps: number = 0
 ): FeeSplit {
+  if (guildFeeBps < 0 || guildFeeBps > FEES.MAX_GUILD_BPS) {
+    throw new Error(
+      `Guild fee must be between 0 and ${FEES.MAX_GUILD_BPS} basis points`
+    );
+  }
+
   const bpsDivisor = BigInt(10000);
 
   const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / bpsDivisor;
