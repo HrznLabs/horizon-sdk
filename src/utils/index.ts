@@ -38,6 +38,14 @@ export function calculateFeeSplit(
   rewardAmount: bigint,
   guildFeeBps: number = 0
 ): FeeSplit {
+  // Validate guild fee
+  if (guildFeeBps < 0) {
+    throw new Error('Guild fee cannot be negative');
+  }
+  if (guildFeeBps > FEES.MAX_GUILD_BPS) {
+    throw new Error(`Guild fee exceeds maximum allowed (${FEES.MAX_GUILD_BPS} basis points)`);
+  }
+
   const bpsDivisor = BigInt(10000);
 
   const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / bpsDivisor;
@@ -148,5 +156,3 @@ export function getBaseScanUrl(
     : 'https://basescan.org';
   return `${baseUrl}/${type}/${hashOrAddress}`;
 }
-
-
