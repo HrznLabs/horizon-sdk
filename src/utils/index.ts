@@ -68,6 +68,22 @@ export function calculateFeeSplit(
   };
 }
 
+  const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / BPS_DIVISOR;
+  const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / BPS_DIVISOR;
+  const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / BPS_DIVISOR;
+  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / BPS_DIVISOR;
+  const performerAmount =
+    rewardAmount - protocolAmount - labsAmount - resolverAmount - guildAmount;
+
+  return {
+    performerAmount,
+    protocolAmount,
+    guildAmount,
+    resolverAmount,
+    labsAmount,
+  };
+}
+
 /**
  * Calculate DDR (Dynamic Dispute Reserve) amount
  * @param rewardAmount Total reward amount in USDC base units
