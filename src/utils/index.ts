@@ -5,6 +5,9 @@
 import { USDC_DECIMALS, FEES } from '../constants';
 import type { FeeSplit } from '../types';
 
+const BPS_DIVISOR = BigInt(10000);
+const USDC_DIVISOR = BigInt(10 ** USDC_DECIMALS);
+
 /**
  * Parse USDC amount from human-readable string to bigint
  * @param amount Human-readable amount (e.g., "10.50")
@@ -21,9 +24,8 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const divisor = BigInt(10 ** USDC_DECIMALS);
-  const whole = amount / divisor;
-  const fraction = amount % divisor;
+  const whole = amount / USDC_DIVISOR;
+  const fraction = amount % USDC_DIVISOR;
   const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
   return `${whole}.${fractionStr}`;
 }
@@ -38,18 +40,19 @@ export function calculateFeeSplit(
   rewardAmount: bigint,
   guildFeeBps: number = 0
 ): FeeSplit {
+  if (rewardAmount < 0n) {
+    throw new Error('Reward amount cannot be negative');
+  }
   if (guildFeeBps < 0 || guildFeeBps > FEES.MAX_GUILD_BPS) {
     throw new Error(
       `Guild fee must be between 0 and ${FEES.MAX_GUILD_BPS} basis points`
     );
   }
 
-  const bpsDivisor = BigInt(10000);
-
-  const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / bpsDivisor;
-  const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / bpsDivisor;
-  const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / bpsDivisor;
-  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / bpsDivisor;
+  const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / BPS_DIVISOR;
+  const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / BPS_DIVISOR;
+  const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / BPS_DIVISOR;
+  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / BPS_DIVISOR;
   const performerAmount =
     rewardAmount - protocolAmount - labsAmount - resolverAmount - guildAmount;
 
@@ -68,7 +71,7 @@ export function calculateFeeSplit(
  * @returns DDR amount each party must deposit
  */
 export function calculateDDR(rewardAmount: bigint): bigint {
-  return (rewardAmount * BigInt(FEES.DDR_BPS)) / BigInt(10000);
+  return (rewardAmount * BigInt(FEES.DDR_BPS)) / BPS_DIVISOR;
 }
 
 /**
@@ -77,7 +80,7 @@ export function calculateDDR(rewardAmount: bigint): bigint {
  * @returns LPP amount
  */
 export function calculateLPP(rewardAmount: bigint): bigint {
-  return (rewardAmount * BigInt(FEES.LPP_BPS)) / BigInt(10000);
+  return (rewardAmount * BigInt(FEES.LPP_BPS)) / BPS_DIVISOR;
 }
 
 /**
@@ -109,8 +112,13 @@ export function toBytes32(str: string): `0x${string}` {
     const hex = str.slice(2).padEnd(64, '0');
     return `0x${hex}` as `0x${string}`;
   }
-  // Convert string to hex
-  const hex = Buffer.from(str).toString('hex').padEnd(64, '0');
+  // Convert string to hex - isomorphic approach using TextEncoder
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .padEnd(64, '0');
   return `0x${hex}` as `0x${string}`;
 }
 
@@ -155,6 +163,28 @@ export function getBaseScanUrl(
   return `${baseUrl}/${type}/${hashOrAddress}`;
 }
 
+/**
+ * Format duration in seconds to human-readable string (e.g., "2d 4h", "1h 30m")
+ * @param seconds Duration in seconds
+ * @returns Formatted string
+ */
+export function formatDuration(seconds: number): string {
+  const totalSeconds = Math.max(0, Math.floor(seconds));
+  if (totalSeconds === 0) return '0s';
 
+  const days = Math.floor(totalSeconds / (24 * 3600));
+  const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
 
-
+  if (days > 0) {
+    return `${days}d${hours > 0 ? ` ${hours}h` : ''}`;
+  }
+  if (hours > 0) {
+    return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m${secs > 0 ? ` ${secs}s` : ''}`;
+  }
+  return `${secs}s`;
+}
