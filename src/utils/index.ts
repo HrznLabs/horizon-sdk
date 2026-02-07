@@ -5,8 +5,10 @@
 import { USDC_DECIMALS, FEES } from '../constants';
 import type { FeeSplit } from '../types';
 
+// Constants to avoid re-creation on every function call
 const BPS_DIVISOR = BigInt(10000);
-const USDC_DIVISOR = BigInt(10 ** USDC_DECIMALS);
+const USDC_MULTIPLIER = 10 ** USDC_DECIMALS;
+const USDC_DIVISOR = BigInt(USDC_MULTIPLIER);
 
 /**
  * Parse USDC amount from human-readable string to bigint
@@ -15,7 +17,7 @@ const USDC_DIVISOR = BigInt(10 ** USDC_DECIMALS);
  */
 export function parseUSDC(amount: string | number): bigint {
   const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return BigInt(Math.round(numAmount * 10 ** USDC_DECIMALS));
+  return BigInt(Math.round(numAmount * USDC_MULTIPLIER));
 }
 
 /**
@@ -113,7 +115,7 @@ export function toBytes32(str: string): `0x${string}` {
     const hex = str.slice(2).padEnd(64, '0');
     return `0x${hex}` as `0x${string}`;
   }
-  // Convert string to hex
+  // Convert string to hex - optimized approach using Buffer (faster in Node.js)
   const hex = Buffer.from(str).toString('hex').padEnd(64, '0');
   return `0x${hex}` as `0x${string}`;
 }
