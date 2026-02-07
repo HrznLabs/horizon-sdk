@@ -42,6 +42,16 @@ export function calculateFeeSplit(
   rewardAmount: bigint,
   guildFeeBps: number = 0
 ): FeeSplit {
+  if (rewardAmount < 0n) {
+    throw new Error('Reward amount cannot be negative');
+  }
+  if (guildFeeBps < 0) {
+    throw new Error('Guild fee cannot be negative');
+  }
+  if (guildFeeBps > FEES.MAX_GUILD_BPS) {
+    throw new Error(`Guild fee exceeds maximum allowed (${FEES.MAX_GUILD_BPS} basis points)`);
+  }
+
   const protocolAmount = (rewardAmount * BigInt(FEES.PROTOCOL_BPS)) / BPS_DIVISOR;
   const labsAmount = (rewardAmount * BigInt(FEES.LABS_BPS)) / BPS_DIVISOR;
   const resolverAmount = (rewardAmount * BigInt(FEES.RESOLVER_BPS)) / BPS_DIVISOR;
@@ -105,7 +115,7 @@ export function toBytes32(str: string): `0x${string}` {
     const hex = str.slice(2).padEnd(64, '0');
     return `0x${hex}` as `0x${string}`;
   }
-  // Convert string to hex
+  // Convert string to hex - optimized approach using Buffer (faster in Node.js)
   const hex = Buffer.from(str).toString('hex').padEnd(64, '0');
   return `0x${hex}` as `0x${string}`;
 }
@@ -151,6 +161,28 @@ export function getBaseScanUrl(
   return `${baseUrl}/${type}/${hashOrAddress}`;
 }
 
+/**
+ * Format duration in seconds to human-readable string (e.g., "2d 4h", "1h 30m")
+ * @param seconds Duration in seconds
+ * @returns Formatted string
+ */
+export function formatDuration(seconds: number): string {
+  const totalSeconds = Math.max(0, Math.floor(seconds));
+  if (totalSeconds === 0) return '0s';
 
+  const days = Math.floor(totalSeconds / (24 * 3600));
+  const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
 
-
+  if (days > 0) {
+    return `${days}d${hours > 0 ? ` ${hours}h` : ''}`;
+  }
+  if (hours > 0) {
+    return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m${secs > 0 ? ` ${secs}s` : ''}`;
+  }
+  return `${secs}s`;
+}
