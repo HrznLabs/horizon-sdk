@@ -104,7 +104,12 @@ export function toBytes32(str: string): `0x${string}` {
     return `0x${hex}` as `0x${string}`;
   }
   // Convert string to hex
-  const hex = Buffer.from(str).toString('hex').padEnd(64, '0');
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .padEnd(64, '0');
   return `0x${hex}` as `0x${string}`;
 }
 
