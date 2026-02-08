@@ -22,7 +22,28 @@ const LPP_BPS_BIGINT = BigInt(FEES.LPP_BPS);
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  let numAmount: number;
+
+  if (typeof amount === 'string') {
+    const str = amount.trim();
+    if (!str) throw new Error(`Invalid USDC amount: "${amount}"`);
+
+    // Strict validation for decimal format
+    // Allows: "10", "10.5", ".5", "-10", "-.5"
+    // Disallows: "10abc", "10.5.5", "1,5", "", " "
+    const regex = /^-?(?:\d+(?:\.\d*)?|\.\d+)$/;
+    if (!regex.test(str)) {
+      throw new Error(`Invalid USDC amount: "${amount}"`);
+    }
+    numAmount = parseFloat(str);
+  } else {
+    numAmount = amount;
+  }
+
+  if (!Number.isFinite(numAmount)) {
+    throw new Error(`Invalid USDC amount: "${amount}"`);
+  }
+
   return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
 }
 
