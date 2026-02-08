@@ -7,6 +7,12 @@ import type { FeeSplit } from '../types';
 
 // Pre-calculated constants to improve performance
 const BPS_DIVISOR = BigInt(10000);
+// Pre-calculated hex strings for byte conversion (0x00...0xff)
+const HEX_STRINGS: string[] = [];
+for (let i = 0; i < 256; i++) {
+  HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
+}
+
 const USDC_MULTIPLIER_NUM = 10 ** USDC_DECIMALS;
 const USDC_MULTIPLIER_BIGINT = BigInt(USDC_MULTIPLIER_NUM);
 
@@ -127,11 +133,11 @@ export function toBytes32(str: string): `0x${string}` {
   // Convert string to hex
   const encoder = new TextEncoder();
   const bytes = encoder.encode(str);
-  const hex = Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-    .padEnd(64, '0');
-  return `0x${hex}` as `0x${string}`;
+  let hex = '';
+  for (let i = 0; i < bytes.length; i++) {
+    hex += HEX_STRINGS[bytes[i]];
+  }
+  return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
 }
 
 /**
@@ -141,9 +147,10 @@ export function toBytes32(str: string): `0x${string}` {
 export function randomBytes32(): `0x${string}` {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  const hex = Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+  let hex = '';
+  for (let i = 0; i < bytes.length; i++) {
+    hex += HEX_STRINGS[bytes[i]];
+  }
   return `0x${hex}` as `0x${string}`;
 }
 
