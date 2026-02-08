@@ -83,6 +83,9 @@ export function calculateFeeSplit(
  * @returns DDR amount each party must deposit
  */
 export function calculateDDR(rewardAmount: bigint): bigint {
+  if (rewardAmount < 0n) {
+    throw new Error('Reward amount must be non-negative');
+  }
   return (rewardAmount * DDR_BPS_BIGINT) / BPS_DIVISOR;
 }
 
@@ -92,6 +95,9 @@ export function calculateDDR(rewardAmount: bigint): bigint {
  * @returns LPP amount
  */
 export function calculateLPP(rewardAmount: bigint): bigint {
+  if (rewardAmount < 0n) {
+    throw new Error('Reward amount must be non-negative');
+  }
   return (rewardAmount * LPP_BPS_BIGINT) / BPS_DIVISOR;
 }
 
@@ -101,6 +107,9 @@ export function calculateLPP(rewardAmount: bigint): bigint {
  * @returns Expiration timestamp (bigint)
  */
 export function calculateExpiresAt(durationSeconds: number): bigint {
+  if (durationSeconds < 0) {
+    throw new Error('Duration must be non-negative');
+  }
   return BigInt(Math.floor(Date.now() / 1000) + durationSeconds);
 }
 
@@ -121,12 +130,18 @@ export function isMissionExpired(expiresAt: bigint): boolean {
 export function toBytes32(str: string): `0x${string}` {
   // If already a hex string with 0x prefix
   if (str.startsWith('0x')) {
+    if (str.length > 66) {
+      throw new Error('Hex string exceeds 32 bytes');
+    }
     const hex = str.slice(2).padEnd(64, '0');
     return `0x${hex}` as `0x${string}`;
   }
   // Convert string to hex
   const encoder = new TextEncoder();
   const bytes = encoder.encode(str);
+  if (bytes.length > 32) {
+    throw new Error('String exceeds 32 bytes');
+  }
   const hex = Array.from(bytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
