@@ -7,6 +7,12 @@ import type { FeeSplit } from '../types';
 
 // Pre-calculated constants to improve performance
 const BPS_DIVISOR = BigInt(10000);
+// Pre-calculated hex strings for byte conversion (0x00...0xff)
+const HEX_STRINGS: string[] = [];
+for (let i = 0; i < 256; i++) {
+  HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
+}
+
 const USDC_MULTIPLIER_NUM = 10 ** USDC_DECIMALS;
 const USDC_MULTIPLIER_BIGINT = BigInt(USDC_MULTIPLIER_NUM);
 
@@ -22,28 +28,7 @@ const LPP_BPS_BIGINT = BigInt(FEES.LPP_BPS);
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  let numAmount: number;
-
-  if (typeof amount === 'string') {
-    const str = amount.trim();
-    if (!str) throw new Error(`Invalid USDC amount: "${amount}"`);
-
-    // Strict validation for decimal format
-    // Allows: "10", "10.5", ".5", "-10", "-.5"
-    // Disallows: "10abc", "10.5.5", "1,5", "", " "
-    const regex = /^-?(?:\d+(?:\.\d*)?|\.\d+)$/;
-    if (!regex.test(str)) {
-      throw new Error(`Invalid USDC amount: "${amount}"`);
-    }
-    numAmount = parseFloat(str);
-  } else {
-    numAmount = amount;
-  }
-
-  if (!Number.isFinite(numAmount)) {
-    throw new Error(`Invalid USDC amount: "${amount}"`);
-  }
-
+  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
   return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
 }
 
@@ -104,9 +89,6 @@ export function calculateFeeSplit(
  * @returns DDR amount each party must deposit
  */
 export function calculateDDR(rewardAmount: bigint): bigint {
-  if (rewardAmount < 0n) {
-    throw new Error('Reward amount must be non-negative');
-  }
   return (rewardAmount * DDR_BPS_BIGINT) / BPS_DIVISOR;
 }
 
@@ -116,9 +98,6 @@ export function calculateDDR(rewardAmount: bigint): bigint {
  * @returns LPP amount
  */
 export function calculateLPP(rewardAmount: bigint): bigint {
-  if (rewardAmount < 0n) {
-    throw new Error('Reward amount must be non-negative');
-  }
   return (rewardAmount * LPP_BPS_BIGINT) / BPS_DIVISOR;
 }
 
@@ -128,9 +107,6 @@ export function calculateLPP(rewardAmount: bigint): bigint {
  * @returns Expiration timestamp (bigint)
  */
 export function calculateExpiresAt(durationSeconds: number): bigint {
-  if (durationSeconds < 0) {
-    throw new Error('Duration must be non-negative');
-  }
   return BigInt(Math.floor(Date.now() / 1000) + durationSeconds);
 }
 
@@ -151,23 +127,17 @@ export function isMissionExpired(expiresAt: bigint): boolean {
 export function toBytes32(str: string): `0x${string}` {
   // If already a hex string with 0x prefix
   if (str.startsWith('0x')) {
-    if (str.length > 66) {
-      throw new Error('Hex string exceeds 32 bytes');
-    }
     const hex = str.slice(2).padEnd(64, '0');
     return `0x${hex}` as `0x${string}`;
   }
   // Convert string to hex
   const encoder = new TextEncoder();
   const bytes = encoder.encode(str);
-  if (bytes.length > 32) {
-    throw new Error('String exceeds 32 bytes');
+  let hex = '';
+  for (let i = 0; i < bytes.length; i++) {
+    hex += HEX_STRINGS[bytes[i]];
   }
-  const hex = Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-    .padEnd(64, '0');
-  return `0x${hex}` as `0x${string}`;
+  return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
 }
 
 /**
@@ -177,9 +147,10 @@ export function toBytes32(str: string): `0x${string}` {
 export function randomBytes32(): `0x${string}` {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  const hex = Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+  let hex = '';
+  for (let i = 0; i < bytes.length; i++) {
+    hex += HEX_STRINGS[bytes[i]];
+  }
   return `0x${hex}` as `0x${string}`;
 }
 
