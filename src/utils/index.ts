@@ -33,7 +33,7 @@ export function parseUSDC(amount: string | number): bigint {
 }
 
 /**
- * Format USDC amount from bigint to human-readable string
+ * Format USDC amount from bigint to human-readable string with comma separators
  * @param amount Amount in USDC base units
  * @returns Human-readable amount string
  */
@@ -41,7 +41,11 @@ export function formatUSDC(amount: bigint): string {
   const whole = amount / USDC_MULTIPLIER_BIGINT;
   const fraction = amount % USDC_MULTIPLIER_BIGINT;
   const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-  return `${whole}.${fractionStr}`;
+
+  // Add commas to the whole part
+  const wholeStr = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  return `${wholeStr}.${fractionStr}`;
 }
 
 /**
