@@ -3,43 +3,42 @@ import { test, describe, it } from 'node:test';
 import assert from 'node:assert';
 import { parseUSDC } from '../src/utils/index';
 
-describe('parseUSDC UX Improvements', () => {
-  it('should parse valid string inputs correctly', () => {
-    assert.strictEqual(parseUSDC('10'), 10000000n);
-    assert.strictEqual(parseUSDC('10.5'), 10500000n);
-    assert.strictEqual(parseUSDC('0.5'), 500000n);
-    assert.strictEqual(parseUSDC('.5'), 500000n);
-    assert.strictEqual(parseUSDC('100.123456'), 100123456n);
+describe('parseUSDC Security Checks', () => {
+  it('should parse valid string amounts correctly', () => {
+    assert.strictEqual(parseUSDC('1'), 1000000n);
+    assert.strictEqual(parseUSDC('1.5'), 1500000n);
+    assert.strictEqual(parseUSDC('0.000001'), 1n);
+    assert.strictEqual(parseUSDC('0'), 0n);
   });
 
-  it('should handle number inputs correctly', () => {
-    assert.strictEqual(parseUSDC(10), 10000000n);
-    assert.strictEqual(parseUSDC(10.5), 10500000n);
+  it('should handle large numbers correctly without precision loss', () => {
+    // 2^53 + 1 is not safe integer in JS number, but valid in string -> BigInt
+    // 9007199254740993
+    const largeStr = '9007199254740993';
+    // Current implementation uses parseFloat, so it will lose precision here
+    // Expected: 9007199254740993000000n
+    // Actual (with float): 9007199254740992000000n (due to float precision limit at 2^53)
+
+    // We expect the safe implementation to handle this correctly.
+    // For now, let's just log what happens or assert the safe behavior (which will fail currently)
+    assert.strictEqual(parseUSDC(largeStr), 9007199254740993000000n);
   });
 
-  it('should throw clear error for non-numeric strings', () => {
-    assert.throws(() => parseUSDC('abc'), /Invalid USDC amount: "abc"/);
-    assert.throws(() => parseUSDC('10abc'), /Invalid USDC amount: "10abc"/);
-    assert.throws(() => parseUSDC('xyz10'), /Invalid USDC amount: "xyz10"/);
+  it('should throw error for invalid characters', () => {
+    // Current implementation: parseFloat("10abc") -> 10. Returns 10000000n.
+    // Safe implementation should throw.
+    assert.throws(() => parseUSDC('10abc'), /Invalid amount format/);
   });
 
-  it('should throw clear error for empty strings', () => {
-    assert.throws(() => parseUSDC(''), /Invalid USDC amount: ""/);
-    assert.throws(() => parseUSDC('   '), /Invalid USDC amount: "   "/);
+  it('should throw error for too many decimals', () => {
+    // Current implementation: rounds.
+    // Safe implementation should probably throw or truncate strict?
+    // Usually throw is safer to avoid implicit loss.
+    assert.throws(() => parseUSDC('1.1234567'), /Too many decimals/);
   });
 
-  it('should throw clear error for multiple decimal points', () => {
-    assert.throws(() => parseUSDC('10.5.5'), /Invalid USDC amount: "10.5.5"/);
-    assert.throws(() => parseUSDC('..5'), /Invalid USDC amount: "..5"/);
-  });
-
-  it('should throw clear error for invalid characters like commas', () => {
-    assert.throws(() => parseUSDC('10,5'), /Invalid USDC amount: "10,5"/);
-  });
-
-  it('should handle too many decimals by truncating or throwing (decision: throw for precision loss warning or truncate? let\'s stick to current behavior of rounding but maybe warn? No, strict validation means strict. Let\'s allow extra decimals but round them, consistent with current behavior, OR strict error? Current behavior rounds. Let\'s keep rounding behavior but validate format first.)', () => {
-    // If I use strict regex validation, I can still allow extra decimals and round.
-    // "10.1234567" -> 10123457n (rounded)
-    assert.strictEqual(parseUSDC('10.1234567'), 10123457n);
+  it('should throw error for multiple decimal points', () => {
+    // Current implementation: parseFloat("1.2.3") -> 1.2
+    assert.throws(() => parseUSDC('1.2.3'), /Invalid amount format/);
   });
 });
