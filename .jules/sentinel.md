@@ -3,7 +3,7 @@
 **Learning:** Utility functions in SDKs are often treated as "pure logic" without defensive checks, assuming callers validate inputs. However, SDKs must be robust against invalid usage.
 **Prevention:** Enforce input validation (e.g., basis point ranges 0-1500) within utility functions to guarantee valid output states (e.g., non-negative amounts).
 
-## 2024-05-23 - Strict Bytes32 Validation
-**Vulnerability:** `toBytes32` utility allowed inputs longer than 32 bytes, which could lead to silent data corruption or transaction failures when interacting with contracts expecting strictly 32 bytes.
-**Learning:** Helper functions dealing with fixed-size EVM types (like `bytes32`) must strictly enforce length limits to prevent invalid data from propagating to the blockchain layer.
-**Prevention:** Always validate input length against the target type's size (e.g., 32 bytes) and throw errors for oversized inputs instead of truncating or passing invalid data.
+## 2026-02-09 - Float Precision in Financial Parsing
+**Vulnerability:** `parseUSDC` used `parseFloat` to convert strings to numbers before scaling to `BigInt`. This caused precision loss for large integers (beyond `Number.MAX_SAFE_INTEGER`) and silent acceptance of malformed inputs (e.g., "10abc").
+**Learning:** Even when converting to `BigInt` eventually, intermediate use of `number` or `parseFloat` compromises integrity. JavaScript `number` type is insufficient for precise financial calculations.
+**Prevention:** Implement strict string-based parsing for financial amounts. Avoid `parseFloat` entirely. Use regex validation to reject ambiguous formats.
