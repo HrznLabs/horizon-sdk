@@ -30,8 +30,43 @@ const TEXT_ENCODER = new TextEncoder();
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
+  // Convert to string, normalize
+  let strAmount =
+    typeof amount === 'number'
+      ? amount.toFixed(USDC_DECIMALS) // Use toFixed to avoid scientific notation
+      : amount.trim(); // Trim whitespace for strings
+
+  // Remove commas
+  strAmount = strAmount.replace(/,/g, '');
+
+  // Validate format: optional negative sign, digits, optional dot and decimals
+  // Matches: "100", "100.5", ".5", "-100"
+  if (!/^-?(\d+|\d*\.\d+)$/.test(strAmount)) {
+    throw new Error(`Invalid USDC amount: "${amount}"`);
+  }
+
+  // Handle negative sign
+  const isNegative = strAmount.startsWith('-');
+  if (isNegative) {
+    strAmount = strAmount.substring(1);
+  }
+
+  // Split integer and fraction
+  const parts = strAmount.split('.');
+  const integerPart = parts[0] || '0';
+  let fractionPart = parts[1] || '';
+
+  // Pad or truncate fraction to USDC_DECIMALS
+  if (fractionPart.length > USDC_DECIMALS) {
+    fractionPart = fractionPart.substring(0, USDC_DECIMALS);
+  } else {
+    fractionPart = fractionPart.padEnd(USDC_DECIMALS, '0');
+  }
+
+  // Combine and parse
+  const value = BigInt(integerPart + fractionPart);
+
+  return isNegative ? -value : value;
 }
 
 /**
@@ -40,10 +75,16 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const whole = amount / USDC_MULTIPLIER_BIGINT;
-  const fraction = amount % USDC_MULTIPLIER_BIGINT;
+  const isNegative = amount < 0n;
+  const absAmount = isNegative ? -amount : amount;
+
+  const whole = absAmount / USDC_MULTIPLIER_BIGINT;
+  const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
+
   const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-  return `${whole}.${fractionStr}`;
+  const sign = isNegative ? '-' : '';
+
+  return `${sign}${whole}.${fractionStr}`;
 }
 
 /**
