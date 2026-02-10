@@ -2,10 +2,6 @@
 **Learning:** SDK utility functions often rely on Node.js globals like `Buffer`, causing `ReferenceError` in browser environments. This creates poor Developer Experience (DX) for frontend consumers.
 **Action:** Replace `Buffer` with `TextEncoder` and `Uint8Array` methods for string-to-bytes conversion to ensure browser compatibility without polyfills.
 
-## 2024-05-24 - SDK UX vs Logic
-**Learning:** For backend SDKs without UI, "UX" improvements should focus on output formatting (e.g., human-readable strings) rather than strict input validation logic, which can be seen as backend/security work.
-**Action:** When working on SDKs, look for  functions to improve readability (commas, truncation) instead of changing parsing logic.
-
-## 2024-05-24 - SDK UX vs Logic
-**Learning:** For backend SDKs without UI, "UX" improvements should focus on output formatting (e.g., human-readable strings) rather than strict input validation logic, which can be seen as backend/security work.
-**Action:** When working on SDKs, look for `format*` functions to improve readability (commas, truncation) instead of changing parsing logic.
+## 2024-06-15 - [Financial Input Parsing]
+**Learning:** `parseFloat` is dangerous for financial SDK inputs as it silently ignores invalid trailing characters (e.g., "10abc" -> 10) and stops at commas ("1,000" -> 1), leading to confusing developer errors and potential fund loss.
+**Action:** Always implement strict string-based parsing with regex validation (`/^-?(\d+|\d*\.\d+)$/`) for financial utilities, explicitly handling commas and rejecting malformed inputs instead of relying on loose coercion.
