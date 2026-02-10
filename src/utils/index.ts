@@ -22,8 +22,33 @@ const LPP_BPS_BIGINT = BigInt(FEES.LPP_BPS);
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
+  const amountStr = amount.toString();
+
+  // Reject scientific notation (e.g., 1e-7) as it implies precision loss
+  if (amountStr.toLowerCase().includes('e')) {
+    throw new Error('Scientific notation not supported');
+  }
+
+  // Regex for valid number: optional minus, digits, optional dot and 0-6 digits
+  const regex = new RegExp(`^-?\\d+(\\.\\d{0,${USDC_DECIMALS}})?$`);
+
+  if (!regex.test(amountStr)) {
+    // Check if failure is due to too many decimals
+    // Matches numbers with any number of decimals
+    const excessiveDecimalsRegex = /^-?\d+\.\d+$/;
+    if (excessiveDecimalsRegex.test(amountStr)) {
+      throw new Error(`Too many decimals. Max ${USDC_DECIMALS} allowed.`);
+    }
+    throw new Error('Invalid amount format');
+  }
+
+  const parts = amountStr.split('.');
+  const whole = parts[0];
+  const fraction = parts[1] || '';
+
+  const paddedFraction = fraction.padEnd(USDC_DECIMALS, '0');
+
+  return BigInt(`${whole}${paddedFraction}`);
 }
 
 /**
