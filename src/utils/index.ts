@@ -8,12 +8,6 @@ import type { FeeSplit } from '../types';
 // Pre-calculated constants to improve performance
 const BPS_DIVISOR = BigInt(10000);
 const USDC_MULTIPLIER_NUM = 10 ** USDC_DECIMALS;
-
-// Pre-calculate hex strings for performance
-const HEX_STRINGS: string[] = [];
-for (let i = 0; i < 256; i++) {
-  HEX_STRINGS[i] = i.toString(16).padStart(2, '0');
-}
 const USDC_MULTIPLIER_BIGINT = BigInt(USDC_MULTIPLIER_NUM);
 
 const PROTOCOL_BPS_BIGINT = BigInt(FEES.PROTOCOL_BPS);
@@ -22,42 +16,26 @@ const RESOLVER_BPS_BIGINT = BigInt(FEES.RESOLVER_BPS);
 const DDR_BPS_BIGINT = BigInt(FEES.DDR_BPS);
 const LPP_BPS_BIGINT = BigInt(FEES.LPP_BPS);
 
+// Pre-calculated hex strings for performance
+const HEX_STRINGS: string[] = [];
+for (let i = 0; i < 256; i++) {
+  HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
+}
+
+const TEXT_ENCODER = new TextEncoder();
+
 /**
  * Parse USDC amount from human-readable string to bigint
  * @param amount Human-readable amount (e.g., "10.50")
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  const strAmount = typeof amount === 'string' ? amount : amount.toString();
-
-  // Allow optional negative sign
-  const isNegative = strAmount.startsWith('-');
-  const absAmount = isNegative ? strAmount.slice(1) : strAmount;
-
-  // Validate format: digits only, optional dot followed by digits
-  if (!/^\d+(\.\d*)?$/.test(absAmount)) {
-    throw new Error(`Invalid amount format: "${amount}"`);
-  }
-
-  const parts = absAmount.split('.');
-  const whole = parts[0];
-  const fraction = parts[1] || '';
-
-  if (fraction.length > USDC_DECIMALS) {
-    throw new Error(`Too many decimals: ${fraction.length}. Max allowed: ${USDC_DECIMALS}`);
-  }
-
-  // Pad fraction to USDC_DECIMALS (6)
-  const paddedFraction = fraction.padEnd(USDC_DECIMALS, '0');
-
-  // Combine whole and fraction
-  const resultStr = `${isNegative ? '-' : ''}${whole}${paddedFraction}`;
-
-  return BigInt(resultStr);
+  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
 }
 
 /**
- * Format USDC amount from bigint to human-readable string with comma separators
+ * Format USDC amount from bigint to human-readable string
  * @param amount Amount in USDC base units
  * @returns Human-readable amount string
  */
@@ -65,11 +43,7 @@ export function formatUSDC(amount: bigint): string {
   const whole = amount / USDC_MULTIPLIER_BIGINT;
   const fraction = amount % USDC_MULTIPLIER_BIGINT;
   const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-
-  // Add commas to the whole part
-  const wholeStr = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-  return `${wholeStr}.${fractionStr}`;
+  return `${whole}.${fractionStr}`;
 }
 
 /**
@@ -158,11 +132,10 @@ export function toBytes32(str: string): `0x${string}` {
     const hex = str.slice(2).padEnd(64, '0');
     return `0x${hex}` as `0x${string}`;
   }
+  // Convert string to hex
+  const bytes = TEXT_ENCODER.encode(str);
 
-  // Optimization: Use pre-calculated hex strings and manual loop
-  // This is significantly faster (~7x) than Array.from().map().join()
-  const encoder = new TextEncoder();
-  const bytes = encoder.encode(str);
+  // Optimized hex conversion using lookup table
   let hex = '';
   for (let i = 0; i < bytes.length; i++) {
     hex += HEX_STRINGS[bytes[i]];
@@ -179,8 +152,7 @@ export function randomBytes32(): `0x${string}` {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
 
-  // Optimization: Use pre-calculated hex strings and manual loop
-  // This is significantly faster (~2.5x) than Array.from().map().join()
+  // Optimized hex conversion using lookup table
   let hex = '';
   for (let i = 0; i < 32; i++) {
     hex += HEX_STRINGS[bytes[i]];
