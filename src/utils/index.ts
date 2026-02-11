@@ -16,45 +16,25 @@ const RESOLVER_BPS_BIGINT = BigInt(FEES.RESOLVER_BPS);
 const DDR_BPS_BIGINT = BigInt(FEES.DDR_BPS);
 const LPP_BPS_BIGINT = BigInt(FEES.LPP_BPS);
 
-// Pre-allocate hex strings for performance
-const HEX_STRINGS: string[] = Array.from({ length: 256 }, (_, i) =>
-  i.toString(16).padStart(2, '0')
-);
-const TEXT_ENCODER = new TextEncoder();
-
 /**
  * Parse USDC amount from human-readable string to bigint
  * @param amount Human-readable amount (e.g., "10.50")
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  const amountStr = amount.toString();
+  let numStr = amount.toString();
 
-  // Reject scientific notation (e.g., 1e-7) as it implies precision loss
-  if (amountStr.toLowerCase().includes('e')) {
-    throw new Error('Scientific notation not supported');
+  // Remove commas
+  numStr = numStr.replace(/,/g, '');
+
+  // Validate format: optional negative sign, digits, optional decimal point and digits
+  // Matches: "100", "100.50", ".50", "100."
+  if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(numStr)) {
+    throw new Error(`Invalid number format: ${amount}`);
   }
 
-  // Regex for valid number: optional minus, digits, optional dot and 0-6 digits
-  const regex = new RegExp(`^-?\\d+(\\.\\d{0,${USDC_DECIMALS}})?$`);
-
-  if (!regex.test(amountStr)) {
-    // Check if failure is due to too many decimals
-    // Matches numbers with any number of decimals
-    const excessiveDecimalsRegex = /^-?\d+\.\d+$/;
-    if (excessiveDecimalsRegex.test(amountStr)) {
-      throw new Error(`Too many decimals. Max ${USDC_DECIMALS} allowed.`);
-    }
-    throw new Error('Invalid amount format');
-  }
-
-  const parts = amountStr.split('.');
-  const whole = parts[0];
-  const fraction = parts[1] || '';
-
-  const paddedFraction = fraction.padEnd(USDC_DECIMALS, '0');
-
-  return BigInt(`${whole}${paddedFraction}`);
+  const numAmount = parseFloat(numStr);
+  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
 }
 
 /**
@@ -156,12 +136,12 @@ export function toBytes32(str: string): `0x${string}` {
     return `0x${hex}` as `0x${string}`;
   }
   // Convert string to hex
-  const bytes = TEXT_ENCODER.encode(str);
-  let hex = '';
-  for (let i = 0; i < bytes.length; i++) {
-    hex += HEX_STRINGS[bytes[i]];
-  }
-  hex = hex.padEnd(64, '0');
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .padEnd(64, '0');
   return `0x${hex}` as `0x${string}`;
 }
 
@@ -172,10 +152,9 @@ export function toBytes32(str: string): `0x${string}` {
 export function randomBytes32(): `0x${string}` {
   const bytes = new Uint8Array(32);
   crypto.getRandomValues(bytes);
-  let hex = '';
-  for (let i = 0; i < bytes.length; i++) {
-    hex += HEX_STRINGS[bytes[i]];
-  }
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
   return `0x${hex}` as `0x${string}`;
 }
 
