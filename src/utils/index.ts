@@ -22,6 +22,12 @@ const LPP_BPS_BIGINT = BigInt(FEES.LPP_BPS);
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
+  if (typeof amount === 'string') {
+    // Strict validation to prevent parsing errors (e.g. "1,000" -> 1)
+    if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(amount)) {
+      throw new Error(`Invalid USDC amount format: "${amount}"`);
+    }
+  }
   const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
   return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
 }
