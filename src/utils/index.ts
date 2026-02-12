@@ -35,9 +35,22 @@ export function parseUSDC(amount: string | number): bigint {
     if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(amount)) {
       throw new Error(`Invalid USDC amount format: "${amount}"`);
     }
+
+    const [whole, fraction = ''] = amount.split('.');
+    if (fraction.length > USDC_DECIMALS) {
+      throw new Error(`Too many decimals: "${amount}"`);
+    }
+
+    const isNegative = amount.startsWith('-');
+    let wholePart = whole.replace('-', '');
+    if (wholePart === '') wholePart = '0';
+
+    const fractionPart = fraction.padEnd(USDC_DECIMALS, '0');
+    const value = BigInt(wholePart + fractionPart);
+
+    return isNegative ? -value : value;
   }
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
+  return BigInt(Math.round(amount * USDC_MULTIPLIER_NUM));
 }
 
 /**
