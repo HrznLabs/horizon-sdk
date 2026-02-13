@@ -27,18 +27,18 @@ describe('parseUSDC Security Checks', () => {
   it('should throw error for invalid characters', () => {
     // Current implementation: parseFloat("10abc") -> 10. Returns 10000000n.
     // Safe implementation should throw.
-    assert.throws(() => parseUSDC('10abc'), /Invalid amount format/);
+    assert.throws(() => parseUSDC('10abc'), /Invalid USDC amount format/);
   });
 
   it('should throw error for too many decimals', () => {
     // Current implementation: rounds.
     // Safe implementation should probably throw or truncate strict?
     // Usually throw is safer to avoid implicit loss.
-    assert.throws(() => parseUSDC('1.1234567'), /Too many decimals/);
+    assert.throws(() => parseUSDC('1.1234567'), /Too many decimal places/);
   });
 
   it('should throw error for multiple decimal points', () => {
     // Current implementation: parseFloat("1.2.3") -> 1.2
-    assert.throws(() => parseUSDC('1.2.3'), /Invalid amount format/);
+    assert.throws(() => parseUSDC('1.2.3'), /Invalid USDC amount format/);
   });
 });
