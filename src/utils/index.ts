@@ -46,10 +46,26 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const whole = amount / USDC_MULTIPLIER_BIGINT;
-  const fraction = amount % USDC_MULTIPLIER_BIGINT;
-  const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-  return `${whole}.${fractionStr}`;
+  if (amount === 0n) return '0';
+
+  const isNegative = amount < 0n;
+  const absAmount = isNegative ? -amount : amount;
+
+  const whole = absAmount / USDC_MULTIPLIER_BIGINT;
+  const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
+
+  const wholeStr = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  let fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
+
+  // Trim trailing zeros
+  fractionStr = fractionStr.replace(/0+$/, '');
+
+  let result = wholeStr;
+  if (fractionStr.length > 0) {
+    result += `.${fractionStr}`;
+  }
+
+  return isNegative ? `-${result}` : result;
 }
 
 /**
