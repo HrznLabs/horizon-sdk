@@ -30,14 +30,35 @@ for (let i = 0; i < 256; i++) {
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  if (typeof amount === 'string') {
-    // Strict validation to prevent parsing errors (e.g. "1,000" -> 1)
-    if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(amount)) {
-      throw new Error(`Invalid USDC amount format: "${amount}"`);
-    }
+  const strAmount = amount.toString();
+
+  // Strict validation to prevent parsing errors (e.g. "1,000" -> 1)
+  if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(strAmount)) {
+    throw new Error(`Invalid USDC amount format: "${amount}"`);
   }
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
+
+  const isNegative = strAmount.startsWith('-');
+  const cleanAmount = isNegative ? strAmount.slice(1) : strAmount;
+
+  // Split whole and fraction parts
+  // eslint-disable-next-line prefer-const
+  let [whole, fraction = ''] = cleanAmount.split('.');
+
+  // Limit decimal places to USDC_DECIMALS
+  if (fraction.length > USDC_DECIMALS) {
+    throw new Error(`Too many decimal places: "${amount}"`);
+  }
+
+  // Pad fraction to USDC_DECIMALS
+  fraction = fraction.padEnd(USDC_DECIMALS, '0');
+
+  // Handle empty whole part (e.g., ".5")
+  if (whole === '') whole = '0';
+
+  // Parse as BigInt
+  const value = BigInt(whole + fraction);
+
+  return isNegative ? -value : value;
 }
 
 /**
@@ -46,10 +67,16 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const whole = amount / USDC_MULTIPLIER_BIGINT;
-  const fraction = amount % USDC_MULTIPLIER_BIGINT;
+  const isNegative = amount < 0n;
+  const absAmount = isNegative ? -amount : amount;
+  const whole = absAmount / USDC_MULTIPLIER_BIGINT;
+  const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
   const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-  return `${whole}.${fractionStr}`;
+
+  // Add commas to whole part
+  const wholeStr = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  return `${isNegative ? '-' : ''}${wholeStr}.${fractionStr}`;
 }
 
 /**
