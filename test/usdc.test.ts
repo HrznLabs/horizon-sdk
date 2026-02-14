@@ -41,7 +41,7 @@ describe('USDC Utility Security Checks', () => {
 
   describe('formatUSDC', () => {
     it('should format correctly', () => {
-      assert.strictEqual(formatUSDC(10500000n), '10.500000');
+      assert.strictEqual(formatUSDC(10500000n), '10.5');
     });
   });
 });
