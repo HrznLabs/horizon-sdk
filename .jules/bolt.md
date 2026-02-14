@@ -5,3 +5,7 @@
 ## 2025-02-17 - [TextEncoder and Hex String Optimization]
 **Learning:** Instantiating `TextEncoder` inside a hot function is significantly slower than hoisting it to module scope. Additionally, using `Array.from(bytes).map(...).join('')` for hex conversion is a major bottleneck (up to 7x slower). A pre-calculated lookup table (`HEX_STRINGS`) combined with a simple loop is much faster.
 **Action:** Hoist `TextEncoder` instances for frequently called functions. Use lookup tables for byte-to-hex conversions instead of array methods.
+
+## 2025-02-18 - [Financial Parsing & Formatting Performance]
+**Learning:** For financial string parsing, `parseFloat` is fast but incorrect for large numbers (>2^53). Replacing it with `indexOf` + substring concatenation is ~1.25x faster than the standard `split` + `padEnd` approach for correctness. For formatting, manual loops to insert commas are ~2.7x faster than `Intl.NumberFormat` and ~1.6x faster than regex replacement.
+**Action:** Prefer `indexOf` and manual substring concatenation over `split` for parsing decimals. Use manual loops over `Intl` or Regex for high-frequency number formatting.
