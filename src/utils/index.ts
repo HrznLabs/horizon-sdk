@@ -41,15 +41,30 @@ export function parseUSDC(amount: string | number): bigint {
 }
 
 /**
- * Format USDC amount from bigint to human-readable string
+ * Format USDC amount from bigint to human-readable string with commas and trimmed zeros
  * @param amount Amount in USDC base units
- * @returns Human-readable amount string
+ * @returns Human-readable amount string (e.g. "1,000.50")
  */
 export function formatUSDC(amount: bigint): string {
-  const whole = amount / USDC_MULTIPLIER_BIGINT;
-  const fraction = amount % USDC_MULTIPLIER_BIGINT;
-  const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-  return `${whole}.${fractionStr}`;
+  const isNegative = amount < 0n;
+  const absAmount = isNegative ? -amount : amount;
+
+  const whole = absAmount / USDC_MULTIPLIER_BIGINT;
+  const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
+
+  const wholeStr = whole.toLocaleString('en-US');
+  let fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
+
+  // Trim trailing zeros
+  fractionStr = fractionStr.replace(/0+$/, '');
+
+  const sign = isNegative ? '-' : '';
+
+  if (fractionStr === '') {
+    return `${sign}${wholeStr}`;
+  }
+
+  return `${sign}${wholeStr}.${fractionStr}`;
 }
 
 /**
