@@ -26,57 +26,90 @@ for (let i = 0; i < 256; i++) {
 
 /**
  * Parse USDC amount from human-readable string to bigint
+ * Optimized to avoid parseFloat precision issues and improve performance
  * @param amount Human-readable amount (e.g., "10.50")
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  const strAmount = amount.toString();
+  if (typeof amount === 'number') {
+    return BigInt(Math.round(amount * USDC_MULTIPLIER_NUM));
+  }
 
-  // Strict validation to prevent parsing errors (e.g. "1,000" -> 1)
-  if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(strAmount)) {
+  const len = amount.length;
+  if (len === 0) throw new Error(`Invalid USDC amount format: "${amount}"`);
+
+  let dotIndex = -1;
+  let start = 0;
+  let isNegative = false;
+
+  if (amount.charCodeAt(0) === 45) { // '-'
+    isNegative = true;
+    start = 1;
+  }
+
+  // Validate chars and find dot
+  for (let i = start; i < len; i++) {
+    const code = amount.charCodeAt(i);
+    if (code === 46) { // '.'
+      if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}"`);
+      dotIndex = i;
+    } else if (code < 48 || code > 57) { // not digit '0'-'9'
+      throw new Error(`Invalid USDC amount format: "${amount}"`);
+    }
+  }
+
+  let integerPartStr: string;
+  let fractionPartStr: string;
+
+  if (dotIndex === -1) {
+    integerPartStr = start === 0 ? amount : amount.substring(start);
+    fractionPartStr = "";
+  } else {
+    integerPartStr = amount.substring(start, dotIndex);
+    fractionPartStr = amount.substring(dotIndex + 1);
+  }
+
+  if (integerPartStr === "" && fractionPartStr === "") {
     throw new Error(`Invalid USDC amount format: "${amount}"`);
   }
 
-  const isNegative = strAmount.startsWith('-');
-  const cleanAmount = isNegative ? strAmount.slice(1) : strAmount;
-
-  // Split whole and fraction parts
-  // eslint-disable-next-line prefer-const
-  let [whole, fraction = ''] = cleanAmount.split('.');
-
-  // Limit decimal places to USDC_DECIMALS
-  if (fraction.length > USDC_DECIMALS) {
-    throw new Error(`Too many decimal places: "${amount}"`);
+  if (fractionPartStr.length > USDC_DECIMALS) {
+    throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
   }
 
-  // Pad fraction to USDC_DECIMALS
-  fraction = fraction.padEnd(USDC_DECIMALS, '0');
+  const intStr = integerPartStr || "0";
+  const fracStr = fractionPartStr.padEnd(USDC_DECIMALS, '0');
 
-  // Handle empty whole part (e.g., ".5")
-  if (whole === '') whole = '0';
-
-  // Parse as BigInt
-  const value = BigInt(whole + fraction);
-
-  return isNegative ? -value : value;
+  const val = BigInt(intStr + fracStr);
+  return isNegative ? -val : val;
 }
 
 /**
- * Format USDC amount from bigint to human-readable string
+ * Format USDC amount from bigint to human-readable string with commas and trimmed zeros
  * @param amount Amount in USDC base units
- * @returns Human-readable amount string
+ * @returns Human-readable amount string (e.g. "1,000.50")
  */
 export function formatUSDC(amount: bigint): string {
-  const isNegative = amount < 0n;
-  const absAmount = isNegative ? -amount : amount;
+  if (amount === 0n) return '0';
+
+  const absAmount = amount < 0n ? -amount : amount;
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
   const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
-  const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
 
-  // Add commas to whole part
-  const wholeStr = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  let fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
 
-  return `${isNegative ? '-' : ''}${wholeStr}.${fractionStr}`;
+  // Trim trailing zeros for cleaner display
+  fractionStr = fractionStr.replace(/0+$/, '');
+
+  const sign = amount < 0n ? '-' : '';
+
+  const wholeStr = whole.toLocaleString('en-US');
+
+  if (fractionStr === '') {
+    return `${sign}${wholeStr}`;
+  }
+
+  return `${sign}${wholeStr}.${fractionStr}`;
 }
 
 /**
