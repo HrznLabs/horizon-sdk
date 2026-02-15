@@ -195,11 +195,21 @@ export function isMissionExpired(expiresAt: bigint): boolean {
 export function toBytes32(str: string): `0x${string}` {
   // If already a hex string with 0x prefix
   if (str.startsWith('0x')) {
-    const hex = str.slice(2).padEnd(64, '0');
-    return `0x${hex}` as `0x${string}`;
+    const hex = str.slice(2);
+    if (hex.length > 64) {
+      throw new Error(
+        `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
+      );
+    }
+    return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
+  if (bytes.length > 32) {
+    throw new Error(
+      `String too long for bytes32: ${bytes.length} bytes (max 32)`
+    );
+  }
   let hex = '';
   // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
   for (let i = 0; i < bytes.length; i++) {
