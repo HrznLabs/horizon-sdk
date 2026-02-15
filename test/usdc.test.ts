@@ -17,19 +17,19 @@ describe('USDC Utility Security Checks', () => {
       // Currently this parses as 1, which is dangerous
       assert.throws(() => {
         parseUSDC('1,000');
-      }, /Invalid USDC amount format/);
+      }, /Commas are not allowed/);
     });
 
     it('should throw error for inputs with multiple decimals', () => {
       assert.throws(() => {
         parseUSDC('10.5.5');
-      }, /Invalid USDC amount format/);
+      }, /Multiple decimal points found/);
     });
 
     it('should throw error for non-numeric characters', () => {
       assert.throws(() => {
         parseUSDC('100abc');
-      }, /Invalid USDC amount format/);
+      }, /Invalid character 'a' found/);
     });
 
     it('should throw error for negative numbers if not supported (or just parse correctly)', () => {
