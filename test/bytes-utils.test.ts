@@ -26,4 +26,26 @@ describe('Byte Utils Tests', () => {
     assert.strictEqual(result1.length, 66);
     assert.notStrictEqual(result1, result2);
   });
+
+  it('should throw error for string longer than 32 bytes', () => {
+    // 33 characters = 33 bytes
+    const input = 'a'.repeat(33);
+    assert.throws(
+      () => toBytes32(input),
+      {
+        message: 'String too long for bytes32: 33 bytes (max 32)',
+      }
+    );
+  });
+
+  it('should throw error for hex string longer than 64 characters (32 bytes)', () => {
+    // 65 characters = 32.5 bytes
+    const input = '0x' + '1'.repeat(65);
+    assert.throws(
+      () => toBytes32(input),
+      {
+        message: 'String too long for bytes32: 33 bytes (max 32)',
+      }
+    );
+  });
 });
