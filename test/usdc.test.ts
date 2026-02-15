@@ -41,7 +41,6 @@ describe('USDC Utility Security Checks', () => {
 
   describe('formatUSDC', () => {
     it('should format correctly', () => {
-      // Expect trimmed zeros for better UX
       assert.strictEqual(formatUSDC(10500000n), '10.5');
     });
 

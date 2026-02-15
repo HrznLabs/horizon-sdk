@@ -65,6 +65,8 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
+  if (amount === 0n) return '0';
+
   const absAmount = amount < 0n ? -amount : amount;
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
   const fraction = absAmount % USDC_MULTIPLIER_BIGINT;

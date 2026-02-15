@@ -10,14 +10,11 @@ describe('formatUSDC', () => {
   });
 
   it('should format amounts with commas', () => {
-    // 1000
     assert.strictEqual(formatUSDC(1000000000n), '1,000');
-    // 1000000 -> 1,000,000
     assert.strictEqual(formatUSDC(1000000000000n), '1,000,000');
   });
 
   it('should format small amounts correctly', () => {
-    // 0.5
     assert.strictEqual(formatUSDC(500000n), '0.5');
   });
 
