@@ -86,9 +86,9 @@ export function parseUSDC(amount: string | number): bigint {
 }
 
 /**
- * Format USDC amount from bigint to human-readable string
+ * Format USDC amount from bigint to human-readable string with commas and trimmed zeros
  * @param amount Amount in USDC base units
- * @returns Human-readable amount string
+ * @returns Human-readable amount string (e.g. "1,000.50")
  */
 export function formatUSDC(amount: bigint): string {
   if (amount === 0n) return '0';

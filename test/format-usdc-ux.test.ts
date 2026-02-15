@@ -1,4 +1,3 @@
-
 import { test, describe, it } from 'node:test';
 import assert from 'node:assert';
 import { formatUSDC } from '../src/utils/index';
@@ -29,7 +28,6 @@ describe('formatUSDC UX Improvements', () => {
   });
 
   it('should handle complex cases', () => {
-    // -1,234,567.89
     assert.strictEqual(formatUSDC(-1234567890000n), '-1,234,567.89');
   });
 });
