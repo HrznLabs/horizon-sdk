@@ -26,37 +26,63 @@ for (let i = 0; i < 256; i++) {
 
 /**
  * Parse USDC amount from human-readable string to bigint
+ * Optimized to avoid parseFloat precision issues and improve performance
  * @param amount Human-readable amount (e.g., "10.50")
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  if (typeof amount === 'string') {
-    // Strict validation to prevent parsing errors (e.g. "1,000" -> 1)
-    if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(amount)) {
+  if (typeof amount === 'number') {
+    return BigInt(Math.round(amount * USDC_MULTIPLIER_NUM));
+  }
+
+  const len = amount.length;
+  if (len === 0) throw new Error(`Invalid USDC amount format: "${amount}"`);
+
+  let dotIndex = -1;
+  let start = 0;
+  let isNegative = false;
+
+  if (amount.charCodeAt(0) === 45) { // '-'
+    isNegative = true;
+    start = 1;
+  }
+
+  // Validate chars and find dot
+  // Manual loop is faster than regex and avoids allocation
+  for (let i = start; i < len; i++) {
+    const code = amount.charCodeAt(i);
+    if (code === 46) { // '.'
+      if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}"`);
+      dotIndex = i;
+    } else if (code < 48 || code > 57) { // not digit '0'-'9'
       throw new Error(`Invalid USDC amount format: "${amount}"`);
     }
-
-    let cleanAmount = amount;
-    let negative = false;
-    if (cleanAmount.startsWith('-')) {
-      negative = true;
-      cleanAmount = cleanAmount.substring(1);
-    }
-
-    const [integerPart, fractionalPart = ''] = cleanAmount.split('.');
-
-    if (fractionalPart.length > USDC_DECIMALS) {
-      throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
-    }
-
-    const paddedFraction = fractionalPart.padEnd(USDC_DECIMALS, '0');
-    const combinedStr = (integerPart || '0') + paddedFraction;
-
-    const result = BigInt(combinedStr);
-    return negative ? -result : result;
   }
-  const numAmount = amount;
-  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
+
+  let integerPartStr: string;
+  let fractionPartStr: string;
+
+  if (dotIndex === -1) {
+    integerPartStr = start === 0 ? amount : amount.substring(start);
+    fractionPartStr = "";
+  } else {
+    integerPartStr = amount.substring(start, dotIndex);
+    fractionPartStr = amount.substring(dotIndex + 1);
+  }
+
+  if (integerPartStr === "" && fractionPartStr === "") {
+    throw new Error(`Invalid USDC amount format: "${amount}"`);
+  }
+
+  if (fractionPartStr.length > USDC_DECIMALS) {
+    throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
+  }
+
+  const intStr = integerPartStr || "0";
+  const fracStr = fractionPartStr.padEnd(USDC_DECIMALS, '0');
+
+  const val = BigInt(intStr + fracStr);
+  return isNegative ? -val : val;
 }
 
 /**
