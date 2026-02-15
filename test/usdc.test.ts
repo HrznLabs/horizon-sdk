@@ -43,5 +43,17 @@ describe('USDC Utility Security Checks', () => {
     it('should format correctly', () => {
       assert.strictEqual(formatUSDC(10500000n), '10.5');
     });
+
+    it('should format integer amounts without decimals', () => {
+      assert.strictEqual(formatUSDC(100000000n), '100');
+    });
+
+    it('should format negative numbers correctly', () => {
+      assert.strictEqual(formatUSDC(-1500000n), '-1.5');
+    });
+
+    it('should format zero correctly', () => {
+      assert.strictEqual(formatUSDC(0n), '0');
+    });
   });
 });
