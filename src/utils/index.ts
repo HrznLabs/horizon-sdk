@@ -83,6 +83,7 @@ export function parseUSDC(amount: string | number): bigint {
 
   const val = BigInt(intStr + fracStr);
   return isNegative ? -val : val;
+>>>>>>> origin/main
 }
 
 /**
