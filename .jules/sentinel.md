@@ -8,7 +8,7 @@
 **Learning:** Standard JavaScript parsing functions like `parseFloat` are designed for leniency, not security. They are dangerous for financial applications where precision and intent are paramount.
 **Prevention:** Always validate financial input strings against a strict format (regex) before parsing. Reject ambiguous characters like commas unless explicitly handled.
 
-## 2024-05-22 - [Double Precision in Financial SDKs]
-**Vulnerability:** Precision loss in `parseUSDC` when parsing large numeric strings or high-precision values due to implicit usage of `parseFloat`.
-**Learning:** Even if a function accepts `string`, converting it to `number` (float) before `BigInt` destroys precision for values > `MAX_SAFE_INTEGER` (approx 9e15) or high-decimal fractions, causing silent data corruption in financial operations.
-**Prevention:** For financial SDKs, ALWAYS parse string inputs manually (split integer/fraction, pad, concatenate) into `BigInt`. Never use `parseFloat` or `Number()` for amounts that might exceed 53 bits of precision.
+## 2026-02-13 - Precision Loss in Financial Parsing
+**Vulnerability:** `parseUSDC` used `parseFloat` to convert large numeric strings, causing precision loss for inputs exceeding `2^53 - 1` (e.g., `9007199254740993` became `9007199254740992`). This allowed incorrect financial values to be processed silently.
+**Learning:** `parseFloat` and `Number` in JavaScript are inherently unsafe for high-precision financial calculations. Even if the result is immediately cast to `BigInt`, the intermediate float step destroys information.
+**Prevention:** Avoid `parseFloat` entirely for financial strings. Implement manual string parsing (split by decimal, pad fractional part) and construct `BigInt` directly from the sanitized string components.

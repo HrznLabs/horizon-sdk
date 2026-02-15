@@ -36,21 +36,27 @@ export function parseUSDC(amount: string | number): bigint {
       throw new Error(`Invalid USDC amount format: "${amount}"`);
     }
 
-    const [whole, fraction = ''] = amount.split('.');
-    if (fraction.length > USDC_DECIMALS) {
-      throw new Error(`Too many decimals: "${amount}"`);
+    let cleanAmount = amount;
+    let negative = false;
+    if (cleanAmount.startsWith('-')) {
+      negative = true;
+      cleanAmount = cleanAmount.substring(1);
     }
 
-    const isNegative = amount.startsWith('-');
-    let wholePart = whole.replace('-', '');
-    if (wholePart === '') wholePart = '0';
+    const [integerPart, fractionalPart = ''] = cleanAmount.split('.');
 
-    const fractionPart = fraction.padEnd(USDC_DECIMALS, '0');
-    const value = BigInt(wholePart + fractionPart);
+    if (fractionalPart.length > USDC_DECIMALS) {
+      throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
+    }
 
-    return isNegative ? -value : value;
+    const paddedFraction = fractionalPart.padEnd(USDC_DECIMALS, '0');
+    const combinedStr = (integerPart || '0') + paddedFraction;
+
+    const result = BigInt(combinedStr);
+    return negative ? -result : result;
   }
-  return BigInt(Math.round(amount * USDC_MULTIPLIER_NUM));
+  const numAmount = amount;
+  return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
 }
 
 /**
