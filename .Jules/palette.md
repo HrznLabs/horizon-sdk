@@ -9,3 +9,7 @@
 ## 2024-05-23 - [Currency Formatting UX]
 **Learning:** Manual string construction for currency values (e.g. `${whole}.${fraction}`) fails for negative numbers (e.g. `-1.-500000`) and produces overly verbose output (e.g. `100.000000`). This confuses users and looks broken.
 **Action:** Use `toLocaleString` for the integer part to add grouping (commas), handle negative signs explicitly, and trim unnecessary trailing zeros for cleaner, more human-readable display.
+
+## 2024-05-24 - [Actionable Error Feedback]
+**Learning:** Generic "Invalid format" errors force users to guess the validation rules (e.g., are commas allowed? can I use currency symbols?). This increases friction and support requests.
+**Action:** Detect specific common invalid characters (commas, spaces, currency symbols) and throw precise error messages explaining exactly why the input was rejected and how to fix it.

@@ -26,7 +26,7 @@ describe('parseUSDC Security Checks', () => {
 
   it('should throw error for invalid characters', () => {
     assert.throws(() => parseUSDC('10abc'), {
-      message: /Invalid USDC amount format/
+      message: /Invalid character 'a' found/
     });
   });
 
@@ -38,7 +38,25 @@ describe('parseUSDC Security Checks', () => {
 
   it('should throw error for multiple decimal points', () => {
     assert.throws(() => parseUSDC('1.2.3'), {
-      message: /Invalid USDC amount format/
+      message: /Multiple decimal points found/
+    });
+  });
+
+  it('should throw specific error for commas', () => {
+    assert.throws(() => parseUSDC('1,000'), {
+      message: /Commas are not allowed, please remove thousands separators/
+    });
+  });
+
+  it('should throw specific error for currency symbols', () => {
+    assert.throws(() => parseUSDC('$100'), {
+      message: /Currency symbols are not allowed/
+    });
+  });
+
+  it('should throw specific error for spaces', () => {
+    assert.throws(() => parseUSDC('100 00'), {
+      message: /Spaces are not allowed/
     });
   });
 });

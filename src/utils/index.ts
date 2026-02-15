@@ -51,10 +51,16 @@ export function parseUSDC(amount: string | number): bigint {
   for (let i = start; i < len; i++) {
     const code = amount.charCodeAt(i);
     if (code === 46) { // '.'
-      if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}"`);
+      if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}". Multiple decimal points found.`);
       dotIndex = i;
+    } else if (code === 44) { // ','
+      throw new Error(`Invalid USDC amount format: "${amount}". Commas are not allowed, please remove thousands separators.`);
+    } else if (code === 36) { // '$'
+      throw new Error(`Invalid USDC amount format: "${amount}". Currency symbols are not allowed.`);
+    } else if (code === 32) { // ' '
+      throw new Error(`Invalid USDC amount format: "${amount}". Spaces are not allowed.`);
     } else if (code < 48 || code > 57) { // not digit '0'-'9'
-      throw new Error(`Invalid USDC amount format: "${amount}"`);
+      throw new Error(`Invalid USDC amount format: "${amount}". Invalid character '${amount[i]}' found.`);
     }
   }
 
