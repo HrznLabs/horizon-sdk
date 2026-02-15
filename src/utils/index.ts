@@ -35,8 +35,27 @@ export function parseUSDC(amount: string | number): bigint {
     if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(amount)) {
       throw new Error(`Invalid USDC amount format: "${amount}"`);
     }
+
+    let cleanAmount = amount;
+    let negative = false;
+    if (cleanAmount.startsWith('-')) {
+      negative = true;
+      cleanAmount = cleanAmount.substring(1);
+    }
+
+    const [integerPart, fractionalPart = ''] = cleanAmount.split('.');
+
+    if (fractionalPart.length > USDC_DECIMALS) {
+      throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
+    }
+
+    const paddedFraction = fractionalPart.padEnd(USDC_DECIMALS, '0');
+    const combinedStr = (integerPart || '0') + paddedFraction;
+
+    const result = BigInt(combinedStr);
+    return negative ? -result : result;
   }
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  const numAmount = amount;
   return BigInt(Math.round(numAmount * USDC_MULTIPLIER_NUM));
 }
 
@@ -48,24 +67,24 @@ export function parseUSDC(amount: string | number): bigint {
 export function formatUSDC(amount: bigint): string {
   if (amount === 0n) return '0';
 
-  const isNegative = amount < 0n;
-  const absAmount = isNegative ? -amount : amount;
-
+  const absAmount = amount < 0n ? -amount : amount;
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
   const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
 
-  const wholeStr = whole.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   let fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
 
-  // Trim trailing zeros
+  // Trim trailing zeros for cleaner display
   fractionStr = fractionStr.replace(/0+$/, '');
 
-  let result = wholeStr;
-  if (fractionStr.length > 0) {
-    result += `.${fractionStr}`;
+  const sign = amount < 0n ? '-' : '';
+
+  const wholeStr = whole.toLocaleString('en-US');
+
+  if (fractionStr === '') {
+    return `${sign}${wholeStr}`;
   }
 
-  return isNegative ? `-${result}` : result;
+  return `${sign}${wholeStr}.${fractionStr}`;
 }
 
 /**
