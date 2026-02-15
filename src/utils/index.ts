@@ -65,10 +65,24 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const whole = amount / USDC_MULTIPLIER_BIGINT;
-  const fraction = amount % USDC_MULTIPLIER_BIGINT;
-  const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-  return `${whole}.${fractionStr}`;
+  const absAmount = amount < 0n ? -amount : amount;
+  const whole = absAmount / USDC_MULTIPLIER_BIGINT;
+  const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
+
+  let fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
+
+  // Trim trailing zeros for cleaner display
+  fractionStr = fractionStr.replace(/0+$/, '');
+
+  const sign = amount < 0n ? '-' : '';
+
+  const wholeStr = whole.toLocaleString('en-US');
+
+  if (fractionStr === '') {
+    return `${sign}${wholeStr}`;
+  }
+
+  return `${sign}${wholeStr}.${fractionStr}`;
 }
 
 /**
