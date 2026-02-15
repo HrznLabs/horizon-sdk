@@ -26,36 +26,64 @@ for (let i = 0; i < 256; i++) {
 
 /**
  * Parse USDC amount from human-readable string to bigint
+ * Optimized to avoid parseFloat precision issues and improve performance
  * @param amount Human-readable amount (e.g., "10.50")
  * @returns Amount in USDC base units (bigint)
  */
 export function parseUSDC(amount: string | number): bigint {
-  const str = typeof amount === 'string' ? amount : amount.toString();
-
-  // Validate format strictly
-  if (!/^-?(\d+(\.\d*)?|\.\d+)$/.test(str)) {
-    throw new Error(`Invalid USDC amount format: "${str}"`);
+  if (typeof amount === 'number') {
+    return BigInt(Math.round(amount * USDC_MULTIPLIER_NUM));
   }
 
-  // Optimization: Manual string parsing is significantly faster (~1.25x) than splitting
-  // and avoids precision loss from parseFloat for large numbers.
-  const dotIndex = str.indexOf('.');
+  const len = amount.length;
+  if (len === 0) throw new Error(`Invalid USDC amount format: "${amount}"`);
+
+  let dotIndex = -1;
+  let start = 0;
+  let isNegative = false;
+
+  if (amount.charCodeAt(0) === 45) { // '-'
+    isNegative = true;
+    start = 1;
+  }
+
+  // Validate chars and find dot
+  // Manual loop is faster than regex and avoids allocation
+  for (let i = start; i < len; i++) {
+    const code = amount.charCodeAt(i);
+    if (code === 46) { // '.'
+      if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}"`);
+      dotIndex = i;
+    } else if (code < 48 || code > 57) { // not digit '0'-'9'
+      throw new Error(`Invalid USDC amount format: "${amount}"`);
+    }
+  }
+
+  let integerPartStr: string;
+  let fractionPartStr: string;
 
   if (dotIndex === -1) {
-    return BigInt(str + '000000');
+    integerPartStr = start === 0 ? amount : amount.substring(start);
+    fractionPartStr = "";
+  } else {
+    integerPartStr = amount.substring(start, dotIndex);
+    fractionPartStr = amount.substring(dotIndex + 1);
   }
 
-  const integerPart = str.substring(0, dotIndex);
-  const fractionPart = str.substring(dotIndex + 1);
-
-  if (fractionPart.length > USDC_DECIMALS) {
-    throw new Error(`Too many decimals: "${str}"`);
+  if (integerPartStr === "" && fractionPartStr === "") {
+    throw new Error(`Invalid USDC amount format: "${amount}"`);
   }
 
-  // Pad fraction with zeros to ensure 6 decimal places
-  // using pre-calculated substring is faster than padEnd
-  const padding = '000000'.substring(fractionPart.length);
-  return BigInt(integerPart + fractionPart + padding);
+  if (fractionPartStr.length > USDC_DECIMALS) {
+    throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
+  }
+
+  const intStr = integerPartStr || "0";
+  const fracStr = fractionPartStr.padEnd(USDC_DECIMALS, '0');
+
+  const val = BigInt(intStr + fracStr);
+  return isNegative ? -val : val;
+>>>>>>> origin/main
 }
 
 /**
@@ -64,29 +92,26 @@ export function parseUSDC(amount: string | number): bigint {
  * @returns Human-readable amount string
  */
 export function formatUSDC(amount: bigint): string {
-  const isNegative = amount < 0n;
-  const absAmount = isNegative ? -amount : amount;
+  if (amount === 0n) return '0';
 
+  const absAmount = amount < 0n ? -amount : amount;
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
   const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
 
-  const wholeStr = whole.toString();
-  let formattedWhole = '';
+  let fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
 
-  // Optimization: Manual loop is ~2.7x faster than Intl.NumberFormat
-  // and ~1.6x faster than regex replacement
-  const len = wholeStr.length;
-  let count = 0;
-  for (let i = len - 1; i >= 0; i--) {
-    if (count > 0 && count % 3 === 0) {
-      formattedWhole = ',' + formattedWhole;
-    }
-    formattedWhole = wholeStr[i] + formattedWhole;
-    count++;
+  // Trim trailing zeros for cleaner display
+  fractionStr = fractionStr.replace(/0+$/, '');
+
+  const sign = amount < 0n ? '-' : '';
+
+  const wholeStr = whole.toLocaleString('en-US');
+
+  if (fractionStr === '') {
+    return `${sign}${wholeStr}`;
   }
 
-  const fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
-  return `${isNegative ? '-' : ''}${formattedWhole}.${fractionStr}`;
+  return `${sign}${wholeStr}.${fractionStr}`;
 }
 
 /**
