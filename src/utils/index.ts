@@ -48,7 +48,6 @@ export function parseUSDC(amount: string | number): bigint {
   }
 
   // Validate chars and find dot
-  // Manual loop is faster than regex and avoids allocation
   for (let i = start; i < len; i++) {
     const code = amount.charCodeAt(i);
     if (code === 46) { // '.'
@@ -83,7 +82,6 @@ export function parseUSDC(amount: string | number): bigint {
 
   const val = BigInt(intStr + fracStr);
   return isNegative ? -val : val;
->>>>>>> origin/main
 }
 
 /**
