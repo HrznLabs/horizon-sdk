@@ -10,6 +10,17 @@ const BPS_DIVISOR = BigInt(10000);
 const USDC_MULTIPLIER_NUM = 10 ** USDC_DECIMALS;
 const USDC_MULTIPLIER_BIGINT = BigInt(USDC_MULTIPLIER_NUM);
 
+// Optimization: Pre-calculate powers of 10 for parseUSDC
+const POWERS_OF_10: bigint[] = [
+  1n,
+  10n,
+  100n,
+  1000n,
+  10000n,
+  100000n,
+  1000000n,
+];
+
 const PROTOCOL_BPS_BIGINT = BigInt(FEES.PROTOCOL_BPS);
 const LABS_BPS_BIGINT = BigInt(FEES.LABS_BPS);
 const RESOLVER_BPS_BIGINT = BigInt(FEES.RESOLVER_BPS);
@@ -79,14 +90,24 @@ export function parseUSDC(amount: string | number): bigint {
     throw new Error(`Invalid USDC amount format: "${amount}"`);
   }
 
-  if (fractionPartStr.length > USDC_DECIMALS) {
+  const fracLen = fractionPartStr.length;
+  if (fracLen > USDC_DECIMALS) {
     throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
   }
 
-  const intStr = integerPartStr || "0";
-  const fracStr = fractionPartStr.padEnd(USDC_DECIMALS, '0');
+  // Optimize: Avoid string concatenation and padding by using math
+  const intPart = integerPartStr === '' ? 0n : BigInt(integerPartStr);
 
-  const val = BigInt(intStr + fracStr);
+  let val: bigint;
+  if (fractionPartStr === '') {
+    val = intPart * USDC_MULTIPLIER_BIGINT;
+  } else {
+    const fracPart = BigInt(fractionPartStr);
+    // Use pre-calculated power to scale fraction correctly
+    const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
+    val = intPart * USDC_MULTIPLIER_BIGINT + fracPart * power;
+  }
+
   return isNegative ? -val : val;
 }
 
