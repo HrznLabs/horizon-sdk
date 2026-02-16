@@ -17,3 +17,8 @@
 **Vulnerability:** The `toBytes32` utility function accepted strings longer than 32 bytes and returned invalid hex strings (> 66 chars), which could lead to contract reverts or undefined behavior if passed as calldata.
 **Learning:** Utility functions that prepare data for smart contracts must strictly enforce the constraints of the target Solidity types (e.g., `bytes32`) to fail fast on the client side.
 **Prevention:** Always validate the length of inputs in utility functions that map to fixed-size Solidity types.
+
+## 2026-02-14 - Time-Based Input Validation
+**Vulnerability:** `calculateExpiresAt` accepted any `number` for `durationSeconds`, allowing creation of invalid timestamps (e.g., past dates, extremely far future, or `Infinity`), which could lead to failed transactions or locked funds.
+**Learning:** Utility functions dealing with time often assume "sensible" inputs but fail to enforce protocol constraints (like min/max duration) at the earliest possible point.
+**Prevention:** Always validate time-based inputs against protocol constants (e.g., `MIN_DURATION`, `MAX_DURATION`) in utility functions to catch errors before they reach the blockchain.

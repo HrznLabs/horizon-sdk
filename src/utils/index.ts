@@ -2,7 +2,7 @@
 // HORIZON PROTOCOL - UTILITY FUNCTIONS
 // =============================================================================
 
-import { USDC_DECIMALS, FEES } from '../constants';
+import { USDC_DECIMALS, FEES, MIN_DURATION, MAX_DURATION } from '../constants';
 import type { FeeSplit } from '../types';
 
 // Pre-calculated constants to improve performance
@@ -192,6 +192,16 @@ export function calculateLPP(rewardAmount: bigint): bigint {
  * @returns Expiration timestamp (bigint)
  */
 export function calculateExpiresAt(durationSeconds: number): bigint {
+  if (!Number.isInteger(durationSeconds)) {
+    throw new Error(
+      `Invalid duration: ${durationSeconds} seconds. Duration must be an integer.`
+    );
+  }
+  if (durationSeconds < MIN_DURATION || durationSeconds > MAX_DURATION) {
+    throw new Error(
+      `Invalid duration: ${durationSeconds} seconds. Duration must be between ${MIN_DURATION} and ${MAX_DURATION} seconds.`
+    );
+  }
   return BigInt(Math.floor(Date.now() / 1000) + durationSeconds);
 }
 
