@@ -13,3 +13,7 @@
 ## 2024-05-24 - [Actionable Error Feedback]
 **Learning:** Generic "Invalid format" errors force users to guess the validation rules (e.g., are commas allowed? can I use currency symbols?). This increases friction and support requests.
 **Action:** Detect specific common invalid characters (commas, spaces, currency symbols) and throw precise error messages explaining exactly why the input was rejected and how to fix it.
+
+## 2024-05-24 - [Flexible Decimal Formatting]
+**Learning:** Hard-coded zero trimming in currency formatters (e.g. `10.50` -> `10.5`) causes visual misalignment in lists and tables. Developers often need fixed decimal places for alignment.
+**Action:** Add options to formatting utilities (e.g., `{ minDecimals: 2 }`) to allow developers to enforce minimum decimal precision for consistent UI alignment while defaulting to trimming for compact display.
