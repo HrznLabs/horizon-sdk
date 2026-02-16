@@ -13,3 +13,7 @@
 ## 2025-02-17 - [String Formatting Performance]
 **Learning:** `BigInt.toLocaleString('en-US')` is significantly slower (~2.7x) than a manual loop for inserting comma separators. While `toLocaleString` is robust for locale support, for fixed formatting requirements (like comma-separated thousands), manual string manipulation is much more performant.
 **Action:** Avoid `toLocaleString` in performance-critical rendering loops if only simple comma formatting is needed. Use manual string manipulation instead.
+
+## 2025-05-20 - [BigInt Parsing Performance]
+**Learning:** For parsing fixed-point decimals (like USDC), mathematically constructing the BigInt (using `intPart * multiplier + fracPart * power`) is ~14% faster than string manipulation (`padEnd` + concatenation) followed by `BigInt(string)`.
+**Action:** When parsing decimals to BigInt in hot paths, prefer mathematical construction over string manipulation to avoid allocation overhead.
