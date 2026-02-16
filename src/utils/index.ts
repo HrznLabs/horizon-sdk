@@ -93,10 +93,14 @@ export function parseUSDC(amount: string | number): bigint {
 /**
  * Format USDC amount from bigint to human-readable string with commas and trimmed zeros
  * @param amount Amount in USDC base units
+ * @param options Formatting options
  * @returns Human-readable amount string (e.g. "1,000.50")
  */
-export function formatUSDC(amount: bigint): string {
-  if (amount === 0n) return '0';
+export function formatUSDC(
+  amount: bigint,
+  options?: { minDecimals?: number }
+): string {
+  const minDecimals = options?.minDecimals || 0;
 
   const absAmount = amount < 0n ? -amount : amount;
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
@@ -106,6 +110,10 @@ export function formatUSDC(amount: bigint): string {
 
   // Trim trailing zeros for cleaner display
   fractionStr = fractionStr.replace(/0+$/, '');
+
+  if (minDecimals > 0) {
+    fractionStr = fractionStr.padEnd(minDecimals, '0');
+  }
 
   const sign = amount < 0n ? '-' : '';
 
