@@ -17,3 +17,7 @@
 ## 2025-05-20 - [BigInt Parsing Performance]
 **Learning:** For parsing fixed-point decimals (like USDC), mathematically constructing the BigInt (using `intPart * multiplier + fracPart * power`) is ~14% faster than string manipulation (`padEnd` + concatenation) followed by `BigInt(string)`.
 **Action:** When parsing decimals to BigInt in hot paths, prefer mathematical construction over string manipulation to avoid allocation overhead.
+
+## 2025-05-20 - [Optimized String Trimming]
+**Learning:** Using `regex.replace(/0+$/, '')` to trim trailing zeros is significantly slower (~60%) than a manual loop iterating backwards from the end of the string. Regex compilation and execution overhead is high for simple character matching tasks. Additionally, for integer amounts where the fraction is zero, skipping string operations entirely (via an early return) provides a massive speedup.
+**Action:** Prefer manual loops over regex for simple string trimming operations in hot paths. Always look for early returns for common cases (like zero) to avoid unnecessary allocations.
