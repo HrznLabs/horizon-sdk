@@ -119,9 +119,11 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number }
+  options?: { minDecimals?: number; prefix?: string; commas?: boolean }
 ): string {
   const minDecimals = options?.minDecimals || 0;
+  const prefix = options?.prefix || '';
+  const useCommas = options?.commas !== false;
 
   const absAmount = amount < 0n ? -amount : amount;
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
@@ -152,22 +154,24 @@ export function formatUSDC(
 
   // Performance optimization: Manual comma insertion is ~2.7x faster than toLocaleString
   let wholeStr = whole.toString();
-  const len = wholeStr.length;
-  if (len > 3) {
-    let start = len % 3;
-    if (start === 0) start = 3;
-    let formatted = wholeStr.slice(0, start);
-    for (let i = start; i < len; i += 3) {
-      formatted += ',' + wholeStr.slice(i, i + 3);
+  if (useCommas) {
+    const len = wholeStr.length;
+    if (len > 3) {
+      let start = len % 3;
+      if (start === 0) start = 3;
+      let formatted = wholeStr.slice(0, start);
+      for (let i = start; i < len; i += 3) {
+        formatted += ',' + wholeStr.slice(i, i + 3);
+      }
+      wholeStr = formatted;
     }
-    wholeStr = formatted;
   }
 
   if (fractionStr === '') {
-    return `${sign}${wholeStr}`;
+    return `${sign}${prefix}${wholeStr}`;
   }
 
-  return `${sign}${wholeStr}.${fractionStr}`;
+  return `${sign}${prefix}${wholeStr}.${fractionStr}`;
 }
 
 /**
