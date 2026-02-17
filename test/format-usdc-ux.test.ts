@@ -56,4 +56,30 @@ describe('formatUSDC UX Improvements', () => {
     assert.strictEqual(formatUSDC(1000000n), '1');
     assert.strictEqual(formatUSDC(1000000n, { minDecimals: 0 }), '1');
   });
+
+  it('should handle prefix option', () => {
+    assert.strictEqual(formatUSDC(10000000n, { prefix: '$' }), '$10');
+    assert.strictEqual(formatUSDC(-10000000n, { prefix: '$' }), '-$10');
+    assert.strictEqual(formatUSDC(500000n, { prefix: 'USDC ' }), 'USDC 0.5');
+  });
+
+  it('should handle commas option', () => {
+    assert.strictEqual(formatUSDC(1234567000000n, { commas: false }), '1234567');
+    assert.strictEqual(formatUSDC(1234567000000n, { commas: true }), '1,234,567');
+    assert.strictEqual(formatUSDC(1000000n, { commas: false }), '1');
+  });
+
+  it('should combine options correctly', () => {
+    // -$1,234.50
+    assert.strictEqual(
+      formatUSDC(-1234500000n, { prefix: '$', minDecimals: 2 }),
+      '-$1,234.50'
+    );
+
+    // -$1234.50 (no commas)
+    assert.strictEqual(
+      formatUSDC(-1234500000n, { prefix: '$', minDecimals: 2, commas: false }),
+      '-$1234.50'
+    );
+  });
 });

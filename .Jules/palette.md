@@ -17,3 +17,7 @@
 ## 2024-05-24 - [Flexible Decimal Formatting]
 **Learning:** Hard-coded zero trimming in currency formatters (e.g. `10.50` -> `10.5`) causes visual misalignment in lists and tables. Developers often need fixed decimal places for alignment.
 **Action:** Add options to formatting utilities (e.g., `{ minDecimals: 2 }`) to allow developers to enforce minimum decimal precision for consistent UI alignment while defaulting to trimming for compact display.
+
+## 2024-05-25 - [Complete Currency Formatting]
+**Learning:** Developers often manually concatenate currency symbols (e.g., `'$' + format(amount)`), which leads to incorrect negative formatting (e.g., `$-10.00` instead of `-$10.00`) and inconsistent UI.
+**Action:** Utility functions should handle the full display logic, including prefix/suffix placement relative to the sign, to ensure typographically correct and localized output.
