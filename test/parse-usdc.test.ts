@@ -59,4 +59,25 @@ describe('parseUSDC Security Checks', () => {
       message: /Spaces are not allowed/
     });
   });
+
+  it('should throw error for numbers with too many decimals', () => {
+    // 1.1234569.toString() = "1.1234569" (7 decimals)
+    assert.throws(() => parseUSDC(1.1234569), {
+      message: /Too many decimals/
+    });
+  });
+
+  it('should throw error for scientific notation (unsafe or non-standard)', () => {
+    // 1e-7.toString() = "1e-7" which contains 'e'
+    assert.throws(() => parseUSDC(1e-7), {
+      message: /Invalid character 'e' found/
+    });
+  });
+
+  it('should accept safe numbers', () => {
+    assert.strictEqual(parseUSDC(1.5), 1500000n);
+    assert.strictEqual(parseUSDC(100), 100000000n);
+    // 0.57 previously failed safe integer check due to float math, but toString() fixes it
+    assert.strictEqual(parseUSDC(0.57), 570000n);
+  });
 });

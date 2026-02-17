@@ -43,7 +43,7 @@ for (let i = 0; i < 256; i++) {
  */
 export function parseUSDC(amount: string | number): bigint {
   if (typeof amount === 'number') {
-    return BigInt(Math.round(amount * USDC_MULTIPLIER_NUM));
+    return parseUSDC(amount.toString());
   }
 
   const len = amount.length;
