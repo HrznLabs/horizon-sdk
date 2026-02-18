@@ -22,3 +22,8 @@
 **Vulnerability:** `calculateExpiresAt` accepted any `number` for `durationSeconds`, allowing creation of invalid timestamps (e.g., past dates, extremely far future, or `Infinity`), which could lead to failed transactions or locked funds.
 **Learning:** Utility functions dealing with time often assume "sensible" inputs but fail to enforce protocol constraints (like min/max duration) at the earliest possible point.
 **Prevention:** Always validate time-based inputs against protocol constants (e.g., `MIN_DURATION`, `MAX_DURATION`) in utility functions to catch errors before they reach the blockchain.
+
+## 2026-02-18 - Unbounded String Processing in Financial Parsing
+**Vulnerability:** `parseUSDC` iterated over the entire input string without length validation, allowing a malicious actor to cause Denial of Service (DoS) by supplying an excessively long string (e.g., 100MB) which would block the event loop.
+**Learning:** Utility functions exposed to user input (e.g., via API or UI) must implement resource limits (like maximum string length) to prevent resource exhaustion attacks, even if the parsing logic itself is robust.
+**Prevention:** Enforce strict length limits on string inputs in parsing functions before processing (implemented 32-char limit in `parseUSDC`).

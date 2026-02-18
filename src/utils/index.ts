@@ -10,6 +10,9 @@ const BPS_DIVISOR = BigInt(10000);
 const USDC_MULTIPLIER_NUM = 10 ** USDC_DECIMALS;
 const USDC_MULTIPLIER_BIGINT = BigInt(USDC_MULTIPLIER_NUM);
 
+// Max length for USDC amount string to prevent DoS (supports > 1e25 USDC)
+const MAX_USDC_STRING_LENGTH = 32;
+
 // Optimization: Pre-calculate powers of 10 for parseUSDC
 const POWERS_OF_10: bigint[] = [
   1n,
@@ -48,6 +51,9 @@ export function parseUSDC(amount: string | number): bigint {
 
   const len = amount.length;
   if (len === 0) throw new Error(`Invalid USDC amount format: "${amount}"`);
+  if (len > MAX_USDC_STRING_LENGTH) {
+    throw new Error('Invalid USDC amount format: Input too long.');
+  }
 
   let dotIndex = -1;
   let start = 0;
