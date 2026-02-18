@@ -21,3 +21,7 @@
 ## 2025-05-20 - [Optimized String Trimming]
 **Learning:** Using `regex.replace(/0+$/, '')` to trim trailing zeros is significantly slower (~60%) than a manual loop iterating backwards from the end of the string. Regex compilation and execution overhead is high for simple character matching tasks. Additionally, for integer amounts where the fraction is zero, skipping string operations entirely (via an early return) provides a massive speedup.
 **Action:** Prefer manual loops over regex for simple string trimming operations in hot paths. Always look for early returns for common cases (like zero) to avoid unnecessary allocations.
+
+## 2025-05-20 - [Optimized Expiration Check]
+**Learning:** In `isMissionExpired`, comparing `BigInt(Math.floor(Date.now() / 1000))` against `bigint` expiration is slower than comparing `Date.now()` (number) against `(Number(expiresAt) + 1) * 1000`. The latter avoids floating point division, floor operation, and `BigInt` allocation, resulting in a ~30% speedup.
+**Action:** For simple timestamp comparisons where seconds precision is sufficient, prefer transforming the comparison to avoid `BigInt` and division in hot paths.
