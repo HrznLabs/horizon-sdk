@@ -64,6 +64,7 @@ export {
 export {
   parseUSDC,
   formatUSDC,
+  formatBps,
   calculateFeeSplit,
   calculateDDR,
   calculateLPP,

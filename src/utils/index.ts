@@ -181,6 +181,36 @@ export function formatUSDC(
 }
 
 /**
+ * Format basis points as a percentage string
+ * @param bps Basis points (e.g. 150 for 1.5%)
+ * @param options Formatting options
+ * @returns Formatted percentage (e.g. "1.5%")
+ */
+export function formatBps(
+  bps: number,
+  options?: { minDecimals?: number; prefix?: string; suffix?: string }
+): string {
+  const minDecimals = options?.minDecimals || 0;
+  const prefix = options?.prefix || '';
+  const suffix = options?.suffix !== undefined ? options.suffix : '%';
+
+  const sign = bps < 0 ? '-' : '';
+  const absBps = Math.abs(bps);
+  const percentage = absBps / 100;
+  let formatted = percentage.toString();
+
+  if (minDecimals > 0) {
+    const parts = formatted.split('.');
+    const decimals = parts[1] ? parts[1].length : 0;
+    if (decimals < minDecimals) {
+      formatted = percentage.toFixed(minDecimals);
+    }
+  }
+
+  return `${sign}${prefix}${formatted}${suffix}`;
+}
+
+/**
  * Calculate fee split for a mission reward
  * @param rewardAmount Total reward amount in USDC base units
  * @param guildFeeBps Guild fee in basis points (0-1500)
