@@ -256,7 +256,10 @@ export function calculateExpiresAt(durationSeconds: number): bigint {
  * @returns True if expired
  */
 export function isMissionExpired(expiresAt: bigint): boolean {
-  return BigInt(Math.floor(Date.now() / 1000)) > expiresAt;
+  // Optimization: Comparison using Number is faster and avoids BigInt allocation for current time
+  // Equivalent to: BigInt(Math.floor(Date.now() / 1000)) > expiresAt
+  // Safe until year 285,616 AD (Number.MAX_SAFE_INTEGER)
+  return Date.now() >= (Number(expiresAt) + 1) * 1000;
 }
 
 /**
