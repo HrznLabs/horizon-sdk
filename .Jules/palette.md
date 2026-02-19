@@ -21,3 +21,7 @@
 ## 2024-05-25 - [Complete Currency Formatting]
 **Learning:** Developers often manually concatenate currency symbols (e.g., `'$' + format(amount)`), which leads to incorrect negative formatting (e.g., `$-10.00` instead of `-$10.00`) and inconsistent UI.
 **Action:** Utility functions should handle the full display logic, including prefix/suffix placement relative to the sign, to ensure typographically correct and localized output.
+
+## 2024-05-26 - [Flexible String Truncation]
+**Learning:** Hard-coded truncation (e.g. 6...4) limits developer flexibility, forcing them to reimplement truncation logic for different screen sizes (e.g. mobile vs desktop).
+**Action:** Update utility functions like `formatAddress` to accept optional `start` and `end` parameters, allowing developers to customize the display while maintaining safe defaults.
