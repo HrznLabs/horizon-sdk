@@ -27,3 +27,8 @@
 **Vulnerability:** `parseUSDC` iterated over the entire input string without length validation, allowing a malicious actor to cause Denial of Service (DoS) by supplying an excessively long string (e.g., 100MB) which would block the event loop.
 **Learning:** Utility functions exposed to user input (e.g., via API or UI) must implement resource limits (like maximum string length) to prevent resource exhaustion attacks, even if the parsing logic itself is robust.
 **Prevention:** Enforce strict length limits on string inputs in parsing functions before processing (implemented 32-char limit in `parseUSDC`).
+
+## 2026-02-19 - Inconsistent Financial Validation
+**Vulnerability:** `calculateDDR` and `calculateLPP` accepted negative `rewardAmount` inputs, returning negative values, while `calculateFeeSplit` correctly enforced non-negative inputs.
+**Learning:** Security validation must be applied consistently across all related utility functions, not just the "primary" one. Copy-paste errors or oversight often leave secondary functions vulnerable.
+**Prevention:** Audit all related financial functions for consistent input validation when modifying or reviewing one function.
