@@ -347,9 +347,22 @@ export function randomBytes32(): `0x${string}` {
 /**
  * Format address for display (truncated)
  * @param address Full address
+ * @param options Formatting options
  * @returns Truncated address (e.g., "0x1234...5678")
  */
-export function formatAddress(address: string): string {
+export function formatAddress(
+  address: string,
+  options?: { start?: number; end?: number }
+): string {
+  if (options) {
+    const start = options.start ?? 6;
+    const end = options.end ?? 4;
+    // If address is shorter than or equal to the truncated parts, return as is
+    if (address.length <= start + end) return address;
+    return `${address.slice(0, start)}...${address.slice(-end)}`;
+  }
+
+  // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
   if (address.length !== 42) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
