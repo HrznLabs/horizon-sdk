@@ -200,8 +200,9 @@ export function formatBps(
   let formatted = percentage.toString();
 
   if (minDecimals > 0) {
-    const parts = formatted.split('.');
-    const decimals = parts[1] ? parts[1].length : 0;
+    // Optimization: Avoid creating an array with split()
+    const dotIndex = formatted.indexOf('.');
+    const decimals = dotIndex === -1 ? 0 : formatted.length - dotIndex - 1;
     if (decimals < minDecimals) {
       formatted = percentage.toFixed(minDecimals);
     }
