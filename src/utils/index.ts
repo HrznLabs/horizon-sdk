@@ -255,6 +255,9 @@ export function calculateFeeSplit(
  * @returns DDR amount each party must deposit
  */
 export function calculateDDR(rewardAmount: bigint): bigint {
+  if (rewardAmount < 0n) {
+    throw new Error('Reward amount must be non-negative');
+  }
   return (rewardAmount * DDR_BPS_BIGINT) / BPS_DIVISOR;
 }
 
@@ -264,6 +267,9 @@ export function calculateDDR(rewardAmount: bigint): bigint {
  * @returns LPP amount
  */
 export function calculateLPP(rewardAmount: bigint): bigint {
+  if (rewardAmount < 0n) {
+    throw new Error('Reward amount must be non-negative');
+  }
   return (rewardAmount * LPP_BPS_BIGINT) / BPS_DIVISOR;
 }
 
