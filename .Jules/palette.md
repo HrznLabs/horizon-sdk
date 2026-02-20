@@ -25,3 +25,7 @@
 ## 2024-05-26 - [Flexible String Truncation]
 **Learning:** Hard-coded truncation (e.g. 6...4) limits developer flexibility, forcing them to reimplement truncation logic for different screen sizes (e.g. mobile vs desktop).
 **Action:** Update utility functions like `formatAddress` to accept optional `start` and `end` parameters, allowing developers to customize the display while maintaining safe defaults.
+
+## 2024-06-03 - [Smart Defaults for Link Generation]
+**Learning:** Utilities that require explicit type parameters (e.g., `'tx'` vs `'address'`) for ambiguous inputs often lead to broken links or developer frustration when the input format is self-evident (e.g., 66-char tx hash vs 42-char address).
+**Action:** Implement auto-detection logic based on clear patterns (like length or prefix) to provide "smart defaults," while still allowing manual overrides for edge cases.
