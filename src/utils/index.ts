@@ -383,11 +383,17 @@ export function formatAddress(
  */
 export function getBaseScanUrl(
   hashOrAddress: string,
-  type: 'address' | 'tx' = 'address',
+  type?: 'address' | 'tx',
   testnet: boolean = true
 ): string {
   const baseUrl = testnet
     ? 'https://sepolia.basescan.org'
     : 'https://basescan.org';
-  return `${baseUrl}/${type}/${hashOrAddress}`;
+
+  let resolvedType = type;
+  if (!resolvedType) {
+    resolvedType = hashOrAddress.length === 66 ? 'tx' : 'address';
+  }
+
+  return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
 }
