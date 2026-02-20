@@ -319,6 +319,10 @@ export function toBytes32(str: string): `0x${string}` {
         `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
       );
     }
+    // Validate hex characters
+    if (!/^[0-9a-fA-F]*$/.test(hex)) {
+      throw new Error(`Invalid hex string: "${str}"`);
+    }
     return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
   }
   // Convert string to hex
