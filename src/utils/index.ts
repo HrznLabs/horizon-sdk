@@ -67,6 +67,12 @@ export function parseUSDC(amount: string | number): bigint {
   // Validate chars and find dot
   for (let i = start; i < len; i++) {
     const code = amount.charCodeAt(i);
+
+    // Optimization: Check for digits first as they are the most common
+    if (code >= 48 && code <= 57) {
+      continue;
+    }
+
     if (code === 46) { // '.'
       if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}". Multiple decimal points found.`);
       dotIndex = i;
@@ -76,7 +82,7 @@ export function parseUSDC(amount: string | number): bigint {
       throw new Error(`Invalid USDC amount format: "${amount}". Currency symbols are not allowed.`);
     } else if (code === 32) { // ' '
       throw new Error(`Invalid USDC amount format: "${amount}". Spaces are not allowed.`);
-    } else if (code < 48 || code > 57) { // not digit '0'-'9'
+    } else {
       throw new Error(`Invalid USDC amount format: "${amount}". Invalid character '${amount[i]}' found.`);
     }
   }
