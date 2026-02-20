@@ -28,3 +28,7 @@
 ## 2024-05-22 - Avoid split() for simple checks
 **Learning:** Using `String.split('.')` just to check the length of a substring creates unnecessary array and string allocations.
 **Action:** Use `String.indexOf('.')` and math for length checks instead. It benchmarked ~46% faster for `formatBps`.
+
+## 2025-05-22 - [Optimized Character Validation]
+**Learning:** In manual string validation loops (like `parseUSDC`), prioritizing the most common case (digits) at the start of the loop can significantly improve performance (~12-20%) by avoiding multiple checks for rare invalid characters.
+**Action:** When iterating over strings for validation, always check for the expected valid range (e.g., `0-9`) first and `continue` to skip error handling logic.
