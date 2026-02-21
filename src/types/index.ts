@@ -150,6 +150,13 @@ export interface ContractAddresses {
   disputeResolver: `0x${string}`;
   achievements: `0x${string}`;
   usdc: `0x${string}`;
+  // M5 Token Economics (addresses filled after testnet deploy)
+  horizonToken: `0x${string}`;
+  sHRZNVault: `0x${string}`;
+  feeDistributor: `0x${string}`;
+  horizonVesting: `0x${string}`;
+  horizonGovernor: `0x${string}`;
+  horizonTimelock: `0x${string}`;
 }
 
 /**
@@ -172,6 +179,29 @@ export interface CreateGuildParams {
   guildFeeBps: number;
 }
 
+// ─── M5 Token Economics ─────────────────────────────────────────────────────
 
+export interface StakeParams {
+  amount: bigint; // HRZN amount to stake (18 decimals)
+}
 
+export interface VestingSchedule {
+  beneficiary: `0x${string}`;
+  start: bigint;
+  cliff: bigint;
+  duration: bigint;
+  revocable: boolean;
+}
 
+export interface GovernanceProposal {
+  targets: `0x${string}`[];
+  values: bigint[];
+  calldatas: `0x${string}`[];
+  description: string;
+}
+
+export enum VoteSupport {
+  Against = 0,
+  For = 1,
+  Abstain = 2,
+}
