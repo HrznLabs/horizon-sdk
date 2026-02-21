@@ -79,13 +79,13 @@ export const BASE_SEPOLIA_CONTRACTS: ContractAddresses = {
   disputeResolver: '0xb00ac4278129928aecc72541b0bcd69d94c1691e',
   achievements: '0x568e0e3102bfa1f4045d3f62559c0f9823b469bc',
   usdc: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
-  // M5 Token Economics (addresses to be filled after testnet deploy)
-  horizonToken: '' as `0x${string}`,
-  sHRZNVault: '' as `0x${string}`,
-  feeDistributor: '' as `0x${string}`,
-  horizonVesting: '' as `0x${string}`,
-  horizonGovernor: '' as `0x${string}`,
-  horizonTimelock: '' as `0x${string}`,
+  // M5 Token Economics — deployed 2026-02-21
+  horizonToken: '0xE6044147c8Af0206b027d845eD8E62796C95e092' as `0x${string}`,
+  sHRZNVault: '0x4f7d551a2482Ba27c7477fEdF62b491DE3156aB6' as `0x${string}`,
+  feeDistributor: '0x4f1b954A293c36C762F81276357c8Dd8438485BC' as `0x${string}`,
+  horizonVesting: '0xa7F10148D14cb3D8459ebf94A64E4e05F4bB95f4' as `0x${string}`,
+  horizonGovernor: '0x4246b5d58960D796F3d562A3ECE333f51e2bFdCc' as `0x${string}`,
+  horizonTimelock: '0xBB50b9987e93E831Fd1C0C54c2C952bF5B7D87d7' as `0x${string}`,
 };
 
 /**
