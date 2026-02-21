@@ -403,13 +403,22 @@ export function getBaseScanUrl(
   type?: 'address' | 'tx',
   testnet: boolean = true
 ): string {
+  // Security: Strict validation to prevent path traversal and XSS
+  // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
+  const isAddress = /^0x[0-9a-fA-F]{40}$/.test(hashOrAddress);
+  const isTx = /^0x[0-9a-fA-F]{64}$/.test(hashOrAddress);
+
+  if (!isAddress && !isTx) {
+    throw new Error(`Invalid address or transaction hash: "${hashOrAddress}"`);
+  }
+
   const baseUrl = testnet
     ? 'https://sepolia.basescan.org'
     : 'https://basescan.org';
 
   let resolvedType = type;
   if (!resolvedType) {
-    resolvedType = hashOrAddress.length === 66 ? 'tx' : 'address';
+    resolvedType = isTx ? 'tx' : 'address';
   }
 
   return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
