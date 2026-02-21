@@ -241,7 +241,12 @@ export function calculateFeeSplit(
   // in this specific function (V8 optimization quirk).
   const bpsDivisor = BigInt(10000);
   const protocolAmount = (rewardAmount * PROTOCOL_BPS_BIGINT) / bpsDivisor;
-  const labsAmount = (rewardAmount * LABS_BPS_BIGINT) / bpsDivisor;
+
+  // Optimization: Avoid redundant calculation if BPS values are identical
+  const labsAmount = (LABS_BPS_BIGINT === PROTOCOL_BPS_BIGINT)
+    ? protocolAmount
+    : (rewardAmount * LABS_BPS_BIGINT) / bpsDivisor;
+
   const resolverAmount = (rewardAmount * RESOLVER_BPS_BIGINT) / bpsDivisor;
   const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / bpsDivisor;
   const performerAmount =
