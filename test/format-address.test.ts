@@ -69,4 +69,10 @@ describe('formatAddress', () => {
     // Equivalent to no options but uses new logic branch
     assert.strictEqual(formatAddress(address, {}), '0x1234...7890');
   });
+
+  it('should handle end: 0 correctly (truncate suffix completely)', () => {
+    const address = '0x1234567890123456789012345678901234567890';
+    // start=6, end=0 -> 0x1234...
+    assert.strictEqual(formatAddress(address, { start: 6, end: 0 }), '0x1234...');
+  });
 });
