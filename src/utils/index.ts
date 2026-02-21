@@ -376,7 +376,9 @@ export function formatAddress(
     const end = options.end ?? 4;
     // If address is shorter than or equal to the truncated parts, return as is
     if (address.length <= start + end) return address;
-    return `${address.slice(0, start)}...${address.slice(-end)}`;
+
+    const endStr = end === 0 ? '' : address.slice(-end);
+    return `${address.slice(0, start)}...${endStr}`;
   }
 
   // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
