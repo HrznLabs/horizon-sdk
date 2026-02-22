@@ -133,7 +133,8 @@ export function formatUSDC(
   amount: bigint,
   options?: { minDecimals?: number; prefix?: string; commas?: boolean }
 ): string {
-  const minDecimals = options?.minDecimals || 0;
+  // Security: Limit minDecimals to prevent memory exhaustion (DoS)
+  const minDecimals = Math.min(Math.max(0, options?.minDecimals || 0), 100);
   const prefix = options?.prefix || '';
   const useCommas = options?.commas !== false;
 
@@ -196,7 +197,8 @@ export function formatBps(
   bps: number,
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
-  const minDecimals = options?.minDecimals || 0;
+  // Security: Limit minDecimals to prevent toFixed() RangeError and DoS
+  const minDecimals = Math.min(Math.max(0, options?.minDecimals || 0), 100);
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
@@ -230,6 +232,10 @@ export function calculateFeeSplit(
   // Validate inputs
   if (rewardAmount < 0n) {
     throw new Error('Reward amount must be non-negative');
+  }
+  // Security: Strict validation for guild fee to prevent NaN/float bypass
+  if (!Number.isInteger(guildFeeBps)) {
+    throw new Error('Guild fee must be an integer');
   }
   if (guildFeeBps < 0 || guildFeeBps > FEES.MAX_GUILD_BPS) {
     throw new Error(
