@@ -82,4 +82,11 @@ describe('formatUSDC UX Improvements', () => {
       '-$1234.50'
     );
   });
+
+  it('should handle suffix option', () => {
+    assert.strictEqual(formatUSDC(10000000n, { suffix: ' USDC' }), '10 USDC');
+    assert.strictEqual(formatUSDC(10500000n, { suffix: ' USDC' }), '10.5 USDC');
+    assert.strictEqual(formatUSDC(10000000n, { prefix: '$', suffix: ' USD' }), '$10 USD');
+    assert.strictEqual(formatUSDC(-10000000n, { suffix: ' USDC' }), '-10 USDC');
+  });
 });
