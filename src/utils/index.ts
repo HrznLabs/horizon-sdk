@@ -131,10 +131,11 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; commas?: boolean }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean }
 ): string {
   const minDecimals = options?.minDecimals || 0;
   const prefix = options?.prefix || '';
+  const suffix = options?.suffix || '';
   const useCommas = options?.commas !== false;
 
   const absAmount = amount < 0n ? -amount : amount;
@@ -180,10 +181,10 @@ export function formatUSDC(
   }
 
   if (fractionStr === '') {
-    return `${sign}${prefix}${wholeStr}`;
+    return `${sign}${prefix}${wholeStr}${suffix}`;
   }
 
-  return `${sign}${prefix}${wholeStr}.${fractionStr}`;
+  return `${sign}${prefix}${wholeStr}.${fractionStr}${suffix}`;
 }
 
 /**
