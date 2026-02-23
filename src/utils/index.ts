@@ -317,6 +317,46 @@ export function isMissionExpired(expiresAt: bigint): boolean {
 }
 
 /**
+ * Format duration in seconds to human-readable string
+ * @param seconds Duration in seconds
+ * @param options Formatting options
+ * @returns Formatted duration string (e.g. "1h 30m")
+ */
+export function formatDuration(
+  seconds: number,
+  options?: { style?: 'short' | 'long' }
+): string {
+  if (seconds < 0) throw new Error('Duration must be non-negative');
+  if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
+  if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
+
+  const style = options?.style || 'short';
+  const timeUnits = [
+    { label: style === 'long' ? 'day' : 'd', seconds: 86400 },
+    { label: style === 'long' ? 'hour' : 'h', seconds: 3600 },
+    { label: style === 'long' ? 'minute' : 'm', seconds: 60 },
+    { label: style === 'long' ? 'second' : 's', seconds: 1 },
+  ];
+
+  const result: string[] = [];
+  let remainingSeconds = seconds;
+
+  for (const { label, seconds: unitSeconds } of timeUnits) {
+    const count = Math.floor(remainingSeconds / unitSeconds);
+    if (count > 0) {
+      let unitLabel = label;
+      if (style === 'long' && count > 1) {
+        unitLabel += 's';
+      }
+      result.push(`${count}${style === 'long' ? ' ' : ''}${unitLabel}`);
+      remainingSeconds %= unitSeconds;
+    }
+  }
+
+  return result.join(' ');
+}
+
+/**
  * Convert string to bytes32 (for IPFS hashes, etc.)
  * @param str String to convert (usually hex string)
  * @returns bytes32 hex string
