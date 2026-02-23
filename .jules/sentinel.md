@@ -37,3 +37,8 @@
 **Vulnerability:** `getBaseScanUrl` blindly concatenated user input into a URL, allowing generation of malicious links (XSS, Open Redirect) if the output was used in a web context without further validation.
 **Learning:** Helper functions that generate external links (e.g., block explorers) are often trusted by developers as "safe", but if they accept arbitrary input, they become a vector for injection attacks.
 **Prevention:** Strictly validate inputs (e.g., regex for hex address/tx hash) before constructing URLs. Fail securely by throwing an error instead of returning a malformed URL.
+
+## 2026-02-21 - Unbounded Formatting Options DoS
+**Vulnerability:** `formatUSDC` and `formatBps` accepted any integer for `minDecimals`. Excessive values could cause `RangeError` (crash) in `toFixed` or memory exhaustion DoS in `padEnd`.
+**Learning:** Formatting options controlled by user input (e.g., via URL parameters or config) can be attack vectors if not validated. Native methods like `toFixed` and `padEnd` have limits.
+**Prevention:** Strictly validate formatting options like precision/decimals against reasonable bounds (e.g., 0-100) to prevent crashes and resource exhaustion.
