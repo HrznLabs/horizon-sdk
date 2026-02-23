@@ -134,6 +134,9 @@ export function formatUSDC(
   options?: { minDecimals?: number; prefix?: string; commas?: boolean }
 ): string {
   const minDecimals = options?.minDecimals || 0;
+  if (minDecimals < 0 || minDecimals > 100) {
+    throw new Error('minDecimals must be between 0 and 100');
+  }
   const prefix = options?.prefix || '';
   const useCommas = options?.commas !== false;
 
@@ -197,6 +200,9 @@ export function formatBps(
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
   const minDecimals = options?.minDecimals || 0;
+  if (minDecimals < 0 || minDecimals > 100) {
+    throw new Error('minDecimals must be between 0 and 100');
+  }
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
