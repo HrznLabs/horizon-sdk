@@ -81,6 +81,7 @@ export {
   calculateLPP,
   calculateExpiresAt,
   isMissionExpired,
+  formatDuration,
   toBytes32,
   randomBytes32,
   formatAddress,

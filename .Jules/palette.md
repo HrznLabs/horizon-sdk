@@ -33,3 +33,7 @@
 ## 2025-02-27 - [Safe String Truncation]
 **Learning:** Using negative indices in `slice` (e.g., `str.slice(-n)`) is convenient for truncation, but fails silently when `n` is `0` (returns the full string instead of empty string). This leads to confusing UI bugs where "hidden" parts reappear.
 **Action:** Always check if the end length is `0` before using `slice(-n)`, or use `str.slice(str.length - n)` to ensure consistent behavior.
+
+## 2025-02-27 - [Consistent Duration Formatting]
+**Learning:** Developers often reinvent duration formatting (e.g. `Math.floor(s/60) + 'm'`), leading to inconsistent displays across the app (e.g. '1h 5m' vs '65 mins').
+**Action:** Centralize duration logic in a flexible utility that supports both short (1h 5m) and long (1 hour 5 minutes) formats to ensure consistent voice and tone.
