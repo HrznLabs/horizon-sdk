@@ -33,6 +33,8 @@ const LPP_BPS_BIGINT = BigInt(FEES.LPP_BPS);
 // Performance optimization: Reusable TextEncoder and hex lookup table
 // Hoisting these avoids re-instantiation and array creation overhead
 const TEXT_ENCODER = new TextEncoder();
+// Optimization: Reusable buffer for randomBytes32 to avoid allocation on every call
+const RANDOM_BUFFER = new Uint8Array(32);
 const HEX_STRINGS: string[] = [];
 for (let i = 0; i < 256; i++) {
   HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
@@ -356,12 +358,11 @@ export function toBytes32(str: string): `0x${string}` {
  * @returns Random bytes32 hex string
  */
 export function randomBytes32(): `0x${string}` {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
+  crypto.getRandomValues(RANDOM_BUFFER);
   let hex = '';
   // Optimization: Loop with lookup table
   for (let i = 0; i < 32; i++) {
-    hex += HEX_STRINGS[bytes[i]];
+    hex += HEX_STRINGS[RANDOM_BUFFER[i]];
   }
   return `0x${hex}` as `0x${string}`;
 }
