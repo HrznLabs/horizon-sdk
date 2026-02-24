@@ -131,9 +131,10 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; commas?: boolean }
+  options?: { minDecimals?: number; maxDecimals?: number; prefix?: string; commas?: boolean }
 ): string {
   const minDecimals = options?.minDecimals || 0;
+  const maxDecimals = options?.maxDecimals;
   const prefix = options?.prefix || '';
   const useCommas = options?.commas !== false;
 
@@ -148,6 +149,11 @@ export function formatUSDC(
     fractionStr = '';
   } else {
     fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
+
+    // Truncate to maxDecimals if specified
+    if (maxDecimals !== undefined && fractionStr.length > maxDecimals) {
+      fractionStr = fractionStr.substring(0, maxDecimals);
+    }
 
     // Trim trailing zeros for cleaner display
     // Optimization: Manual loop is ~60% faster than regex replace(/0+$/, '')
