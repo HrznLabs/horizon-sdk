@@ -91,6 +91,13 @@ async function main() {
   const ddr = calculateDDR(rewardAmount);
   console.log(`\n   DDR (Dispute Reserve): ${formatUSDC(ddr)} USDC per party`);
 
+  // 3.5 Demonstrate formatting options
+  console.log('\n✨ Formatting Example:');
+  const largeAmount = parseUSDC("1234.567890");
+  console.log(`   Original:       ${formatUSDC(largeAmount)} USDC`);
+  console.log(`   Max 2 Decimals: ${formatUSDC(largeAmount, { maxDecimals: 2 })} USDC`);
+  console.log(`   Max 0 Decimals: ${formatUSDC(largeAmount, { maxDecimals: 0 })} USDC`);
+
   // 4. Contract addresses
   console.log('\n📜 Contract Addresses (Base Sepolia):');
   console.log(`   MissionFactory: ${BASE_SEPOLIA.contracts.missionFactory}`);
