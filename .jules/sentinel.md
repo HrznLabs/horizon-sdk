@@ -37,3 +37,7 @@
 **Vulnerability:** `getBaseScanUrl` blindly concatenated user input into a URL, allowing generation of malicious links (XSS, Open Redirect) if the output was used in a web context without further validation.
 **Learning:** Helper functions that generate external links (e.g., block explorers) are often trusted by developers as "safe", but if they accept arbitrary input, they become a vector for injection attacks.
 **Prevention:** Strictly validate inputs (e.g., regex for hex address/tx hash) before constructing URLs. Fail securely by throwing an error instead of returning a malformed URL.
+
+## 2024-05-25 - Reflected Input in Error Messages (Duplicate)
+**Vulnerability:** Input values were reflected in error messages, leading to potential XSS.
+**Resolution:** This fix was identified as a duplicate of existing work and the PR was closed.
