@@ -134,9 +134,6 @@ export function formatUSDC(
   options?: { minDecimals?: number; prefix?: string; commas?: boolean }
 ): string {
   const minDecimals = options?.minDecimals || 0;
-  if (minDecimals < 0 || minDecimals > 100) {
-    throw new Error('minDecimals must be between 0 and 100');
-  }
   const prefix = options?.prefix || '';
   const useCommas = options?.commas !== false;
 
@@ -200,9 +197,6 @@ export function formatBps(
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
   const minDecimals = options?.minDecimals || 0;
-  if (minDecimals < 0 || minDecimals > 100) {
-    throw new Error('minDecimals must be between 0 and 100');
-  }
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
@@ -411,6 +405,11 @@ export function getBaseScanUrl(
 ): string {
   // Security: Strict validation to prevent path traversal and XSS
   // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
+  // Optimization: Check length first to avoid regex on large inputs
+  if (hashOrAddress.length !== 42 && hashOrAddress.length !== 66) {
+    throw new Error(`Invalid address or transaction hash: "${hashOrAddress}"`);
+  }
+
   const isAddress = /^0x[0-9a-fA-F]{40}$/.test(hashOrAddress);
   const isTx = /^0x[0-9a-fA-F]{64}$/.test(hashOrAddress);
 
