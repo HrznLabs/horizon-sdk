@@ -30,26 +30,26 @@ describe('getBaseScanUrl', () => {
 
   it('should throw error for invalid short strings', () => {
     const short = 'Alice';
-    assert.throws(() => getBaseScanUrl(short), /Invalid address or transaction hash/);
+    assert.throws(() => getBaseScanUrl(short), { message: 'Invalid address or transaction hash.' });
   });
 
   it('should throw error for XSS payload', () => {
     const xss = '<script>alert(1)</script>';
-    assert.throws(() => getBaseScanUrl(xss), /Invalid address or transaction hash/);
+    assert.throws(() => getBaseScanUrl(xss), { message: 'Invalid address or transaction hash.' });
   });
 
   it('should throw error for path traversal', () => {
     const path = '../../evil';
-    assert.throws(() => getBaseScanUrl(path), /Invalid address or transaction hash/);
+    assert.throws(() => getBaseScanUrl(path), { message: 'Invalid address or transaction hash.' });
   });
 
   it('should throw error for invalid hex length', () => {
     const weird = '0x12345';
-    assert.throws(() => getBaseScanUrl(weird), /Invalid address or transaction hash/);
+    assert.throws(() => getBaseScanUrl(weird), { message: 'Invalid address or transaction hash.' });
   });
 
   it('should throw error for non-hex characters', () => {
     const badHex = '0xZZZ4567890123456789012345678901234567890';
-    assert.throws(() => getBaseScanUrl(badHex), /Invalid address or transaction hash/);
+    assert.throws(() => getBaseScanUrl(badHex), { message: 'Invalid address or transaction hash.' });
   });
 });
