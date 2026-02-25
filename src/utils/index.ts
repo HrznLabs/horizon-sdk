@@ -50,7 +50,7 @@ export function parseUSDC(amount: string | number): bigint {
   }
 
   const len = amount.length;
-  if (len === 0) throw new Error(`Invalid USDC amount format: "${amount}"`);
+  if (len === 0) throw new Error('Invalid USDC amount format: Empty input.');
   if (len > MAX_USDC_STRING_LENGTH) {
     throw new Error('Invalid USDC amount format: Input too long.');
   }
@@ -74,16 +74,16 @@ export function parseUSDC(amount: string | number): bigint {
     }
 
     if (code === 46) { // '.'
-      if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}". Multiple decimal points found.`);
+      if (dotIndex !== -1) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
       dotIndex = i;
     } else if (code === 44) { // ','
-      throw new Error(`Invalid USDC amount format: "${amount}". Commas are not allowed, please remove thousands separators.`);
+      throw new Error('Invalid USDC amount format: Commas are not allowed, please remove thousands separators.');
     } else if (code === 36) { // '$'
-      throw new Error(`Invalid USDC amount format: "${amount}". Currency symbols are not allowed.`);
+      throw new Error('Invalid USDC amount format: Currency symbols are not allowed.');
     } else if (code === 32) { // ' '
-      throw new Error(`Invalid USDC amount format: "${amount}". Spaces are not allowed.`);
+      throw new Error('Invalid USDC amount format: Spaces are not allowed.');
     } else {
-      throw new Error(`Invalid USDC amount format: "${amount}". Invalid character '${amount[i]}' found.`);
+      throw new Error('Invalid USDC amount format: Invalid character found.');
     }
   }
 
@@ -99,12 +99,12 @@ export function parseUSDC(amount: string | number): bigint {
   }
 
   if (integerPartStr === "" && fractionPartStr === "") {
-    throw new Error(`Invalid USDC amount format: "${amount}"`);
+    throw new Error('Invalid USDC amount format: Empty input.');
   }
 
   const fracLen = fractionPartStr.length;
   if (fracLen > USDC_DECIMALS) {
-    throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
+    throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
   }
 
   // Optimize: Avoid string concatenation and padding by using math
@@ -332,7 +332,7 @@ export function toBytes32(str: string): `0x${string}` {
     }
     // Validate hex characters
     if (!/^[0-9a-fA-F]*$/.test(hex)) {
-      throw new Error(`Invalid hex string: "${str}"`);
+      throw new Error('Invalid hex string.');
     }
     return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
   }
@@ -409,7 +409,7 @@ export function getBaseScanUrl(
   const isTx = /^0x[0-9a-fA-F]{64}$/.test(hashOrAddress);
 
   if (!isAddress && !isTx) {
-    throw new Error(`Invalid address or transaction hash: "${hashOrAddress}"`);
+    throw new Error('Invalid address or transaction hash.');
   }
 
   const baseUrl = testnet

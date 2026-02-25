@@ -38,6 +38,16 @@ describe('Byte Utils Tests', () => {
     );
   });
 
+  it('should throw error for invalid hex string', () => {
+    const input = '0xZZZ';
+    assert.throws(
+      () => toBytes32(input),
+      {
+        message: 'Invalid hex string.',
+      }
+    );
+  });
+
   it('should throw error for hex string longer than 64 characters (32 bytes)', () => {
     // 65 characters = 32.5 bytes
     const input = '0x' + '1'.repeat(65);

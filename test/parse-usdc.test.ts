@@ -26,7 +26,7 @@ describe('parseUSDC Security Checks', () => {
 
   it('should throw error for invalid characters', () => {
     assert.throws(() => parseUSDC('10abc'), {
-      message: /Invalid character 'a' found/
+      message: /Invalid character found/
     });
   });
 
@@ -70,7 +70,7 @@ describe('parseUSDC Security Checks', () => {
   it('should throw error for scientific notation (unsafe or non-standard)', () => {
     // 1e-7.toString() = "1e-7" which contains 'e'
     assert.throws(() => parseUSDC(1e-7), {
-      message: /Invalid character 'e' found/
+      message: /Invalid character found/
     });
   });
 

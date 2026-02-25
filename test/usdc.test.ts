@@ -29,7 +29,7 @@ describe('USDC Utility Security Checks', () => {
     it('should throw error for non-numeric characters', () => {
       assert.throws(() => {
         parseUSDC('100abc');
-      }, /Invalid character 'a' found/);
+      }, /Invalid character found/);
     });
 
     it('should throw error for negative numbers if not supported (or just parse correctly)', () => {
