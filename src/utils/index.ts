@@ -137,8 +137,42 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean }
 ): string {
+  if (options?.compact) {
+    const absAmount = amount < 0n ? -amount : amount;
+    // Thresholds in base units (USDC has 6 decimals)
+    const K = 1000n * USDC_MULTIPLIER_BIGINT; // 1e9
+    const M = 1000000n * USDC_MULTIPLIER_BIGINT; // 1e12
+    const B = 1000000000n * USDC_MULTIPLIER_BIGINT; // 1e15
+    const T = 1000000000000n * USDC_MULTIPLIER_BIGINT; // 1e18
+
+    let divisor = 1n;
+    let unitSuffix = '';
+
+    if (absAmount >= T) {
+      divisor = 1000000000000n; // 1e12
+      unitSuffix = 'T';
+    } else if (absAmount >= B) {
+      divisor = 1000000000n; // 1e9
+      unitSuffix = 'B';
+    } else if (absAmount >= M) {
+      divisor = 1000000n; // 1e6
+      unitSuffix = 'M';
+    } else if (absAmount >= K) {
+      divisor = 1000n; // 1e3
+      unitSuffix = 'k';
+    }
+
+    if (divisor > 1n) {
+      // Create new options without compact flag to prevent recursion loop
+      // Append the unit suffix to the user's suffix (or empty string)
+      const newSuffix = unitSuffix + (options.suffix || '');
+      const newOptions = { ...options, suffix: newSuffix, compact: false };
+      return formatUSDC(amount / divisor, newOptions);
+    }
+  }
+
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
