@@ -245,6 +245,9 @@ export function calculateFeeSplit(
       `Guild fee must be between 0 and ${FEES.MAX_GUILD_BPS} bps`
     );
   }
+  if (!Number.isInteger(guildFeeBps)) {
+    throw new Error('Guild fee must be an integer');
+  }
 
   // Use local BigInt(10000) instead of module constant as it benchmarks significantly faster
   // in this specific function (V8 optimization quirk).
