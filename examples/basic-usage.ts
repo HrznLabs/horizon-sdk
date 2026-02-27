@@ -91,7 +91,14 @@ async function main() {
   const ddr = calculateDDR(rewardAmount);
   console.log(`\n   DDR (Dispute Reserve): ${formatUSDC(ddr)} USDC per party`);
 
-  // 4. Contract addresses
+  // 4. Demonstrate compact formatting
+  console.log('\n📐 Compact Formatting Example:');
+  const largeAmount = parseUSDC(1500000); // 1.5M USDC
+  console.log(`   Original: ${formatUSDC(largeAmount)} USDC`);
+  console.log(`   Compact:  ${formatUSDC(largeAmount, { compact: true })} USDC`);
+  console.log(`   Compact (Prefix): ${formatUSDC(largeAmount, { compact: true, prefix: '$' })}`);
+
+  // 5. Contract addresses
   console.log('\n📜 Contract Addresses (Base Sepolia):');
   console.log(`   MissionFactory: ${BASE_SEPOLIA.contracts.missionFactory}`);
   console.log(`   GuildFactory:   ${BASE_SEPOLIA.contracts.guildFactory}`);

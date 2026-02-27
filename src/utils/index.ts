@@ -137,8 +137,9 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean }
 ): string {
+  const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
@@ -146,6 +147,68 @@ export function formatUSDC(
   const useCommas = options?.commas !== false;
 
   const absAmount = amount < 0n ? -amount : amount;
+
+  // Compact notation handling (K, M, B, T)
+  if (compact) {
+    const ONE_THOUSAND = 1000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_MILLION = 1000000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_BILLION = 1000000000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
+
+    let divisor = 1n;
+    let unit = '';
+
+    if (absAmount >= ONE_TRILLION) {
+      divisor = ONE_TRILLION;
+      unit = 'T';
+    } else if (absAmount >= ONE_BILLION) {
+      divisor = ONE_BILLION;
+      unit = 'B';
+    } else if (absAmount >= ONE_MILLION) {
+      divisor = ONE_MILLION;
+      unit = 'M';
+    } else if (absAmount >= ONE_THOUSAND) {
+      divisor = ONE_THOUSAND;
+      unit = 'K';
+    }
+
+    if (unit) {
+      // Calculate scaled amount with higher precision for formatting
+      // We want to keep up to 2 decimals for compact notation by default
+      // but we need to respect the input's actual value
+
+      // Calculate whole part
+      const scaledWhole = absAmount / divisor;
+
+      // Calculate fractional part (simulate 2 decimal places for compact)
+      // Multiply remainder by 100 to get next 2 digits
+      const remainder = absAmount % divisor;
+      // We need to scale remainder based on the divisor
+      // remainder / divisor is the fraction.
+      // To get 2 decimal places: (remainder * 100) / divisor
+
+      let decimals = 2; // Default to 2 decimals for compact
+
+      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
+      let fractionStr = fractionVal.toString();
+
+      // Pad with zeros if needed (e.g. 05)
+      fractionStr = fractionStr.padStart(decimals, '0');
+
+      // Trim trailing zeros
+      let i = fractionStr.length - 1;
+      while (i >= 0 && fractionStr[i] === '0') {
+        i--;
+      }
+      fractionStr = fractionStr.substring(0, i + 1);
+
+      const sign = amount < 0n ? '-' : '';
+      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
+
+      return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
+    }
+  }
+
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
   const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
 
