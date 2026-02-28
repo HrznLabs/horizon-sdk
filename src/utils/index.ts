@@ -44,19 +44,19 @@ for (let i = 0; i < 256; i++) {
 // Performance optimization: Shared buffer for randomBytes32 to avoid allocation on every call
 const RANDOM_BYTES_BUFFER = new Uint8Array(32);
 
-// Optimization: Pre-allocate time unit definitions for formatDuration
-const TIME_UNITS_LONG = [
-  { label: 'day', seconds: 86400 },
-  { label: 'hour', seconds: 3600 },
-  { label: 'minute', seconds: 60 },
-  { label: 'second', seconds: 1 },
-];
-
+// Performance optimization: Hoisted time units for formatDuration
 const TIME_UNITS_SHORT = [
   { label: 'd', seconds: 86400 },
   { label: 'h', seconds: 3600 },
   { label: 'm', seconds: 60 },
   { label: 's', seconds: 1 },
+];
+
+const TIME_UNITS_LONG = [
+  { label: 'day', seconds: 86400 },
+  { label: 'hour', seconds: 3600 },
+  { label: 'minute', seconds: 60 },
+  { label: 'second', seconds: 1 },
 ];
 
 /**
@@ -152,42 +152,8 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean }
 ): string {
-  if (options?.compact) {
-    const absAmount = amount < 0n ? -amount : amount;
-    // Thresholds in base units (USDC has 6 decimals)
-    const K = 1000n * USDC_MULTIPLIER_BIGINT; // 1e9
-    const M = 1000000n * USDC_MULTIPLIER_BIGINT; // 1e12
-    const B = 1000000000n * USDC_MULTIPLIER_BIGINT; // 1e15
-    const T = 1000000000000n * USDC_MULTIPLIER_BIGINT; // 1e18
-
-    let divisor = 1n;
-    let unitSuffix = '';
-
-    if (absAmount >= T) {
-      divisor = 1000000000000n; // 1e12
-      unitSuffix = 'T';
-    } else if (absAmount >= B) {
-      divisor = 1000000000n; // 1e9
-      unitSuffix = 'B';
-    } else if (absAmount >= M) {
-      divisor = 1000000n; // 1e6
-      unitSuffix = 'M';
-    } else if (absAmount >= K) {
-      divisor = 1000n; // 1e3
-      unitSuffix = 'k';
-    }
-
-    if (divisor > 1n) {
-      // Create new options without compact flag to prevent recursion loop
-      // Append the unit suffix to the user's suffix (or empty string)
-      const newSuffix = unitSuffix + (options.suffix || '');
-      const newOptions = { ...options, suffix: newSuffix, compact: false };
-      return formatUSDC(amount / divisor, newOptions);
-    }
-  }
-
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
@@ -289,16 +255,10 @@ export function calculateFeeSplit(
   if (rewardAmount < 0n) {
     throw new Error('Reward amount must be non-negative');
   }
-  if (!Number.isInteger(guildFeeBps)) {
-    throw new Error('Guild fee must be an integer');
-  }
   if (guildFeeBps < 0 || guildFeeBps > FEES.MAX_GUILD_BPS) {
     throw new Error(
       `Guild fee must be between 0 and ${FEES.MAX_GUILD_BPS} bps`
     );
-  }
-  if (!Number.isInteger(guildFeeBps)) {
-    throw new Error('Guild fee must be an integer');
   }
 
   // Use local BigInt(10000) instead of module constant as it benchmarks significantly faster
@@ -395,8 +355,7 @@ export function formatDuration(
   if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
 
   const style = options?.style || 'short';
-  // Optimization: Pre-allocate time unit definitions to avoid object creation on every call
-  // We use two static arrays to avoid conditional checks inside the loop for label selection
+  // Optimization: Use hoisted constants to avoid array allocation on every call
   const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
 
   const result: string[] = [];
@@ -406,7 +365,6 @@ export function formatDuration(
     const count = Math.floor(remainingSeconds / unitSeconds);
     if (count > 0) {
       let unitLabel = label;
-      // Handle pluralization for long style
       if (style === 'long' && count > 1) {
         unitLabel += 's';
       }
