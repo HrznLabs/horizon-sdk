@@ -29,3 +29,15 @@
 ## 2024-06-03 - [Smart Defaults for Link Generation]
 **Learning:** Utilities that require explicit type parameters (e.g., `'tx'` vs `'address'`) for ambiguous inputs often lead to broken links or developer frustration when the input format is self-evident (e.g., 66-char tx hash vs 42-char address).
 **Action:** Implement auto-detection logic based on clear patterns (like length or prefix) to provide "smart defaults," while still allowing manual overrides for edge cases.
+
+## 2025-02-27 - [Safe String Truncation]
+**Learning:** Using negative indices in `slice` (e.g., `str.slice(-n)`) is convenient for truncation, but fails silently when `n` is `0` (returns the full string instead of empty string). This leads to confusing UI bugs where "hidden" parts reappear.
+**Action:** Always check if the end length is `0` before using `slice(-n)`, or use `str.slice(str.length - n)` to ensure consistent behavior.
+
+## 2025-02-27 - [Consistent Duration Formatting]
+**Learning:** Developers often reinvent duration formatting (e.g. `Math.floor(s/60) + 'm'`), leading to inconsistent displays across the app (e.g. '1h 5m' vs '65 mins').
+**Action:** Centralize duration logic in a flexible utility that supports both short (1h 5m) and long (1 hour 5 minutes) formats to ensure consistent voice and tone.
+
+## 2025-05-27 - [Large Number Readability]
+**Learning:** Displaying raw large numbers (e.g. 1,500,000) in dashboards creates cognitive load and makes scanning difficult. Users prefer "1.5M" for quick comparison.
+**Action:** Implement a `compact` option in number formatting utilities that automatically scales values by magnitude (K, M, B, T) and appends the appropriate suffix.
