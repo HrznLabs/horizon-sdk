@@ -10,3 +10,7 @@
 ## 2024-05-23 - Uint8Array Hoisting in randomBytes32
 **Learning:** Hoisting a `Uint8Array` buffer to module scope in `randomBytes32` to avoid repeated allocation reduced execution time by ~21% (461ms -> 364ms for 100k iterations).
 **Action:** Look for other utility functions that allocate buffers or arrays repeatedly in hot paths and hoist them if thread-safety permits.
+
+## 2024-05-24 - Pre-allocation of Constants in formatDuration
+**Learning:** Hoisting configuration objects (like `TIME_UNITS`) to module scope in `formatDuration` avoids allocating new objects and arrays on every function call. While unrolling the loop provided slightly better micro-benchmark results (~17% improvement), the readability cost was deemed too high. Pre-allocating the arrays provided a balanced optimization by reducing GC pressure without sacrificing code clarity.
+**Action:** Identify functions that re-create static configuration objects/arrays on every invocation and hoist them to module scope.
