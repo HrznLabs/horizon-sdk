@@ -28,9 +28,28 @@ describe('getBaseScanUrl', () => {
     assert.strictEqual(getBaseScanUrl(address, undefined, false), expected);
   });
 
-  it('should handle short strings gracefully', () => {
+  it('should throw error for invalid short strings', () => {
     const short = 'Alice';
-    const expected = `https://sepolia.basescan.org/address/${short}`;
-    assert.strictEqual(getBaseScanUrl(short), expected);
+    assert.throws(() => getBaseScanUrl(short), /Invalid address or transaction hash/);
+  });
+
+  it('should throw error for XSS payload', () => {
+    const xss = '<script>alert(1)</script>';
+    assert.throws(() => getBaseScanUrl(xss), /Invalid address or transaction hash/);
+  });
+
+  it('should throw error for path traversal', () => {
+    const path = '../../evil';
+    assert.throws(() => getBaseScanUrl(path), /Invalid address or transaction hash/);
+  });
+
+  it('should throw error for invalid hex length', () => {
+    const weird = '0x12345';
+    assert.throws(() => getBaseScanUrl(weird), /Invalid address or transaction hash/);
+  });
+
+  it('should throw error for non-hex characters', () => {
+    const badHex = '0xZZZ4567890123456789012345678901234567890';
+    assert.throws(() => getBaseScanUrl(badHex), /Invalid address or transaction hash/);
   });
 });

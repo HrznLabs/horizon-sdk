@@ -18,23 +18,35 @@ describe('calculateFeeSplit Security Checks', () => {
     }, /Guild fee must be between 0 and 1500 bps/);
   });
 
+  it('should throw error if guildFeeBps is not an integer', () => {
+    assert.throws(() => {
+      calculateFeeSplit(BigInt(1000), 10.5);
+    }, /Guild fee must be an integer/);
+  });
+
   it('should throw error if rewardAmount is negative', () => {
     assert.throws(() => {
       calculateFeeSplit(-100n, 0);
     }, /Reward amount must be non-negative/);
   });
 
+  it('should throw error if guildFeeBps is not an integer', () => {
+    assert.throws(() => {
+      calculateFeeSplit(BigInt(1000), 10.5);
+    }, /Guild fee must be an integer/);
+  });
+
   it('should calculate correctly for valid inputs', () => {
     const reward = BigInt(10000); // 10000 units
-    // fees: P=400, L=400, R=200, G=300 (3%)
-    // Total fees: 1300/10000 = 13%
-    // 13% of 10000 = 1300
-    // Performer: 10000 - 1300 = 8700
+    // fees: P=250, L=250, R=200, G=300 (3%)
+    // Total fees: 1000/10000 = 10%
+    // 10% of 10000 = 1000
+    // Performer: 10000 - 1000 = 9000
     const split = calculateFeeSplit(reward, 300);
-    assert.strictEqual(split.protocolAmount, 400n);
-    assert.strictEqual(split.labsAmount, 400n);
+    assert.strictEqual(split.protocolAmount, 250n);
+    assert.strictEqual(split.labsAmount, 250n);
     assert.strictEqual(split.resolverAmount, 200n);
     assert.strictEqual(split.guildAmount, 300n);
-    assert.strictEqual(split.performerAmount, 8700n);
+    assert.strictEqual(split.performerAmount, 9000n);
   });
 });

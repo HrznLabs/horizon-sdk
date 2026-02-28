@@ -20,6 +20,12 @@ export {
   ReputationAttestationsABI,
   HorizonAchievementsABI,
   ERC20ABI,
+  HorizonTokenABI,
+  SHRZNVaultABI,
+  FeeDistributorABI,
+  HorizonVestingABI,
+  HorizonGovernorABI,
+  HorizonTimelockABI,
 } from './abis';
 
 // Types
@@ -28,6 +34,7 @@ export {
   DisputeState,
   DisputeOutcome,
   AchievementCategory,
+  VoteSupport,
   type MissionParams,
   type MissionRuntime,
   type Mission,
@@ -39,11 +46,15 @@ export {
   type ContractAddresses,
   type CreateMissionParams,
   type CreateGuildParams,
+  type StakeParams,
+  type VestingSchedule,
+  type GovernanceProposal,
 } from './types';
 
 // Constants
 export {
   USDC_DECIMALS,
+  HRZN_DECIMALS,
   MIN_REWARD,
   MAX_REWARD,
   MIN_DURATION,
@@ -70,6 +81,7 @@ export {
   calculateLPP,
   calculateExpiresAt,
   isMissionExpired,
+  formatDuration,
   toBytes32,
   randomBytes32,
   formatAddress,

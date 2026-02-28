@@ -32,3 +32,13 @@
 **Vulnerability:** `calculateDDR` and `calculateLPP` accepted negative `rewardAmount` inputs, returning negative values, while `calculateFeeSplit` correctly enforced non-negative inputs.
 **Learning:** Security validation must be applied consistently across all related utility functions, not just the "primary" one. Copy-paste errors or oversight often leave secondary functions vulnerable.
 **Prevention:** Audit all related financial functions for consistent input validation when modifying or reviewing one function.
+
+## 2024-05-24 - Unvalidated URL Generation
+**Vulnerability:** `getBaseScanUrl` blindly concatenated user input into a URL, allowing generation of malicious links (XSS, Open Redirect) if the output was used in a web context without further validation.
+**Learning:** Helper functions that generate external links (e.g., block explorers) are often trusted by developers as "safe", but if they accept arbitrary input, they become a vector for injection attacks.
+**Prevention:** Strictly validate inputs (e.g., regex for hex address/tx hash) before constructing URLs. Fail securely by throwing an error instead of returning a malformed URL.
+
+## 2026-02-19 - Implicit BigInt Conversion Risks
+**Vulnerability:** `calculateFeeSplit` allowed non-integer numeric inputs for `guildFeeBps` which caused unhandled `RangeError` exceptions (and stack trace exposure) when internally converted to `BigInt`.
+**Learning:** The `BigInt()` constructor throws a `RangeError` for non-integer inputs, which can crash applications or expose internal implementation details if not caught. Financial utilities must strictly validate integer inputs before attempting BigInt conversion.
+**Prevention:** Explicitly check `Number.isInteger()` for all numeric inputs intended for `BigInt` conversion.

@@ -13,6 +13,9 @@ const USDC_MULTIPLIER_BIGINT = BigInt(USDC_MULTIPLIER_NUM);
 // Max length for USDC amount string to prevent DoS (supports > 1e25 USDC)
 const MAX_USDC_STRING_LENGTH = 32;
 
+// Maximum allowed decimals for formatting to prevent DoS
+const MAX_DECIMALS = 100;
+
 // Optimization: Pre-calculate powers of 10 for parseUSDC
 const POWERS_OF_10: bigint[] = [
   1n,
@@ -38,6 +41,24 @@ for (let i = 0; i < 256; i++) {
   HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
 }
 
+// Performance optimization: Shared buffer for randomBytes32 to avoid allocation on every call
+const RANDOM_BYTES_BUFFER = new Uint8Array(32);
+
+// Performance optimization: Hoisted time units for formatDuration
+const TIME_UNITS_SHORT = [
+  { label: 'd', seconds: 86400 },
+  { label: 'h', seconds: 3600 },
+  { label: 'm', seconds: 60 },
+  { label: 's', seconds: 1 },
+];
+
+const TIME_UNITS_LONG = [
+  { label: 'day', seconds: 86400 },
+  { label: 'hour', seconds: 3600 },
+  { label: 'minute', seconds: 60 },
+  { label: 'second', seconds: 1 },
+];
+
 /**
  * Parse USDC amount from human-readable string to bigint
  * Optimized to avoid parseFloat precision issues and improve performance
@@ -50,7 +71,7 @@ export function parseUSDC(amount: string | number): bigint {
   }
 
   const len = amount.length;
-  if (len === 0) throw new Error(`Invalid USDC amount format: "${amount}"`);
+  if (len === 0) throw new Error('Invalid USDC amount format');
   if (len > MAX_USDC_STRING_LENGTH) {
     throw new Error('Invalid USDC amount format: Input too long.');
   }
@@ -74,16 +95,16 @@ export function parseUSDC(amount: string | number): bigint {
     }
 
     if (code === 46) { // '.'
-      if (dotIndex !== -1) throw new Error(`Invalid USDC amount format: "${amount}". Multiple decimal points found.`);
+      if (dotIndex !== -1) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
       dotIndex = i;
     } else if (code === 44) { // ','
-      throw new Error(`Invalid USDC amount format: "${amount}". Commas are not allowed, please remove thousands separators.`);
+      throw new Error('Invalid USDC amount format: Commas are not allowed.');
     } else if (code === 36) { // '$'
-      throw new Error(`Invalid USDC amount format: "${amount}". Currency symbols are not allowed.`);
+      throw new Error('Invalid USDC amount format: Currency symbols are not allowed.');
     } else if (code === 32) { // ' '
-      throw new Error(`Invalid USDC amount format: "${amount}". Spaces are not allowed.`);
+      throw new Error('Invalid USDC amount format: Spaces are not allowed.');
     } else {
-      throw new Error(`Invalid USDC amount format: "${amount}". Invalid character '${amount[i]}' found.`);
+      throw new Error('Invalid USDC amount format: Invalid character found.');
     }
   }
 
@@ -99,12 +120,12 @@ export function parseUSDC(amount: string | number): bigint {
   }
 
   if (integerPartStr === "" && fractionPartStr === "") {
-    throw new Error(`Invalid USDC amount format: "${amount}"`);
+    throw new Error('Invalid USDC amount format');
   }
 
   const fracLen = fractionPartStr.length;
   if (fracLen > USDC_DECIMALS) {
-    throw new Error(`Too many decimals: "${amount}" (max ${USDC_DECIMALS})`);
+    throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
   }
 
   // Optimize: Avoid string concatenation and padding by using math
@@ -131,13 +152,78 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; commas?: boolean }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean }
 ): string {
-  const minDecimals = options?.minDecimals || 0;
+  const compact = options?.compact === true;
+  let minDecimals = options?.minDecimals || 0;
+  if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
+  const suffix = options?.suffix || '';
   const useCommas = options?.commas !== false;
 
   const absAmount = amount < 0n ? -amount : amount;
+
+  // Compact notation handling (K, M, B, T)
+  if (compact) {
+    const ONE_THOUSAND = 1000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_MILLION = 1000000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_BILLION = 1000000000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
+
+    let divisor = 1n;
+    let unit = '';
+
+    if (absAmount >= ONE_TRILLION) {
+      divisor = ONE_TRILLION;
+      unit = 'T';
+    } else if (absAmount >= ONE_BILLION) {
+      divisor = ONE_BILLION;
+      unit = 'B';
+    } else if (absAmount >= ONE_MILLION) {
+      divisor = ONE_MILLION;
+      unit = 'M';
+    } else if (absAmount >= ONE_THOUSAND) {
+      divisor = ONE_THOUSAND;
+      unit = 'K';
+    }
+
+    if (unit) {
+      // Calculate scaled amount with higher precision for formatting
+      // We want to keep up to 2 decimals for compact notation by default
+      // but we need to respect the input's actual value
+
+      // Calculate whole part
+      const scaledWhole = absAmount / divisor;
+
+      // Calculate fractional part (simulate 2 decimal places for compact)
+      // Multiply remainder by 100 to get next 2 digits
+      const remainder = absAmount % divisor;
+      // We need to scale remainder based on the divisor
+      // remainder / divisor is the fraction.
+      // To get 2 decimal places: (remainder * 100) / divisor
+
+      let decimals = 2; // Default to 2 decimals for compact
+
+      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
+      let fractionStr = fractionVal.toString();
+
+      // Pad with zeros if needed (e.g. 05)
+      fractionStr = fractionStr.padStart(decimals, '0');
+
+      // Trim trailing zeros
+      let i = fractionStr.length - 1;
+      while (i >= 0 && fractionStr[i] === '0') {
+        i--;
+      }
+      fractionStr = fractionStr.substring(0, i + 1);
+
+      const sign = amount < 0n ? '-' : '';
+      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
+
+      return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
+    }
+  }
+
   const whole = absAmount / USDC_MULTIPLIER_BIGINT;
   const fraction = absAmount % USDC_MULTIPLIER_BIGINT;
 
@@ -180,10 +266,10 @@ export function formatUSDC(
   }
 
   if (fractionStr === '') {
-    return `${sign}${prefix}${wholeStr}`;
+    return `${sign}${prefix}${wholeStr}${suffix}`;
   }
 
-  return `${sign}${prefix}${wholeStr}.${fractionStr}`;
+  return `${sign}${prefix}${wholeStr}.${fractionStr}${suffix}`;
 }
 
 /**
@@ -196,7 +282,8 @@ export function formatBps(
   bps: number,
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
-  const minDecimals = options?.minDecimals || 0;
+  let minDecimals = options?.minDecimals || 0;
+  if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
@@ -231,6 +318,9 @@ export function calculateFeeSplit(
   if (rewardAmount < 0n) {
     throw new Error('Reward amount must be non-negative');
   }
+  if (!Number.isInteger(guildFeeBps)) {
+    throw new Error('Guild fee must be an integer');
+  }
   if (guildFeeBps < 0 || guildFeeBps > FEES.MAX_GUILD_BPS) {
     throw new Error(
       `Guild fee must be between 0 and ${FEES.MAX_GUILD_BPS} bps`
@@ -241,7 +331,12 @@ export function calculateFeeSplit(
   // in this specific function (V8 optimization quirk).
   const bpsDivisor = BigInt(10000);
   const protocolAmount = (rewardAmount * PROTOCOL_BPS_BIGINT) / bpsDivisor;
-  const labsAmount = (rewardAmount * LABS_BPS_BIGINT) / bpsDivisor;
+
+  // Optimization: Avoid redundant calculation if BPS values are identical
+  const labsAmount = (LABS_BPS_BIGINT === PROTOCOL_BPS_BIGINT)
+    ? protocolAmount
+    : (rewardAmount * LABS_BPS_BIGINT) / bpsDivisor;
+
   const resolverAmount = (rewardAmount * RESOLVER_BPS_BIGINT) / bpsDivisor;
   const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / bpsDivisor;
   const performerAmount =
@@ -312,6 +407,42 @@ export function isMissionExpired(expiresAt: bigint): boolean {
 }
 
 /**
+ * Format duration in seconds to human-readable string
+ * @param seconds Duration in seconds
+ * @param options Formatting options
+ * @returns Formatted duration string (e.g. "1h 30m")
+ */
+export function formatDuration(
+  seconds: number,
+  options?: { style?: 'short' | 'long' }
+): string {
+  if (seconds < 0) throw new Error('Duration must be non-negative');
+  if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
+  if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
+
+  const style = options?.style || 'short';
+  // Optimization: Use hoisted constants to avoid array allocation on every call
+  const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
+
+  const result: string[] = [];
+  let remainingSeconds = seconds;
+
+  for (const { label, seconds: unitSeconds } of timeUnits) {
+    const count = Math.floor(remainingSeconds / unitSeconds);
+    if (count > 0) {
+      let unitLabel = label;
+      if (style === 'long' && count > 1) {
+        unitLabel += 's';
+      }
+      result.push(`${count}${style === 'long' ? ' ' : ''}${unitLabel}`);
+      remainingSeconds %= unitSeconds;
+    }
+  }
+
+  return result.join(' ');
+}
+
+/**
  * Convert string to bytes32 (for IPFS hashes, etc.)
  * @param str String to convert (usually hex string)
  * @returns bytes32 hex string
@@ -327,7 +458,7 @@ export function toBytes32(str: string): `0x${string}` {
     }
     // Validate hex characters
     if (!/^[0-9a-fA-F]*$/.test(hex)) {
-      throw new Error(`Invalid hex string: "${str}"`);
+      throw new Error('Invalid hex string.');
     }
     return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
   }
@@ -351,12 +482,11 @@ export function toBytes32(str: string): `0x${string}` {
  * @returns Random bytes32 hex string
  */
 export function randomBytes32(): `0x${string}` {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
+  crypto.getRandomValues(RANDOM_BYTES_BUFFER);
   let hex = '';
   // Optimization: Loop with lookup table
   for (let i = 0; i < 32; i++) {
-    hex += HEX_STRINGS[bytes[i]];
+    hex += HEX_STRINGS[RANDOM_BYTES_BUFFER[i]];
   }
   return `0x${hex}` as `0x${string}`;
 }
@@ -376,7 +506,9 @@ export function formatAddress(
     const end = options.end ?? 4;
     // If address is shorter than or equal to the truncated parts, return as is
     if (address.length <= start + end) return address;
-    return `${address.slice(0, start)}...${address.slice(-end)}`;
+
+    const endStr = end === 0 ? '' : address.slice(-end);
+    return `${address.slice(0, start)}...${endStr}`;
   }
 
   // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
@@ -396,13 +528,22 @@ export function getBaseScanUrl(
   type?: 'address' | 'tx',
   testnet: boolean = true
 ): string {
+  // Security: Strict validation to prevent path traversal and XSS
+  // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
+  const isAddress = /^0x[0-9a-fA-F]{40}$/.test(hashOrAddress);
+  const isTx = /^0x[0-9a-fA-F]{64}$/.test(hashOrAddress);
+
+  if (!isAddress && !isTx) {
+    throw new Error('Invalid address or transaction hash.');
+  }
+
   const baseUrl = testnet
     ? 'https://sepolia.basescan.org'
     : 'https://basescan.org';
 
   let resolvedType = type;
   if (!resolvedType) {
-    resolvedType = hashOrAddress.length === 66 ? 'tx' : 'address';
+    resolvedType = isTx ? 'tx' : 'address';
   }
 
   return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
