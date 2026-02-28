@@ -44,6 +44,21 @@ for (let i = 0; i < 256; i++) {
 // Performance optimization: Shared buffer for randomBytes32 to avoid allocation on every call
 const RANDOM_BYTES_BUFFER = new Uint8Array(32);
 
+// Optimization: Pre-allocate time unit definitions for formatDuration
+const TIME_UNITS_LONG = [
+  { label: 'day', seconds: 86400 },
+  { label: 'hour', seconds: 3600 },
+  { label: 'minute', seconds: 60 },
+  { label: 'second', seconds: 1 },
+];
+
+const TIME_UNITS_SHORT = [
+  { label: 'd', seconds: 86400 },
+  { label: 'h', seconds: 3600 },
+  { label: 'm', seconds: 60 },
+  { label: 's', seconds: 1 },
+];
+
 /**
  * Parse USDC amount from human-readable string to bigint
  * Optimized to avoid parseFloat precision issues and improve performance
@@ -343,12 +358,9 @@ export function formatDuration(
   if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
 
   const style = options?.style || 'short';
-  const timeUnits = [
-    { label: style === 'long' ? 'day' : 'd', seconds: 86400 },
-    { label: style === 'long' ? 'hour' : 'h', seconds: 3600 },
-    { label: style === 'long' ? 'minute' : 'm', seconds: 60 },
-    { label: style === 'long' ? 'second' : 's', seconds: 1 },
-  ];
+  // Optimization: Pre-allocate time unit definitions to avoid object creation on every call
+  // We use two static arrays to avoid conditional checks inside the loop for label selection
+  const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
 
   const result: string[] = [];
   let remainingSeconds = seconds;
@@ -357,6 +369,7 @@ export function formatDuration(
     const count = Math.floor(remainingSeconds / unitSeconds);
     if (count > 0) {
       let unitLabel = label;
+      // Handle pluralization for long style
       if (style === 'long' && count > 1) {
         unitLabel += 's';
       }
