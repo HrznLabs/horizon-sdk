@@ -14,3 +14,7 @@
 ## 2024-05-24 - Pre-allocation of Constants in formatDuration
 **Learning:** Hoisting configuration objects (like `TIME_UNITS`) to module scope in `formatDuration` avoids allocating new objects and arrays on every function call. While unrolling the loop provided slightly better micro-benchmark results (~17% improvement), the readability cost was deemed too high. Pre-allocating the arrays provided a balanced optimization by reducing GC pressure without sacrificing code clarity.
 **Action:** Identify functions that re-create static configuration objects/arrays on every invocation and hoist them to module scope.
+
+## 2024-05-25 - substring vs slice and template literals
+**Learning:** For string formatting operations, combining `String.substring` and simple string concatenation (`+`) can be ~20% faster than using `String.slice` with negative indices and template literals. V8 seems to optimize direct string concatenation and `substring` operations well for shorter strings, avoiding the overhead of parsing negative indices and evaluating template literals.
+**Action:** When working on formatting short strings (like Ethereum addresses), favor `substring` and string concatenation (`+`) over `slice` and template literals for better performance, particularly in hot utility functions.

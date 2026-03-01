@@ -498,19 +498,21 @@ export function formatAddress(
   address: string,
   options?: { start?: number; end?: number }
 ): string {
+  const len = address.length;
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
     // If address is shorter than or equal to the truncated parts, return as is
-    if (address.length <= start + end) return address;
+    if (len <= start + end) return address;
 
-    const endStr = end === 0 ? '' : address.slice(-end);
-    return `${address.slice(0, start)}...${endStr}`;
+    // Optimization: substring and string concatenation is faster than slice and template literals
+    const endStr = end === 0 ? '' : address.substring(len - end);
+    return address.substring(0, start) + '...' + endStr;
   }
 
   // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
-  if (address.length !== 42) return address;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  if (len !== 42) return address;
+  return address.substring(0, 6) + '...' + address.substring(38);
 }
 
 /**
