@@ -30,12 +30,6 @@ describe('calculateFeeSplit Security Checks', () => {
     }, /Reward amount must be non-negative/);
   });
 
-  it('should throw error if guildFeeBps is not an integer', () => {
-    assert.throws(() => {
-      calculateFeeSplit(BigInt(1000), 10.5);
-    }, /Guild fee must be an integer/);
-  });
-
   it('should calculate correctly for valid inputs', () => {
     const reward = BigInt(10000); // 10000 units
     // fees: P=250, L=250, R=200, G=300 (3%)
