@@ -385,6 +385,11 @@ export function calculateLPP(rewardAmount: bigint): bigint {
  * @returns Expiration timestamp (bigint)
  */
 export function calculateExpiresAt(durationSeconds: number): bigint {
+  if (!Number.isFinite(durationSeconds)) {
+    throw new Error(
+      `Invalid duration: ${durationSeconds} seconds. Duration must be a finite number.`
+    );
+  }
   if (!Number.isInteger(durationSeconds)) {
     throw new Error(
       `Invalid duration: ${durationSeconds} seconds. Duration must be an integer.`
@@ -420,6 +425,7 @@ export function formatDuration(
   seconds: number,
   options?: { style?: 'short' | 'long' }
 ): string {
+  if (!Number.isFinite(seconds)) throw new Error('Duration must be a finite number');
   if (seconds < 0) throw new Error('Duration must be non-negative');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
   if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
