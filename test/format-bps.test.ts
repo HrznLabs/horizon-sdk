@@ -56,4 +56,10 @@ describe('formatBps UX Improvements', () => {
     assert.strictEqual(formatBps(150.5, { minDecimals: 2 }), '1.505%'); // Should not truncate
     assert.strictEqual(formatBps(150.5, { minDecimals: 4 }), '1.5050%'); // Should pad
   });
+
+  it('should throw error for non-finite basis points', () => {
+    assert.throws(() => formatBps(NaN), /Basis points must be a finite number/);
+    assert.throws(() => formatBps(Infinity), /Basis points must be a finite number/);
+    assert.throws(() => formatBps(-Infinity), /Basis points must be a finite number/);
+  });
 });
