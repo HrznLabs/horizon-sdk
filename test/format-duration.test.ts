@@ -55,4 +55,10 @@ describe('formatDuration', () => {
   it('should throw error for non-integer duration', () => {
     assert.throws(() => formatDuration(1.5), /Duration must be an integer/);
   });
+
+  it('should throw error for non-finite duration', () => {
+    assert.throws(() => formatDuration(NaN), /Duration must be a finite number/);
+    assert.throws(() => formatDuration(Infinity), /Duration must be a finite number/);
+    assert.throws(() => formatDuration(-Infinity), /Duration must be a finite number/);
+  });
 });
