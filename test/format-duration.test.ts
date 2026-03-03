@@ -47,8 +47,9 @@ describe('formatDuration', () => {
     assert.strictEqual(formatDuration(7200, { style: 'long' }), '2 hours');
   });
 
-  it('should throw error for negative duration', () => {
-    assert.throws(() => formatDuration(-1), /Duration must be non-negative/);
+  it('should handle negative duration by formatting absolute value', () => {
+    assert.strictEqual(formatDuration(-3600), '1h');
+    assert.strictEqual(formatDuration(-3660, { style: 'long' }), '1 hour 1 minute');
   });
 
   it('should throw error for non-integer duration', () => {
