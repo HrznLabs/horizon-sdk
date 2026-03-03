@@ -416,7 +416,6 @@ export function formatDuration(
   seconds: number,
   options?: { style?: 'short' | 'long' }
 ): string {
-  if (seconds < 0) throw new Error('Duration must be non-negative');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
   if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
 
@@ -425,7 +424,7 @@ export function formatDuration(
   const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
 
   const result: string[] = [];
-  let remainingSeconds = seconds;
+  let remainingSeconds = Math.abs(seconds);
 
   for (const { label, seconds: unitSeconds } of timeUnits) {
     const count = Math.floor(remainingSeconds / unitSeconds);
