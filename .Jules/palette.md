@@ -41,3 +41,7 @@
 ## 2025-05-27 - [Large Number Readability]
 **Learning:** Displaying raw large numbers (e.g. 1,500,000) in dashboards creates cognitive load and makes scanning difficult. Users prefer "1.5M" for quick comparison.
 **Action:** Implement a `compact` option in number formatting utilities that automatically scales values by magnitude (K, M, B, T) and appends the appropriate suffix.
+
+## 2025-05-28 - [Graceful Degradation in Time Displays]
+**Learning:** Throwing hard errors for negative durations crashes UI components (like countdown timers) when they momentarily drift past zero before a state update. This causes a sudden, jarring error screen for a completely benign edge case.
+**Action:** Utility functions formatting durations should handle negative inputs gracefully (e.g., by formatting their absolute value) rather than throwing, ensuring the UI remains stable during transient state changes.
