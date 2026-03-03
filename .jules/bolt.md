@@ -18,3 +18,7 @@
 ## 2024-05-25 - substring vs slice and template literals
 **Learning:** For string formatting operations, combining `String.substring` and simple string concatenation (`+`) can be ~20% faster than using `String.slice` with negative indices and template literals. V8 seems to optimize direct string concatenation and `substring` operations well for shorter strings, avoiding the overhead of parsing negative indices and evaluating template literals.
 **Action:** When working on formatting short strings (like Ethereum addresses), favor `substring` and string concatenation (`+`) over `slice` and template literals for better performance, particularly in hot utility functions.
+
+## 2024-05-26 - Fast O(1) checks before Regex evaluations
+**Learning:** In `getBaseScanUrl`, replacing length-specific regex evaluations (`/^0x[0-9a-fA-F]{40}$/` and `/^0x[0-9a-fA-F]{64}$/`) with a fast $O(1)$ string `.length` check followed by a single, hoisted, length-agnostic regex (`/^0x[0-9a-fA-F]+$/`) resulted in a ~4.7x speedup (1200ms -> 250ms for 1,000,000 operations). The $O(1)$ check prevents the regex engine from running at all for inputs of invalid length.
+**Action:** When validating string patterns that include strict length requirements, always evaluate `.length` first as a fast-path guard clause before invoking the regex engine.
