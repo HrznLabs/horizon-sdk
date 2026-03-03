@@ -44,6 +44,9 @@ for (let i = 0; i < 256; i++) {
 // Performance optimization: Shared buffer for randomBytes32 to avoid allocation on every call
 const RANDOM_BYTES_BUFFER = new Uint8Array(32);
 
+// Performance optimization: Hoisted regex for getBaseScanUrl
+const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
+
 // Performance optimization: Hoisted time units for formatDuration
 const TIME_UNITS_SHORT = [
   { label: 'd', seconds: 86400 },
@@ -531,10 +534,13 @@ export function getBaseScanUrl(
 ): string {
   // Security: Strict validation to prevent path traversal and XSS
   // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
-  const isAddress = /^0x[0-9a-fA-F]{40}$/.test(hashOrAddress);
-  const isTx = /^0x[0-9a-fA-F]{64}$/.test(hashOrAddress);
+  // Optimization: Fast O(1) string length check avoids regex engine overhead
+  const len = hashOrAddress.length;
+  if (len !== 42 && len !== 66) {
+    throw new Error('Invalid address or transaction hash.');
+  }
 
-  if (!isAddress && !isTx) {
+  if (!HEX_REGEX.test(hashOrAddress)) {
     throw new Error('Invalid address or transaction hash.');
   }
 
@@ -544,7 +550,7 @@ export function getBaseScanUrl(
 
   let resolvedType = type;
   if (!resolvedType) {
-    resolvedType = isTx ? 'tx' : 'address';
+    resolvedType = len === 66 ? 'tx' : 'address';
   }
 
   return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
