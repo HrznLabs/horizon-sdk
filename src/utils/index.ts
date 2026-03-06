@@ -423,28 +423,40 @@ export function formatDuration(
   if (!Number.isFinite(seconds)) throw new Error('Duration must be a finite number');
   if (seconds < 0) throw new Error('Duration must be non-negative');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
-  if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
 
-  const style = options?.style || 'short';
+  const isLong = options?.style === 'long';
+  if (seconds === 0) return isLong ? '0 seconds' : '0s';
+
   // Optimization: Use hoisted constants to avoid array allocation on every call
-  const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
+  const timeUnits = isLong ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
 
-  const result: string[] = [];
-  let remainingSeconds = Math.abs(seconds);
+  let result = '';
+  let remainingSeconds = seconds;
 
-  for (const { label, seconds: unitSeconds } of timeUnits) {
+  // Optimization: standard for loop and direct string concatenation
+  // without Array.push().join() or template literals
+  for (let i = 0; i < timeUnits.length; i++) {
+    const unit = timeUnits[i];
+    const unitSeconds = unit.seconds;
+
+    // integer division
     const count = Math.floor(remainingSeconds / unitSeconds);
     if (count > 0) {
-      let unitLabel = label;
-      if (style === 'long' && count > 1) {
-        unitLabel += 's';
+      if (result.length > 0) {
+        result += ' ';
       }
-      result.push(`${count}${style === 'long' ? ' ' : ''}${unitLabel}`);
+
+      if (isLong) {
+        result += count + ' ' + unit.label + (count > 1 ? 's' : '');
+      } else {
+        result += count + unit.label;
+      }
+
       remainingSeconds %= unitSeconds;
     }
   }
 
-  return result.join(' ');
+  return result;
 }
 
 /**
