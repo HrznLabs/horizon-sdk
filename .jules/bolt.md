@@ -26,3 +26,7 @@
 ## 2024-05-27 - Pure Numeric Calculations vs String Manipulation in Formatting
 **Learning:** In `formatUSDC` compact formatting, replacing string allocations and loops (`toString()`, `padStart()`, `substring()`, `while` zero-trimming) with pure numeric calculations (division/modulo and Number formatting logic) improves execution time by ~45% (e.g. 1684ms -> 927ms for 1,000,000 operations) and reduces memory overhead by avoiding intermediate string objects. Hoisting large numeric constants (e.g., millions/billions scaled) to module scope also contributes by avoiding repetitive initializations.
 **Action:** When calculating and formatting small fractional or decimal values, prefer pure numerical checks and string template concatenation based on math conditions over using native string padding/trimming functions.
+
+## 2026-03-05 - Array Building vs Direct String Concatenation in Formatting
+**Learning:** In `formatDuration`, replacing array allocation (`result.push()`) and joining (`result.join(' ')`) with a standard `for` loop and direct string concatenation (`+=`) reduced execution time by ~50% (800ms -> 393ms for 1M iterations) by avoiding intermediate array allocations and simplifying memory management during string construction.
+**Action:** When iteratively building short strings, prefer traditional loops and direct string concatenation (`+=`) over pushing to an array and using `.join()`.
