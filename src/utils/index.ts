@@ -250,21 +250,23 @@ export function formatUSDC(
   if (useCommas) {
     const len = wholeStr.length;
     if (len > 3) {
-      let start = len % 3;
-      if (start === 0) start = 3;
-      let formatted = wholeStr.slice(0, start);
+      // Optimization: substring is faster than slice, and direct string concatenation
+      // is faster than template literals for simple joins.
+      const mod = len % 3;
+      const start = mod === 0 ? 3 : mod;
+      let formatted = wholeStr.substring(0, start);
       for (let i = start; i < len; i += 3) {
-        formatted += ',' + wholeStr.slice(i, i + 3);
+        formatted += ',' + wholeStr.substring(i, i + 3);
       }
       wholeStr = formatted;
     }
   }
 
   if (fractionStr === '') {
-    return `${sign}${prefix}${wholeStr}${suffix}`;
+    return sign + prefix + wholeStr + suffix;
   }
 
-  return `${sign}${prefix}${wholeStr}.${fractionStr}${suffix}`;
+  return sign + prefix + wholeStr + '.' + fractionStr + suffix;
 }
 
 /**
