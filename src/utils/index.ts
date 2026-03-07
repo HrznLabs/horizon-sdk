@@ -467,30 +467,38 @@ export function formatDuration(
  * @returns bytes32 hex string
  */
 export function toBytes32(str: string): `0x${string}` {
+  const len = str.length;
   // If already a hex string with 0x prefix
-  if (str.startsWith('0x')) {
-    const hex = str.slice(2);
-    if (hex.length > 64) {
+  if (len >= 2 && str.charCodeAt(0) === 48 && str.charCodeAt(1) === 120) { // '0x'
+    const hexLen = len - 2;
+    if (hexLen > 64) {
       throw new Error(
-        `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
+        `String too long for bytes32: ${Math.ceil(hexLen / 2)} bytes (max 32)`
       );
     }
-    // Validate hex characters
-    if (!/^[0-9a-fA-F]*$/.test(hex)) {
-      throw new Error('Invalid hex string.');
+
+    // Optimization: avoid regex and check chars directly to prevent string allocation for substring just for validation
+    for (let i = 2; i < len; i++) {
+        const charCode = str.charCodeAt(i);
+        if (!(charCode >= 48 && charCode <= 57) && // 0-9
+            !(charCode >= 97 && charCode <= 102) && // a-f
+            !(charCode >= 65 && charCode <= 70)) {    // A-F
+            throw new Error('Invalid hex string.');
+        }
     }
-    return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+    return `0x${str.substring(2).padEnd(64, '0')}` as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
-  if (bytes.length > 32) {
+  const bytesLen = bytes.length;
+  if (bytesLen > 32) {
     throw new Error(
-      `String too long for bytes32: ${bytes.length} bytes (max 32)`
+      `String too long for bytes32: ${bytesLen} bytes (max 32)`
     );
   }
   let hex = '';
   // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
-  for (let i = 0; i < bytes.length; i++) {
+  for (let i = 0; i < bytesLen; i++) {
     hex += HEX_STRINGS[bytes[i]];
   }
   return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
