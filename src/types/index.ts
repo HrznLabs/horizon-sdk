@@ -157,6 +157,7 @@ export interface ContractAddresses {
   horizonVesting: `0x${string}`;
   horizonGovernor: `0x${string}`;
   horizonTimelock: `0x${string}`;
+  buybackExecutor: `0x${string}`;
 }
 
 /**
