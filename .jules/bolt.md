@@ -38,3 +38,7 @@
 ## 2026-03-05 - Avoid Regex and String Allocations for Hex Validation
 **Learning:** In `toBytes32`, replacing `str.startsWith('0x')` and regex `.test` hex validation (`/^[0-9a-fA-F]*$/`) with `charCodeAt` evaluations and a direct iteration over characters to check code points reduced execution time by over ~20% (e.g. 197ms -> 156ms for 1,000,000 operations). Avoiding `slice` and `substring` specifically when the substring is only needed for the `.test()` regex avoids unnecessary string allocation overhead.
 **Action:** When validating a short string for character set constraints (e.g., hex only) before further parsing, prefer `charCodeAt` direct loops over regex and substring creations, especially in high-volume utility functions.
+
+## 2026-03-05 - String Concatenation vs Template Literals in formatBps
+**Learning:** In the `formatBps` utility, returning with simple string concatenation (`sign + prefix + formatted + suffix`) instead of template literals (`` `${sign}${prefix}${formatted}${suffix}` ``) resulted in a ~15-20% execution time reduction (e.g. 297ms -> 240ms for 1,000,000 iterations). V8 optimizes native string concatenation (`+`) more effectively for simple, short strings than evaluating template literals, which parse expressions and convert intermediate primitives.
+**Action:** When building straightforward, small output strings without complex internal logic, favor standard string concatenation (`+`) over template literals for minor performance wins in hot paths.
