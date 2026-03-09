@@ -86,6 +86,7 @@ export const BASE_SEPOLIA_CONTRACTS: ContractAddresses = {
   horizonVesting: '0xa7F10148D14cb3D8459ebf94A64E4e05F4bB95f4' as `0x${string}`,
   horizonGovernor: '0x4246b5d58960D796F3d562A3ECE333f51e2bFdCc' as `0x${string}`,
   horizonTimelock: '0xBB50b9987e93E831Fd1C0C54c2C952bF5B7D87d7' as `0x${string}`,
+  buybackExecutor: '0x42cf55353e150C91b522497e220E736ceF0f8890' as `0x${string}`,
 };
 
 /**
@@ -117,6 +118,7 @@ export const BASE_MAINNET_CONTRACTS: ContractAddresses = {
   horizonVesting: '' as `0x${string}`,
   horizonGovernor: '' as `0x${string}`,
   horizonTimelock: '' as `0x${string}`,
+  buybackExecutor: '' as `0x${string}`,
 };
 
 /**
