@@ -52,4 +52,10 @@ describe('getBaseScanUrl', () => {
     const badHex = '0xZZZ4567890123456789012345678901234567890';
     assert.throws(() => getBaseScanUrl(badHex), /Invalid address or transaction hash/);
   });
+
+  it('should throw error for invalid type', () => {
+    // Attempting to inject path traversal via the type parameter
+    assert.throws(() => getBaseScanUrl(address, 'address/../../evil' as any), /Invalid type/);
+    assert.throws(() => getBaseScanUrl(address, 'invalid_type' as any), /Invalid type/);
+  });
 });

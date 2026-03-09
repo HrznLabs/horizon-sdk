@@ -47,3 +47,8 @@
 **Vulnerability:** `formatBps` accepted `NaN`, `Infinity`, and `-Infinity` for the `bps` float input, resulting in malformed strings like `"NaN%"` or `"Infinity%"`.
 **Learning:** Utility functions accepting JavaScript floating point `number` types do not natively enforce finiteness. Failure to explicitly check for `NaN` or `Infinity` allows bad numerical state from upstream operations to leak directly into the user interface or downstream functions as silent data corruption.
 **Prevention:** Use `Number.isFinite()` as the first validation check for any numeric input where standard floating point rules apply and non-finite results indicate an invalid state or operation.
+
+## 2026-03-09 - Unvalidated Type Parameter in URL Generation
+**Vulnerability:** `getBaseScanUrl` accepted any value for the `type` parameter (e.g., bypassing type constraints via `as any`), allowing path traversal and XSS via `type` (e.g., `"address/../../evil"`).
+**Learning:** Even if a parameter's type is strictly defined in TypeScript (e.g., `'address' | 'tx'`), malicious input can be passed during runtime. You cannot rely on TS types alone for input validation, especially for functions generating external URLs.
+**Prevention:** Always validate all parameters that are incorporated into a URL, not just the "main" input. Ensure the `type` parameter strictly matches allowed values (`'address'` or `'tx'`) and throw a generic error if it does not.
