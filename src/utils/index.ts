@@ -576,6 +576,8 @@ export function getBaseScanUrl(
   let resolvedType = type;
   if (!resolvedType) {
     resolvedType = len === 66 ? 'tx' : 'address';
+  } else if (resolvedType !== 'address' && resolvedType !== 'tx') {
+    throw new Error('Invalid type: must be "address" or "tx".');
   }
 
   return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
