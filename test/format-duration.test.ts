@@ -47,11 +47,18 @@ describe('formatDuration', () => {
     assert.strictEqual(formatDuration(7200, { style: 'long' }), '2 hours');
   });
 
-  it('should throw error for negative duration', () => {
-    assert.throws(() => formatDuration(-1), /Duration must be non-negative/);
+  it('should handle negative duration by throwing an error', () => {
+    assert.throws(() => formatDuration(-3600), /Duration must be non-negative/);
+    assert.throws(() => formatDuration(-3660, { style: 'long' }), /Duration must be non-negative/);
   });
 
   it('should throw error for non-integer duration', () => {
     assert.throws(() => formatDuration(1.5), /Duration must be an integer/);
+  });
+
+  it('should throw error for non-finite duration', () => {
+    assert.throws(() => formatDuration(NaN), /Duration must be a finite number/);
+    assert.throws(() => formatDuration(Infinity), /Duration must be a finite number/);
+    assert.throws(() => formatDuration(-Infinity), /Duration must be a finite number/);
   });
 });
