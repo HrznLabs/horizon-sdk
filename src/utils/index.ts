@@ -558,5 +558,9 @@ export function getBaseScanUrl(
     resolvedType = isTx ? 'tx' : 'address';
   }
 
+  if (resolvedType !== 'address' && resolvedType !== 'tx') {
+    throw new Error('Invalid type parameter.');
+  }
+
   return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
 }
