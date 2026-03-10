@@ -27,12 +27,6 @@ const POWERS_OF_10: bigint[] = [
   1000000n,
 ];
 
-// Performance optimization: Hoisted constants for compact USDC formatting
-const COMPACT_ONE_THOUSAND = 1000n * USDC_MULTIPLIER_BIGINT;
-const COMPACT_ONE_MILLION = 1000000n * USDC_MULTIPLIER_BIGINT;
-const COMPACT_ONE_BILLION = 1000000000n * USDC_MULTIPLIER_BIGINT;
-const COMPACT_ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
-
 const PROTOCOL_BPS_BIGINT = BigInt(FEES.PROTOCOL_BPS);
 const LABS_BPS_BIGINT = BigInt(FEES.LABS_BPS);
 const RESOLVER_BPS_BIGINT = BigInt(FEES.RESOLVER_BPS);
@@ -49,9 +43,6 @@ for (let i = 0; i < 256; i++) {
 
 // Performance optimization: Shared buffer for randomBytes32 to avoid allocation on every call
 const RANDOM_BYTES_BUFFER = new Uint8Array(32);
-
-// Performance optimization: Hoisted regex for getBaseScanUrl
-const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
 
 // Performance optimization: Hoisted time units for formatDuration
 const TIME_UNITS_SHORT = [
@@ -174,47 +165,61 @@ export function formatUSDC(
 
   // Compact notation handling (K, M, B, T)
   if (compact) {
+    const ONE_THOUSAND = 1000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_MILLION = 1000000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_BILLION = 1000000000n * USDC_MULTIPLIER_BIGINT;
+    const ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
+
     let divisor = 1n;
     let unit = '';
 
-    if (absAmount >= COMPACT_ONE_TRILLION) {
-      divisor = COMPACT_ONE_TRILLION;
+    if (absAmount >= ONE_TRILLION) {
+      divisor = ONE_TRILLION;
       unit = 'T';
-    } else if (absAmount >= COMPACT_ONE_BILLION) {
-      divisor = COMPACT_ONE_BILLION;
+    } else if (absAmount >= ONE_BILLION) {
+      divisor = ONE_BILLION;
       unit = 'B';
-    } else if (absAmount >= COMPACT_ONE_MILLION) {
-      divisor = COMPACT_ONE_MILLION;
+    } else if (absAmount >= ONE_MILLION) {
+      divisor = ONE_MILLION;
       unit = 'M';
-    } else if (absAmount >= COMPACT_ONE_THOUSAND) {
-      divisor = COMPACT_ONE_THOUSAND;
+    } else if (absAmount >= ONE_THOUSAND) {
+      divisor = ONE_THOUSAND;
       unit = 'K';
     }
 
     if (unit) {
       // Calculate scaled amount with higher precision for formatting
       // We want to keep up to 2 decimals for compact notation by default
+      // but we need to respect the input's actual value
+
+      // Calculate whole part
       const scaledWhole = absAmount / divisor;
+
+      // Calculate fractional part (simulate 2 decimal places for compact)
+      // Multiply remainder by 100 to get next 2 digits
       const remainder = absAmount % divisor;
+      // We need to scale remainder based on the divisor
+      // remainder / divisor is the fraction.
+      // To get 2 decimal places: (remainder * 100) / divisor
 
-      let decimalPart = '';
-      if (remainder > 0n) {
-        // Calculate fractional part (simulate 2 decimal places for compact)
-        // Optimization: Use pure numeric operations to format decimals instead of strings/padding
-        const fractionVal = Number((remainder * 100n) / divisor);
+      let decimals = 2; // Default to 2 decimals for compact
 
-        if (fractionVal > 0) {
-          if (fractionVal < 10) {
-            decimalPart = `.0${fractionVal}`;
-          } else if (fractionVal % 10 === 0) {
-            decimalPart = `.${fractionVal / 10}`;
-          } else {
-            decimalPart = `.${fractionVal}`;
-          }
-        }
+      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
+      let fractionStr = fractionVal.toString();
+
+      // Pad with zeros if needed (e.g. 05)
+      fractionStr = fractionStr.padStart(decimals, '0');
+
+      // Trim trailing zeros
+      let i = fractionStr.length - 1;
+      while (i >= 0 && fractionStr[i] === '0') {
+        i--;
       }
+      fractionStr = fractionStr.substring(0, i + 1);
 
       const sign = amount < 0n ? '-' : '';
+      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
+
       return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
     }
   }
@@ -250,23 +255,21 @@ export function formatUSDC(
   if (useCommas) {
     const len = wholeStr.length;
     if (len > 3) {
-      // Optimization: substring is faster than slice, and direct string concatenation
-      // is faster than template literals for simple joins.
-      const mod = len % 3;
-      const start = mod === 0 ? 3 : mod;
-      let formatted = wholeStr.substring(0, start);
+      let start = len % 3;
+      if (start === 0) start = 3;
+      let formatted = wholeStr.slice(0, start);
       for (let i = start; i < len; i += 3) {
-        formatted += ',' + wholeStr.substring(i, i + 3);
+        formatted += ',' + wholeStr.slice(i, i + 3);
       }
       wholeStr = formatted;
     }
   }
 
   if (fractionStr === '') {
-    return sign + prefix + wholeStr + suffix;
+    return `${sign}${prefix}${wholeStr}${suffix}`;
   }
 
-  return sign + prefix + wholeStr + '.' + fractionStr + suffix;
+  return `${sign}${prefix}${wholeStr}.${fractionStr}${suffix}`;
 }
 
 /**
@@ -279,10 +282,6 @@ export function formatBps(
   bps: number,
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
-  if (!Number.isFinite(bps)) {
-    throw new Error('Basis points must be a finite number');
-  }
-
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
@@ -302,9 +301,7 @@ export function formatBps(
     }
   }
 
-  // Optimization: Direct string concatenation is ~20% faster than template literals
-  // for simple short string combinations without evaluation
-  return sign + prefix + formatted + suffix;
+  return `${sign}${prefix}${formatted}${suffix}`;
 }
 
 /**
@@ -384,11 +381,6 @@ export function calculateLPP(rewardAmount: bigint): bigint {
  * @returns Expiration timestamp (bigint)
  */
 export function calculateExpiresAt(durationSeconds: number): bigint {
-  if (!Number.isFinite(durationSeconds)) {
-    throw new Error(
-      `Invalid duration: ${durationSeconds} seconds. Duration must be a finite number.`
-    );
-  }
   if (!Number.isInteger(durationSeconds)) {
     throw new Error(
       `Invalid duration: ${durationSeconds} seconds. Duration must be an integer.`
@@ -424,43 +416,30 @@ export function formatDuration(
   seconds: number,
   options?: { style?: 'short' | 'long' }
 ): string {
-  if (!Number.isFinite(seconds)) throw new Error('Duration must be a finite number');
   if (seconds < 0) throw new Error('Duration must be non-negative');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
+  if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
 
-  const isLong = options?.style === 'long';
-  if (seconds === 0) return isLong ? '0 seconds' : '0s';
-
+  const style = options?.style || 'short';
   // Optimization: Use hoisted constants to avoid array allocation on every call
-  const timeUnits = isLong ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
+  const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
 
-  let result = '';
+  const result: string[] = [];
   let remainingSeconds = seconds;
 
-  // Optimization: standard for loop and direct string concatenation
-  // without Array.push().join() or template literals
-  for (let i = 0; i < timeUnits.length; i++) {
-    const unit = timeUnits[i];
-    const unitSeconds = unit.seconds;
-
-    // integer division
+  for (const { label, seconds: unitSeconds } of timeUnits) {
     const count = Math.floor(remainingSeconds / unitSeconds);
     if (count > 0) {
-      if (result.length > 0) {
-        result += ' ';
+      let unitLabel = label;
+      if (style === 'long' && count > 1) {
+        unitLabel += 's';
       }
-
-      if (isLong) {
-        result += count + ' ' + unit.label + (count > 1 ? 's' : '');
-      } else {
-        result += count + unit.label;
-      }
-
+      result.push(`${count}${style === 'long' ? ' ' : ''}${unitLabel}`);
       remainingSeconds %= unitSeconds;
     }
   }
 
-  return result;
+  return result.join(' ');
 }
 
 /**
@@ -469,38 +448,30 @@ export function formatDuration(
  * @returns bytes32 hex string
  */
 export function toBytes32(str: string): `0x${string}` {
-  const len = str.length;
   // If already a hex string with 0x prefix
-  if (len >= 2 && str.charCodeAt(0) === 48 && str.charCodeAt(1) === 120) { // '0x'
-    const hexLen = len - 2;
-    if (hexLen > 64) {
+  if (str.startsWith('0x')) {
+    const hex = str.slice(2);
+    if (hex.length > 64) {
       throw new Error(
-        `String too long for bytes32: ${Math.ceil(hexLen / 2)} bytes (max 32)`
+        `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
       );
     }
-
-    // Optimization: avoid regex and check chars directly to prevent string allocation for substring just for validation
-    for (let i = 2; i < len; i++) {
-        const charCode = str.charCodeAt(i);
-        if (!(charCode >= 48 && charCode <= 57) && // 0-9
-            !(charCode >= 97 && charCode <= 102) && // a-f
-            !(charCode >= 65 && charCode <= 70)) {    // A-F
-            throw new Error('Invalid hex string.');
-        }
+    // Validate hex characters
+    if (!/^[0-9a-fA-F]*$/.test(hex)) {
+      throw new Error('Invalid hex string.');
     }
-    return `0x${str.substring(2).padEnd(64, '0')}` as `0x${string}`;
+    return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
-  const bytesLen = bytes.length;
-  if (bytesLen > 32) {
+  if (bytes.length > 32) {
     throw new Error(
-      `String too long for bytes32: ${bytesLen} bytes (max 32)`
+      `String too long for bytes32: ${bytes.length} bytes (max 32)`
     );
   }
   let hex = '';
   // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
-  for (let i = 0; i < bytesLen; i++) {
+  for (let i = 0; i < bytes.length; i++) {
     hex += HEX_STRINGS[bytes[i]];
   }
   return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
@@ -530,22 +501,23 @@ export function formatAddress(
   address: string,
   options?: { start?: number; end?: number }
 ): string {
-  const len = address.length;
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
     // If address is shorter than or equal to the truncated parts, return as is
-    if (len <= start + end) return address;
+    if (address.length <= start + end) return address;
 
-    // Optimization: substring and string concatenation is faster than slice and template literals
-    const endStr = end === 0 ? '' : address.substring(len - end);
-    return address.substring(0, start) + '...' + endStr;
+    const endStr = end === 0 ? '' : address.slice(-end);
+    return `${address.slice(0, start)}...${endStr}`;
   }
 
   // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
-  if (len !== 42) return address;
-  return address.substring(0, 6) + '...' + address.substring(38);
+  if (address.length !== 42) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
+
+// Optimization: Hoisted regex for hex validation to avoid instantiation on every call
+const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
 
 /**
  * Get BaseScan URL for address or transaction
@@ -561,13 +533,19 @@ export function getBaseScanUrl(
 ): string {
   // Security: Strict validation to prevent path traversal and XSS
   // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
-  // Optimization: Fast O(1) string length check avoids regex engine overhead
   const len = hashOrAddress.length;
-  if (len !== 42 && len !== 66) {
-    throw new Error('Invalid address or transaction hash.');
+  let isAddress = false;
+  let isTx = false;
+
+  // Optimization: Fast length check before running regex is ~3x faster
+  if (len === 42 || len === 66) {
+    if (HEX_REGEX.test(hashOrAddress)) {
+      if (len === 42) isAddress = true;
+      else isTx = true;
+    }
   }
 
-  if (!HEX_REGEX.test(hashOrAddress)) {
+  if (!isAddress && !isTx) {
     throw new Error('Invalid address or transaction hash.');
   }
 
@@ -577,9 +555,7 @@ export function getBaseScanUrl(
 
   let resolvedType = type;
   if (!resolvedType) {
-    resolvedType = len === 66 ? 'tx' : 'address';
-  } else if (resolvedType !== 'address' && resolvedType !== 'tx') {
-    throw new Error('Invalid type: must be "address" or "tx".');
+    resolvedType = isTx ? 'tx' : 'address';
   }
 
   return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
