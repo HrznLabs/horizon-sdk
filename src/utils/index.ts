@@ -282,6 +282,10 @@ export function formatBps(
   bps: number,
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
+  if (!Number.isFinite(bps)) {
+    throw new Error('bps must be a finite number');
+  }
+
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
@@ -556,6 +560,10 @@ export function getBaseScanUrl(
   let resolvedType = type;
   if (!resolvedType) {
     resolvedType = isTx ? 'tx' : 'address';
+  } else if (resolvedType !== 'address' && resolvedType !== 'tx') {
+    // Security: Strict validation of type parameter to prevent path traversal/SSRF
+    // TypeScript types do not guarantee runtime safety from malicious input.
+    throw new Error('Invalid type parameter.');
   }
 
   return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
