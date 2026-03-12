@@ -546,6 +546,10 @@ const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
  * @param testnet Whether to use testnet explorer
  * @returns Full BaseScan URL
  */
+// Optimization: Pre-compute base URLs with trailing slashes to avoid template literals later
+const SEPOLIA_BASESCAN_URL = 'https://sepolia.basescan.org/';
+const MAINNET_BASESCAN_URL = 'https://basescan.org/';
+
 export function getBaseScanUrl(
   hashOrAddress: string,
   type?: 'address' | 'tx',
@@ -554,37 +558,22 @@ export function getBaseScanUrl(
   // Security: Strict validation to prevent path traversal and XSS
   // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
   const len = hashOrAddress.length;
-  let isAddress = false;
-  let isTx = false;
 
-  // Optimization: Fast length check before running regex is ~3x faster
-  if (len === 42 || len === 66) {
-    if (HEX_REGEX.test(hashOrAddress)) {
-      if (len === 42) isAddress = true;
-      else isTx = true;
-    }
-  }
-
-  if (!isAddress && !isTx) {
+  // Optimization: Combine length checks and regex test into one short-circuiting expression
+  // Fast length check before running regex is ~3x faster
+  if ((len !== 42 && len !== 66) || !HEX_REGEX.test(hashOrAddress)) {
     throw new Error('Invalid address or transaction hash.');
   }
 
-  const baseUrl = testnet
-    ? 'https://sepolia.basescan.org'
-    : 'https://basescan.org';
-
-  let resolvedType = type;
-  if (!resolvedType) {
-    resolvedType = isTx ? 'tx' : 'address';
-  } else if (resolvedType !== 'address' && resolvedType !== 'tx') {
-    // Security: Strict validation of type parameter to prevent path traversal/SSRF
-    // TypeScript types do not guarantee runtime safety from malicious input.
+  // Security: Prevent path traversal via type parameter (as TypeScript types are not runtime safeguards)
+  if (type !== undefined && type !== 'address' && type !== 'tx') {
     throw new Error('Invalid type parameter.');
   }
 
-  if (resolvedType !== 'address' && resolvedType !== 'tx') {
-    throw new Error('Invalid type parameter.');
-  }
+  // Optimization: Pre-compute base URL with slash and direct string concatenation
+  // to avoid template literal overhead
+  const baseUrl = testnet ? SEPOLIA_BASESCAN_URL : MAINNET_BASESCAN_URL;
+  const pathType = type !== undefined ? type : (len === 42 ? 'address' : 'tx');
 
-  return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
+  return baseUrl + pathType + '/' + hashOrAddress;
 }
