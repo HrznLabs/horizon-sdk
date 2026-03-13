@@ -416,30 +416,42 @@ export function formatDuration(
   seconds: number,
   options?: { style?: 'short' | 'long' }
 ): string {
+  if (!Number.isFinite(seconds)) throw new Error('Duration must be a finite number');
   if (seconds < 0) throw new Error('Duration must be non-negative');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
   if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
 
-  const style = options?.style || 'short';
+  const isLong = options?.style === 'long';
   // Optimization: Use hoisted constants to avoid array allocation on every call
-  const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
+  const timeUnits = isLong ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
 
-  const result: string[] = [];
+  // Optimization: Direct string concatenation avoids array allocations (.push() and .join())
+  let result = '';
   let remainingSeconds = seconds;
 
-  for (const { label, seconds: unitSeconds } of timeUnits) {
-    const count = Math.floor(remainingSeconds / unitSeconds);
-    if (count > 0) {
-      let unitLabel = label;
-      if (style === 'long' && count > 1) {
-        unitLabel += 's';
+  // Optimization: Standard for loop is slightly faster than for...of
+  for (let i = 0; i < timeUnits.length; i++) {
+    const unit = timeUnits[i];
+    const unitSeconds = unit.seconds;
+
+    // Optimization: Quick check prevents unnecessary Math.floor and division
+    if (remainingSeconds >= unitSeconds) {
+      const count = Math.floor(remainingSeconds / unitSeconds);
+
+      if (result !== '') result += ' ';
+      result += count;
+
+      if (isLong) {
+        result += ' ' + unit.label + (count > 1 ? 's' : '');
+      } else {
+        result += unit.label;
       }
-      result.push(`${count}${style === 'long' ? ' ' : ''}${unitLabel}`);
+
       remainingSeconds %= unitSeconds;
     }
   }
 
-  return result.join(' ');
+  return result;
 }
 
 /**

@@ -22,3 +22,7 @@
 ## 2024-05-25 - Substring & Concatenation > Slice & Template Literals
 **Learning:** Using `substring` and direct string concatenation (`+`) instead of `slice` (specifically negative slice like `slice(-4)`) and template literals reduces execution time significantly (~40% reduction for `formatAddress` in micro-benchmarks). The V8 engine optimizes `substring` and `+` more effectively for these specific types of common string manipulations.
 **Action:** When writing high-throughput functions that perform simple string truncation and concatenation, prefer `substring` with calculated lengths and direct `+` concatenation over `slice` with negative indices and template literals.
+
+## 2024-05-15 - [formatDuration Array Join vs String Concatenation]
+**Learning:** In highly-called utility functions formatting strings (like `formatDuration`), repeatedly allocating array elements using `.push()` and then joining them via `.join(' ')` incurs a significant performance overhead compared to straightforward string concatenation (`+=`).
+**Action:** Default to simple string operations (concatenation, `substring`) over array allocations or complex methods for performance-critical string builders in this codebase. Always add quick checks to skip math operations where possible.
