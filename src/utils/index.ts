@@ -282,6 +282,9 @@ export function formatBps(
   bps: number,
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
+  if (!Number.isFinite(bps)) throw new Error('BPS must be a finite number');
+  if (!Number.isInteger(bps)) throw new Error('BPS must be an integer');
+  
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
