@@ -504,16 +504,20 @@ export function formatAddress(
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
+    const len = address.length;
     // If address is shorter than or equal to the truncated parts, return as is
-    if (address.length <= start + end) return address;
+    if (len <= start + end) return address;
 
-    const endStr = end === 0 ? '' : address.slice(-end);
-    return `${address.slice(0, start)}...${endStr}`;
+    // Optimization: substring and direct string concatenation are faster than slice and template literals
+    const endStr = end === 0 ? '' : address.substring(len - end);
+    return address.substring(0, start) + '...' + endStr;
   }
 
   // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
   if (address.length !== 42) return address;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+
+  // Optimization: direct string concat and substring instead of slice
+  return address.substring(0, 6) + '...' + address.substring(38);
 }
 
 // Optimization: Hoisted regex for hex validation to avoid instantiation on every call
