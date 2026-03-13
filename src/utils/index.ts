@@ -458,6 +458,9 @@ export function formatDuration(
   return result;
 }
 
+// Optimization: Hoisted regex for hex validation to avoid instantiation on every call
+const HEX_PREFIX_REGEX = /^0x[0-9a-fA-F]*$/;
+
 /**
  * Convert string to bytes32 (for IPFS hashes, etc.)
  * @param str String to convert (usually hex string)
@@ -466,17 +469,18 @@ export function formatDuration(
 export function toBytes32(str: string): `0x${string}` {
   // If already a hex string with 0x prefix
   if (str.startsWith('0x')) {
-    const hex = str.slice(2);
-    if (hex.length > 64) {
+    const len = str.length;
+    if (len > 66) {
       throw new Error(
-        `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
+        `String too long for bytes32: ${Math.ceil((len - 2) / 2)} bytes (max 32)`
       );
     }
-    // Validate hex characters
-    if (!/^[0-9a-fA-F]*$/.test(hex)) {
+    // Optimization: Check hex using hoisted regex directly on str to avoid slice allocation
+    if (!HEX_PREFIX_REGEX.test(str)) {
       throw new Error('Invalid hex string.');
     }
-    return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+    // Optimization: Avoid template literal and string concatenation by padding the full string
+    return (len === 66 ? str : str.padEnd(66, '0')) as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
@@ -485,12 +489,13 @@ export function toBytes32(str: string): `0x${string}` {
       `String too long for bytes32: ${bytes.length} bytes (max 32)`
     );
   }
-  let hex = '';
+  // Optimization: Start with '0x' prefix to avoid template literal concatenation at the end
+  let hex = '0x';
   // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
   for (let i = 0; i < bytes.length; i++) {
     hex += HEX_STRINGS[bytes[i]];
   }
-  return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+  return hex.padEnd(66, '0') as `0x${string}`;
 }
 
 /**
