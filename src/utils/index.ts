@@ -220,7 +220,8 @@ export function formatUSDC(
       const sign = amount < 0n ? '-' : '';
       const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
 
-      return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
+      // Optimization: Direct string concatenation is faster than template literals
+      return sign + prefix + scaledWhole + decimalPart + unit + suffix;
     }
   }
 
@@ -266,10 +267,12 @@ export function formatUSDC(
   }
 
   if (fractionStr === '') {
-    return `${sign}${prefix}${wholeStr}${suffix}`;
+    // Optimization: Direct string concatenation is faster than template literals
+    return sign + prefix + wholeStr + suffix;
   }
 
-  return `${sign}${prefix}${wholeStr}.${fractionStr}${suffix}`;
+  // Optimization: Direct string concatenation is faster than template literals
+  return sign + prefix + wholeStr + '.' + fractionStr + suffix;
 }
 
 /**
@@ -305,7 +308,8 @@ export function formatBps(
     }
   }
 
-  return `${sign}${prefix}${formatted}${suffix}`;
+  // Optimization: Direct string concatenation is faster than template literals
+  return sign + prefix + formatted + suffix;
 }
 
 /**
