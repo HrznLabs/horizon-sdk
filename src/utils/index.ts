@@ -198,29 +198,25 @@ export function formatUSDC(
       // Calculate fractional part (simulate 2 decimal places for compact)
       // Multiply remainder by 100 to get next 2 digits
       const remainder = absAmount % divisor;
-      // We need to scale remainder based on the divisor
-      // remainder / divisor is the fraction.
-      // To get 2 decimal places: (remainder * 100) / divisor
 
-      let decimals = 2; // Default to 2 decimals for compact
+      // Optimization: Pure numeric calculation of fraction avoids
+      // string allocations (.toString(), .padStart(), .substring())
+      // and manual loop overhead for zero trimming.
+      const fractionVal = Number((remainder * 100n) / divisor);
 
-      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
-      let fractionStr = fractionVal.toString();
-
-      // Pad with zeros if needed (e.g. 05)
-      fractionStr = fractionStr.padStart(decimals, '0');
-
-      // Trim trailing zeros
-      let i = fractionStr.length - 1;
-      while (i >= 0 && fractionStr[i] === '0') {
-        i--;
+      let decimalPart = '';
+      if (fractionVal > 0) {
+        if (fractionVal % 10 === 0) {
+          decimalPart = '.' + (fractionVal / 10).toString();
+        } else {
+          decimalPart = '.' + (fractionVal < 10 ? '0' + fractionVal : fractionVal.toString());
+        }
       }
-      fractionStr = fractionStr.substring(0, i + 1);
 
       const sign = amount < 0n ? '-' : '';
-      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
 
-      return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
+      // Optimization: direct string concatenation
+      return sign + prefix + scaledWhole.toString() + decimalPart + unit + suffix;
     }
   }
 
