@@ -48,8 +48,8 @@ describe('calculateExpiresAt Security Checks', () => {
   });
 
   it('should throw error for non-finite duration', () => {
-    assert.throws(() => calculateExpiresAt(NaN), /Duration must be a finite number/);
-    assert.throws(() => calculateExpiresAt(Infinity), /Duration must be a finite number/);
-    assert.throws(() => calculateExpiresAt(-Infinity), /Duration must be a finite number/);
+    assert.throws(() => calculateExpiresAt(NaN), /Duration must be an integer/);
+    assert.throws(() => calculateExpiresAt(Infinity), /Duration must be an integer/);
+    assert.throws(() => calculateExpiresAt(-Infinity), /Duration must be an integer/);
   });
 });
