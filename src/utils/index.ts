@@ -233,15 +233,17 @@ export function formatUSDC(
   if (fraction === 0n) {
     fractionStr = '';
   } else {
-    fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
+    // Optimization: Pure numeric calculations avoid string allocations and loop overhead
+    let numFraction = fraction;
+    let paddedZeros = USDC_DECIMALS;
 
-    // Trim trailing zeros for cleaner display
-    // Optimization: Manual loop is ~60% faster than regex replace(/0+$/, '')
-    let i = fractionStr.length - 1;
-    while (i >= 0 && fractionStr[i] === '0') {
-      i--;
+    // Trim trailing zeros mathematically
+    while (numFraction > 0n && numFraction % 10n === 0n) {
+      numFraction /= 10n;
+      paddedZeros--;
     }
-    fractionStr = fractionStr.substring(0, i + 1);
+
+    fractionStr = numFraction.toString().padStart(paddedZeros, '0');
   }
 
   if (minDecimals > 0) {

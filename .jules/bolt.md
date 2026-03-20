@@ -30,3 +30,7 @@
 ## 2024-12-04 - [Optimize getBaseScanUrl Construction]
 **Learning:** For short, frequently called URL construction utilities like `getBaseScanUrl`, combining input validation checks into a single short-circuiting expression (`||`) and using direct string concatenation (`+`) instead of ES6 template literals (`${}`) is significantly faster. In Node.js / V8, simple string concatenation avoids the overhead of creating template arrays and parsing nested variables. Combining boolean validations also avoids variable assignment overhead, increasing execution speed by ~20%.
 **Action:** Default to boolean operators `||` for chained fast-fail validations. Default to direct string concatenation instead of template strings for simple URL or path construction in high-frequency utilities.
+
+## 2024-12-06 - formatUSDC Numeric Trimming
+**Learning:** For trailing zero trimming, pure numeric calculations (division by 10) significantly outperform string-based zero-padding and loops. Avoiding `padStart` up-front and avoiding substring operations reduced execution time and GC overhead in the `formatUSDC` non-compact path.
+**Action:** When truncating trailing zeros or calculating lengths, prefer math operations (`% 10` and `/ 10`) over allocating formatted strings and looping over their characters.
