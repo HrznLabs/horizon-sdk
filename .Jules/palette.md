@@ -45,3 +45,7 @@
 ## 2025-05-28 - [Graceful Degradation in Time Displays]
 **Learning:** Throwing hard errors for negative durations crashes UI components (like countdown timers) when they momentarily drift past zero before a state update. This causes a sudden, jarring error screen for a completely benign edge case.
 **Action:** Utility functions formatting durations should handle negative inputs gracefully (e.g., by formatting their absolute value) rather than throwing, ensuring the UI remains stable during transient state changes.
+
+## 2026-03-21 - [Graceful Formatting Degradation]
+**Learning:** SDK formatting utilities should degrade gracefully for edge cases (like clock drift producing slightly negative durations) instead of throwing errors. Unhandled exceptions in simple formatting routines frequently cause frontend UI components to crash entirely, severely impacting developer experience.
+**Action:** Default to returning logical fallbacks (like '-1h') rather than strict range throwing in human-readable presentation utilities.
