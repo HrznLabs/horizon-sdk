@@ -283,7 +283,7 @@ export function formatBps(
   options?: { minDecimals?: number; prefix?: string; suffix?: string }
 ): string {
   if (!Number.isFinite(bps)) {
-    throw new Error('bps must be a finite number');
+    throw new Error('Basis points must be a finite number');
   }
 
   let minDecimals = options?.minDecimals || 0;
@@ -323,7 +323,7 @@ export function calculateFeeSplit(
     throw new Error('Reward amount must be non-negative');
   }
   if (!Number.isInteger(guildFeeBps)) {
-    throw new Error('Guild fee must be an integer');
+    throw new Error('Guild fee failed validation because it is not an integer');
   }
   if (guildFeeBps < 0 || guildFeeBps > FEES.MAX_GUILD_BPS) {
     throw new Error(
@@ -385,14 +385,15 @@ export function calculateLPP(rewardAmount: bigint): bigint {
  * @returns Expiration timestamp (bigint)
  */
 export function calculateExpiresAt(durationSeconds: number): bigint {
+  if (!Number.isFinite(durationSeconds)) {
+    throw new Error('Duration must be a finite number');
+  }
   if (!Number.isInteger(durationSeconds)) {
-    throw new Error(
-      `Invalid duration: ${durationSeconds} seconds. Duration must be an integer.`
-    );
+    throw new Error('Duration must be an integer');
   }
   if (durationSeconds < MIN_DURATION || durationSeconds > MAX_DURATION) {
     throw new Error(
-      `Invalid duration: ${durationSeconds} seconds. Duration must be between ${MIN_DURATION} and ${MAX_DURATION} seconds.`
+      `Duration must be between ${MIN_DURATION} and ${MAX_DURATION} seconds`
     );
   }
   return BigInt(Math.floor(Date.now() / 1000) + durationSeconds);
