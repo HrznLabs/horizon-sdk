@@ -26,19 +26,19 @@ describe('calculateExpiresAt Security Checks', () => {
   it('should throw error if duration is less than MIN_DURATION', () => {
     assert.throws(() => {
       calculateExpiresAt(MIN_DURATION - 1);
-    }, /Duration must be between/);
+    }, /Duration must be within the allowed range/);
   });
 
   it('should throw error if duration is greater than MAX_DURATION', () => {
     assert.throws(() => {
       calculateExpiresAt(MAX_DURATION + 1);
-    }, /Duration must be between/);
+    }, /Duration must be within the allowed range/);
   });
 
   it('should throw error if duration is negative', () => {
     assert.throws(() => {
       calculateExpiresAt(-1);
-    }, /Duration must be between/);
+    }, /Duration must be within the allowed range/);
   });
 
   it('should throw error if duration is not an integer', () => {
