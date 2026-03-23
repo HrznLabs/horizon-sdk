@@ -52,3 +52,8 @@
 **Vulnerability:** `getBaseScanUrl` accepted any value for the `type` parameter (e.g., bypassing type constraints via `as any`), allowing path traversal and XSS via `type` (e.g., `"address/../../evil"`).
 **Learning:** Even if a parameter's type is strictly defined in TypeScript (e.g., `'address' | 'tx'`), malicious input can be passed during runtime. You cannot rely on TS types alone for input validation, especially for functions generating external URLs.
 **Prevention:** Always validate all parameters that are incorporated into a URL, not just the "main" input. Ensure the `type` parameter strictly matches allowed values (`'address'` or `'tx'`) and throw a generic error if it does not.
+
+## 2026-03-10 - Reflected User Input in Utility Errors
+**Vulnerability:** `calculateExpiresAt` interpolated the potentially unvalidated `durationSeconds` input parameter directly into the error message if the value was not an integer. This could allow Log Injection or Reflected XSS if an attacker supplied a string containing malicious payload (e.g., `<script>alert(1)</script>`) to an untyped API endpoint that utilizes the utility without upstream parsing.
+**Learning:** Utility functions that throw exceptions for invalid inputs must never dynamically reflect the unvalidated input string within the error message. Even if the type signature is `number`, external inputs in JavaScript runtimes may bypass this.
+**Prevention:** Use static, safe error messages exclusively for input validation errors (e.g., "Duration must be an integer").
