@@ -52,3 +52,8 @@
 **Vulnerability:** `getBaseScanUrl` accepted any value for the `type` parameter (e.g., bypassing type constraints via `as any`), allowing path traversal and XSS via `type` (e.g., `"address/../../evil"`).
 **Learning:** Even if a parameter's type is strictly defined in TypeScript (e.g., `'address' | 'tx'`), malicious input can be passed during runtime. You cannot rely on TS types alone for input validation, especially for functions generating external URLs.
 **Prevention:** Always validate all parameters that are incorporated into a URL, not just the "main" input. Ensure the `type` parameter strictly matches allowed values (`'address'` or `'tx'`) and throw a generic error if it does not.
+
+## 2026-03-25 - Unvalidated Non-Finite Numbers in Float Utilities
+**Vulnerability:** Similar to `formatBps`, functions like `calculateExpiresAt` accepted `NaN`, `Infinity`, and `-Infinity` resulting in illogical calculations.
+**Learning:** Number validation for floating point non-finite numbers is required for time-based parameter operations to prevent downstream errors.
+**Prevention:** Use `Number.isFinite()` on numeric parameters to ensure valid values before performing downstream logical checks.
