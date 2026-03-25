@@ -458,6 +458,9 @@ export function formatDuration(
   return result;
 }
 
+// Optimization: Hoisted regex for hex validation to avoid instantiation on every call
+const HEX_VALIDATION_REGEX = /^0x[0-9a-fA-F]*$/;
+
 /**
  * Convert string to bytes32 (for IPFS hashes, etc.)
  * @param str String to convert (usually hex string)
@@ -466,17 +469,19 @@ export function formatDuration(
 export function toBytes32(str: string): `0x${string}` {
   // If already a hex string with 0x prefix
   if (str.startsWith('0x')) {
-    const hex = str.slice(2);
-    if (hex.length > 64) {
+    const len = str.length;
+    // Length of 66 corresponds to '0x' + 64 hex characters
+    if (len > 66) {
       throw new Error(
-        `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
+        `String too long for bytes32: ${Math.ceil((len - 2) / 2)} bytes (max 32)`
       );
     }
     // Validate hex characters
-    if (!/^[0-9a-fA-F]*$/.test(hex)) {
+    if (!HEX_VALIDATION_REGEX.test(str)) {
       throw new Error('Invalid hex string.');
     }
-    return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+    // Optimization: Pad the 0x-prefixed string directly to avoid slicing and string concatenation
+    return str.padEnd(66, '0') as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
