@@ -202,25 +202,27 @@ export function formatUSDC(
       // remainder / divisor is the fraction.
       // To get 2 decimal places: (remainder * 100) / divisor
 
-      let decimals = 2; // Default to 2 decimals for compact
+      // Optimization: Avoid string allocations and loops by using mathematical extraction
+      // and fast string concatenation for up to 2 decimals
+      const fractionVal = (remainder * 100n) / divisor;
+      let fractionStr = '';
 
-      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
-      let fractionStr = fractionVal.toString();
-
-      // Pad with zeros if needed (e.g. 05)
-      fractionStr = fractionStr.padStart(decimals, '0');
-
-      // Trim trailing zeros
-      let i = fractionStr.length - 1;
-      while (i >= 0 && fractionStr[i] === '0') {
-        i--;
+      if (fractionVal > 0n) {
+        if (fractionVal < 10n) {
+          fractionStr = '.0' + fractionVal.toString();
+        } else {
+          fractionStr = fractionVal.toString();
+          if (fractionStr[1] === '0') {
+            fractionStr = '.' + fractionStr[0];
+          } else {
+            fractionStr = '.' + fractionStr;
+          }
+        }
       }
-      fractionStr = fractionStr.substring(0, i + 1);
 
       const sign = amount < 0n ? '-' : '';
-      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
 
-      return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
+      return sign + prefix + scaledWhole.toString() + fractionStr + unit + suffix;
     }
   }
 
