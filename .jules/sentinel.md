@@ -52,3 +52,8 @@
 **Vulnerability:** `getBaseScanUrl` accepted any value for the `type` parameter (e.g., bypassing type constraints via `as any`), allowing path traversal and XSS via `type` (e.g., `"address/../../evil"`).
 **Learning:** Even if a parameter's type is strictly defined in TypeScript (e.g., `'address' | 'tx'`), malicious input can be passed during runtime. You cannot rely on TS types alone for input validation, especially for functions generating external URLs.
 **Prevention:** Always validate all parameters that are incorporated into a URL, not just the "main" input. Ensure the `type` parameter strictly matches allowed values (`'address'` or `'tx'`) and throw a generic error if it does not.
+
+## 2024-03-26 - Missing Static Error Messages in Time Utility Functions
+**Vulnerability:** The `calculateExpiresAt` function dynamically reflected the `durationSeconds` parameter in its error messages (e.g., `Invalid duration: NaN seconds. Duration must be an integer.`). This allows reflected XSS or log injection if the error message is passed verbatim to a frontend client or logging service.
+**Learning:** Even internal utility functions like duration calculators must use completely static error strings. Trusting input to be a valid number type in TypeScript doesn't prevent non-finite numbers (NaN, Infinity) or unvalidated strings (in a mixed JS environment) from being reflected.
+**Prevention:** Remove all dynamic variable interpolation from `throw new Error()` statements in utility functions. Enforce static string messages universally (e.g., `Duration must be an integer`).
