@@ -188,39 +188,21 @@ export function formatUSDC(
     }
 
     if (unit) {
-      // Calculate scaled amount with higher precision for formatting
-      // We want to keep up to 2 decimals for compact notation by default
-      // but we need to respect the input's actual value
-
-      // Calculate whole part
       const scaledWhole = absAmount / divisor;
-
-      // Calculate fractional part (simulate 2 decimal places for compact)
-      // Multiply remainder by 100 to get next 2 digits
       const remainder = absAmount % divisor;
-      // We need to scale remainder based on the divisor
-      // remainder / divisor is the fraction.
-      // To get 2 decimal places: (remainder * 100) / divisor
+      const fractionVal = (remainder * 100n) / divisor;
 
-      let decimals = 2; // Default to 2 decimals for compact
-
-      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
-      let fractionStr = fractionVal.toString();
-
-      // Pad with zeros if needed (e.g. 05)
-      fractionStr = fractionStr.padStart(decimals, '0');
-
-      // Trim trailing zeros
-      let i = fractionStr.length - 1;
-      while (i >= 0 && fractionStr[i] === '0') {
-        i--;
+      let decimalPart = '';
+      if (fractionVal > 0n) {
+        if (fractionVal % 10n === 0n) {
+           decimalPart = '.' + (fractionVal / 10n).toString();
+        } else {
+           decimalPart = fractionVal < 10n ? '.0' + fractionVal.toString() : '.' + fractionVal.toString();
+        }
       }
-      fractionStr = fractionStr.substring(0, i + 1);
 
       const sign = amount < 0n ? '-' : '';
-      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
-
-      return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
+      return sign + prefix + scaledWhole + decimalPart + unit + suffix;
     }
   }
 
@@ -238,7 +220,7 @@ export function formatUSDC(
     // Trim trailing zeros for cleaner display
     // Optimization: Manual loop is ~60% faster than regex replace(/0+$/, '')
     let i = fractionStr.length - 1;
-    while (i >= 0 && fractionStr[i] === '0') {
+    while (i >= 0 && fractionStr.charCodeAt(i) === 48) { // 48 is '0'
       i--;
     }
     fractionStr = fractionStr.substring(0, i + 1);
@@ -257,19 +239,20 @@ export function formatUSDC(
     if (len > 3) {
       let start = len % 3;
       if (start === 0) start = 3;
-      let formatted = wholeStr.slice(0, start);
+      // Optimization: substring is faster than slice for string concatenation
+      let formatted = wholeStr.substring(0, start);
       for (let i = start; i < len; i += 3) {
-        formatted += ',' + wholeStr.slice(i, i + 3);
+        formatted += ',' + wholeStr.substring(i, i + 3);
       }
       wholeStr = formatted;
     }
   }
 
   if (fractionStr === '') {
-    return `${sign}${prefix}${wholeStr}${suffix}`;
+    return sign + prefix + wholeStr + suffix;
   }
 
-  return `${sign}${prefix}${wholeStr}.${fractionStr}${suffix}`;
+  return sign + prefix + wholeStr + '.' + fractionStr + suffix;
 }
 
 /**
