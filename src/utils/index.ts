@@ -79,18 +79,32 @@ export function parseUSDC(amount: string | number): bigint {
   let dotIndex = -1;
   let start = 0;
   let isNegative = false;
+  let hasDigits = false;
 
   if (amount.charCodeAt(0) === 45) { // '-'
     isNegative = true;
     start = 1;
   }
 
+  // Performance optimization: Avoid intermediate string allocations (.substring)
+  // and native BigInt(string) conversions by mathematically accumulating the value
+  // in a single pass over the string characters.
+  let intPartNum = 0n;
+  let fracPartNum = 0n;
+
   // Validate chars and find dot
   for (let i = start; i < len; i++) {
     const code = amount.charCodeAt(i);
 
     // Optimization: Check for digits first as they are the most common
-    if (code >= 48 && code <= 57) {
+    if (code >= 48 && code <= 57) { // '0'-'9'
+      hasDigits = true;
+      const digit = BigInt(code - 48);
+      if (dotIndex === -1) {
+        intPartNum = intPartNum * 10n + digit;
+      } else {
+        fracPartNum = fracPartNum * 10n + digit;
+      }
       continue;
     }
 
@@ -108,37 +122,27 @@ export function parseUSDC(amount: string | number): bigint {
     }
   }
 
-  let integerPartStr: string;
-  let fractionPartStr: string;
-
-  if (dotIndex === -1) {
-    integerPartStr = start === 0 ? amount : amount.substring(start);
-    fractionPartStr = "";
-  } else {
-    integerPartStr = amount.substring(start, dotIndex);
-    fractionPartStr = amount.substring(dotIndex + 1);
-  }
-
-  if (integerPartStr === "" && fractionPartStr === "") {
+  // Security: Check if input was only formatting characters (e.g., ".")
+  if (!hasDigits) {
     throw new Error('Invalid USDC amount format');
   }
 
-  const fracLen = fractionPartStr.length;
-  if (fracLen > USDC_DECIMALS) {
-    throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
-  }
-
-  // Optimize: Avoid string concatenation and padding by using math
-  const intPart = integerPartStr === '' ? 0n : BigInt(integerPartStr);
-
   let val: bigint;
-  if (fractionPartStr === '') {
-    val = intPart * USDC_MULTIPLIER_BIGINT;
+  if (dotIndex === -1) {
+    val = intPartNum * USDC_MULTIPLIER_BIGINT;
   } else {
-    const fracPart = BigInt(fractionPartStr);
-    // Use pre-calculated power to scale fraction correctly
-    const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
-    val = intPart * USDC_MULTIPLIER_BIGINT + fracPart * power;
+    const fracLen = len - dotIndex - 1;
+    if (fracLen > USDC_DECIMALS) {
+      throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
+    }
+
+    if (fracLen === 0) {
+      val = intPartNum * USDC_MULTIPLIER_BIGINT;
+    } else {
+      // Use pre-calculated power to scale fraction correctly
+      const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
+      val = intPartNum * USDC_MULTIPLIER_BIGINT + fracPartNum * power;
+    }
   }
 
   return isNegative ? -val : val;
@@ -305,7 +309,8 @@ export function formatBps(
     }
   }
 
-  return `${sign}${prefix}${formatted}${suffix}`;
+  // Performance optimization: Direct string concatenation is faster than template literals
+  return sign + prefix + formatted + suffix;
 }
 
 /**
