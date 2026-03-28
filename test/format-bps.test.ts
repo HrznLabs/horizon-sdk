@@ -58,8 +58,8 @@ describe('formatBps UX Improvements', () => {
   });
 
   it('should throw error for non-finite basis points', () => {
-    assert.throws(() => formatBps(NaN), /Basis points must be a finite number/);
-    assert.throws(() => formatBps(Infinity), /Basis points must be a finite number/);
-    assert.throws(() => formatBps(-Infinity), /Basis points must be a finite number/);
+    assert.throws(() => formatBps(NaN), /bps must be a finite number/);
+    assert.throws(() => formatBps(Infinity), /bps must be a finite number/);
+    assert.throws(() => formatBps(-Infinity), /bps must be a finite number/);
   });
 });
