@@ -421,9 +421,11 @@ export function formatDuration(
   options?: { style?: 'short' | 'long' }
 ): string {
   if (!Number.isFinite(seconds)) throw new Error('Duration must be a finite number');
-  if (seconds < 0) throw new Error('Duration must be non-negative');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
   if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
+
+  const isNegative = seconds < 0;
+  const absSeconds = isNegative ? -seconds : seconds;
 
   const isLong = options?.style === 'long';
   // Optimization: Use hoisted constants to avoid array allocation on every call
@@ -431,7 +433,7 @@ export function formatDuration(
 
   // Optimization: Direct string concatenation avoids array allocations (.push() and .join())
   let result = '';
-  let remainingSeconds = seconds;
+  let remainingSeconds = absSeconds;
 
   // Optimization: Standard for loop is slightly faster than for...of
   for (let i = 0; i < timeUnits.length; i++) {
@@ -455,7 +457,7 @@ export function formatDuration(
     }
   }
 
-  return result;
+  return isNegative ? '-' + result : result;
 }
 
 /**
