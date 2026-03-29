@@ -45,3 +45,7 @@
 ## 2025-05-28 - [Graceful Degradation in Time Displays]
 **Learning:** Throwing hard errors for negative durations crashes UI components (like countdown timers) when they momentarily drift past zero before a state update. This causes a sudden, jarring error screen for a completely benign edge case.
 **Action:** Utility functions formatting durations should handle negative inputs gracefully (e.g., by formatting their absolute value) rather than throwing, ensuring the UI remains stable during transient state changes.
+
+## 2024-05-18 - Graceful degradation for edge cases in presentation logic
+**Learning:** Utilities that format data for UI presentation (like formatDuration) should degrade gracefully instead of throwing hard runtime errors for benign edge cases (like negative numbers caused by minor clock drift). Hard errors in formatting logic can completely crash consuming React/frontend components.
+**Action:** Always ensure UI presentation utilities return logical fallbacks (like `-1h`) instead of throwing errors. Reserve hard errors for strictly invalid inputs (NaN, non-integers).
