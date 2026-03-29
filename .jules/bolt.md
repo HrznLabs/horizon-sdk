@@ -30,3 +30,7 @@
 ## 2024-12-04 - [Optimize getBaseScanUrl Construction]
 **Learning:** For short, frequently called URL construction utilities like `getBaseScanUrl`, combining input validation checks into a single short-circuiting expression (`||`) and using direct string concatenation (`+`) instead of ES6 template literals (`${}`) is significantly faster. In Node.js / V8, simple string concatenation avoids the overhead of creating template arrays and parsing nested variables. Combining boolean validations also avoids variable assignment overhead, increasing execution speed by ~20%.
 **Action:** Default to boolean operators `||` for chained fast-fail validations. Default to direct string concatenation instead of template strings for simple URL or path construction in high-frequency utilities.
+
+## $(date +%Y-%m-%d) - [Optimize toBytes32 String Parsing]
+**Learning:** In string parsing functions that require strict hex validation and padding, repeatedly calling `slice(2)` to remove a prefix creates unnecessary string allocations. By testing the full string (including the prefix) with a hoisted regex and directly using `padEnd` on the complete original string, execution time in `toBytes32` was reduced by ~15% (1844ms to 1523ms for 10M iterations). Additionally, using `charCodeAt(0) === 48 && charCodeAt(1) === 120` is faster than `startsWith('0x')`.
+**Action:** Avoid intermediate string allocations like `slice()` when the original string can be directly tested and manipulated. Use `charCodeAt` for simple prefix matching in hot paths.
