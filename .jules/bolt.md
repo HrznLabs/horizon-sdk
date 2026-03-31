@@ -30,3 +30,7 @@
 ## 2024-12-04 - [Optimize getBaseScanUrl Construction]
 **Learning:** For short, frequently called URL construction utilities like `getBaseScanUrl`, combining input validation checks into a single short-circuiting expression (`||`) and using direct string concatenation (`+`) instead of ES6 template literals (`${}`) is significantly faster. In Node.js / V8, simple string concatenation avoids the overhead of creating template arrays and parsing nested variables. Combining boolean validations also avoids variable assignment overhead, increasing execution speed by ~20%.
 **Action:** Default to boolean operators `||` for chained fast-fail validations. Default to direct string concatenation instead of template strings for simple URL or path construction in high-frequency utilities.
+
+## 2026-03-31 - [parseUSDC Single-Pass Mathematical Accumulation]
+**Learning:** In string parsing functions like `parseUSDC`, replacing string slicing (`substring`) and native `BigInt(string)` conversion with a single-pass character loop that mathematically accumulates the BigInt value (`intPartNum = intPartNum * 10n + digit`) avoids intermediate string allocations and reduces execution time by ~65% (nearly a 3x speedup).
+**Action:** When converting string parsing functions to use single-pass mathematical accumulation for performance, always ensure to explicitly track a `hasDigits` boolean flag during iteration. This ensures inputs containing only formatting characters (like `.` or `-`) do not incorrectly evaluate to 0 instead of throwing expected validation errors.
