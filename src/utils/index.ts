@@ -76,6 +76,7 @@ export function parseUSDC(amount: string | number): bigint {
     throw new Error('Invalid USDC amount format: Input too long.');
   }
 
+  let dotIndex = -1;
   let start = 0;
   let isNegative = false;
 
@@ -84,35 +85,18 @@ export function parseUSDC(amount: string | number): bigint {
     start = 1;
   }
 
-  let intPartNum = 0n;
-  let fractionPartNum = 0n;
-  let fracLen = 0;
-  let isFraction = false;
-  let hasDigits = false;
-
-  // Validate chars, find dot, and build number mathematically
+  // Validate chars and find dot
   for (let i = start; i < len; i++) {
     const code = amount.charCodeAt(i);
 
     // Optimization: Check for digits first as they are the most common
     if (code >= 48 && code <= 57) {
-      hasDigits = true;
-      const digit = BigInt(code - 48);
-      if (isFraction) {
-        fracLen++;
-        if (fracLen > USDC_DECIMALS) {
-          throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
-        }
-        fractionPartNum = fractionPartNum * 10n + digit;
-      } else {
-        intPartNum = intPartNum * 10n + digit;
-      }
       continue;
     }
 
     if (code === 46) { // '.'
-      if (isFraction) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
-      isFraction = true;
+      if (dotIndex !== -1) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
+      dotIndex = i;
     } else if (code === 44) { // ','
       throw new Error('Invalid USDC amount format: Commas are not allowed.');
     } else if (code === 36) { // '$'
@@ -124,14 +108,37 @@ export function parseUSDC(amount: string | number): bigint {
     }
   }
 
-  if (!hasDigits) {
+  let integerPartStr: string;
+  let fractionPartStr: string;
+
+  if (dotIndex === -1) {
+    integerPartStr = start === 0 ? amount : amount.substring(start);
+    fractionPartStr = "";
+  } else {
+    integerPartStr = amount.substring(start, dotIndex);
+    fractionPartStr = amount.substring(dotIndex + 1);
+  }
+
+  if (integerPartStr === "" && fractionPartStr === "") {
     throw new Error('Invalid USDC amount format');
   }
 
-  let val = intPartNum * USDC_MULTIPLIER_BIGINT;
-  if (fracLen > 0) {
+  const fracLen = fractionPartStr.length;
+  if (fracLen > USDC_DECIMALS) {
+    throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
+  }
+
+  // Optimize: Avoid string concatenation and padding by using math
+  const intPart = integerPartStr === '' ? 0n : BigInt(integerPartStr);
+
+  let val: bigint;
+  if (fractionPartStr === '') {
+    val = intPart * USDC_MULTIPLIER_BIGINT;
+  } else {
+    const fracPart = BigInt(fractionPartStr);
     // Use pre-calculated power to scale fraction correctly
-    val += fractionPartNum * POWERS_OF_10[USDC_DECIMALS - fracLen];
+    const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
+    val = intPart * USDC_MULTIPLIER_BIGINT + fracPart * power;
   }
 
   return isNegative ? -val : val;
