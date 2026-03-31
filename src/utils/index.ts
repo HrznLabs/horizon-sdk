@@ -180,35 +180,20 @@ export function formatUSDC(
       // We want to keep up to 2 decimals for compact notation by default
       // but we need to respect the input's actual value
 
-      // Calculate whole part
       const scaledWhole = absAmount / divisor;
-
-      // Calculate fractional part (simulate 2 decimal places for compact)
-      // Multiply remainder by 100 to get next 2 digits
       const remainder = absAmount % divisor;
-      // We need to scale remainder based on the divisor
-      // remainder / divisor is the fraction.
-      // To get 2 decimal places: (remainder * 100) / divisor
+      const fractionVal = (remainder * 100n) / divisor;
 
-      let decimals = 2; // Default to 2 decimals for compact
-
-      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
-      let fractionStr = fractionVal.toString();
-
-      // Pad with zeros if needed (e.g. 05)
-      fractionStr = fractionStr.padStart(decimals, '0');
-
-      // Trim trailing zeros
-      let i = fractionStr.length - 1;
-      while (i >= 0 && fractionStr[i] === '0') {
-        i--;
+      let decimalPart = '';
+      if (fractionVal > 0n) {
+        if (fractionVal % 10n === 0n) {
+           decimalPart = '.' + (fractionVal / 10n).toString();
+        } else {
+           decimalPart = fractionVal < 10n ? '.0' + fractionVal.toString() : '.' + fractionVal.toString();
+        }
       }
-      fractionStr = fractionStr.substring(0, i + 1);
 
       const sign = amount < 0n ? '-' : '';
-      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
-
-      // Optimization: Direct string concatenation is faster than template literals
       return sign + prefix + scaledWhole + decimalPart + unit + suffix;
     }
   }
@@ -227,7 +212,7 @@ export function formatUSDC(
     // Trim trailing zeros for cleaner display
     // Optimization: Manual loop is ~60% faster than regex replace(/0+$/, '')
     let i = fractionStr.length - 1;
-    while (i >= 0 && fractionStr[i] === '0') {
+    while (i >= 0 && fractionStr.charCodeAt(i) === 48) { // 48 is '0'
       i--;
     }
     fractionStr = fractionStr.substring(0, i + 1);
@@ -453,39 +438,46 @@ export function formatDuration(
   return result;
 }
 
+// Optimization: Hoisted regex for hex validation to avoid instantiation on every call
+const HEX_OPT_REGEX = /^0x[0-9a-fA-F]*$/;
+
 /**
  * Convert string to bytes32 (for IPFS hashes, etc.)
  * @param str String to convert (usually hex string)
  * @returns bytes32 hex string
  */
 export function toBytes32(str: string): `0x${string}` {
+  const len = str.length;
   // If already a hex string with 0x prefix
-  if (str.startsWith('0x')) {
-    const hex = str.slice(2);
-    if (hex.length > 64) {
+  // Optimization: charCodeAt check is faster than startsWith
+  if (len >= 2 && str.charCodeAt(0) === 48 && str.charCodeAt(1) === 120) {
+    if (len > 66) {
       throw new Error(
-        `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
+        `String too long for bytes32: ${Math.ceil((len - 2) / 2)} bytes (max 32)`
       );
     }
     // Validate hex characters
-    if (!/^[0-9a-fA-F]*$/.test(hex)) {
+    // Optimization: Avoid string slice allocation and just test the full string.
+    if (!HEX_OPT_REGEX.test(str)) {
       throw new Error('Invalid hex string.');
     }
-    return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+    return str.padEnd(66, '0') as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
-  if (bytes.length > 32) {
+  const bytesLen = bytes.length;
+  if (bytesLen > 32) {
     throw new Error(
-      `String too long for bytes32: ${bytes.length} bytes (max 32)`
+      `String too long for bytes32: ${bytesLen} bytes (max 32)`
     );
   }
-  let hex = '';
+  // Optimization: Concatenate '0x' upfront to avoid template literal overhead
+  let hex = '0x';
   // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
-  for (let i = 0; i < bytes.length; i++) {
+  for (let i = 0; i < bytesLen; i++) {
     hex += HEX_STRINGS[bytes[i]];
   }
-  return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+  return hex.padEnd(66, '0') as `0x${string}`;
 }
 
 /**
