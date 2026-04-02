@@ -187,10 +187,18 @@ export function formatUSDC(
       let decimalPart = '';
       if (fractionVal > 0n) {
         if (fractionVal % 10n === 0n) {
-           decimalPart = '.' + (fractionVal / 10n).toString();
+           decimalPart = (fractionVal / 10n).toString();
         } else {
-           decimalPart = fractionVal < 10n ? '.0' + fractionVal.toString() : '.' + fractionVal.toString();
+           decimalPart = fractionVal < 10n ? '0' + fractionVal.toString() : fractionVal.toString();
         }
+      }
+
+      if (minDecimals > 0) {
+        decimalPart = decimalPart.padEnd(minDecimals, '0');
+      }
+
+      if (decimalPart !== '') {
+        decimalPart = '.' + decimalPart;
       }
 
       const sign = amount < 0n ? '-' : '';

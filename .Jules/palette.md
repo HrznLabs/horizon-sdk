@@ -45,3 +45,7 @@
 ## 2025-05-28 - [Graceful Degradation in Time Displays]
 **Learning:** Throwing hard errors for negative durations crashes UI components (like countdown timers) when they momentarily drift past zero before a state update. This causes a sudden, jarring error screen for a completely benign edge case.
 **Action:** Utility functions formatting durations should handle negative inputs gracefully (e.g., by formatting their absolute value) rather than throwing, ensuring the UI remains stable during transient state changes.
+
+## 2025-06-05 - [Consistent UI Alignment in Compact Formats]
+**Learning:** Utilities that automatically abbreviate large numbers (e.g., K, M, B, T) often hardcode their decimal truncation logic, ignoring parameters like `minDecimals`. This causes visual misalignment in UI tables when developers need consistent string lengths (e.g., '1.00M' instead of '1M').
+**Action:** Number formatting utilities that support `compact` modes must explicitly respect `minDecimals` by padding zeros (`padEnd`) to the fractional part before appending the unit suffix.
