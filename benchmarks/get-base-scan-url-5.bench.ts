@@ -1,0 +1,75 @@
+const SEPOLIA_BASESCAN_URL = 'https://sepolia.basescan.org/';
+const MAINNET_BASESCAN_URL = 'https://basescan.org/';
+const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
+
+function getBaseScanUrlOrig(
+  hashOrAddress: string,
+  type?: 'address' | 'tx',
+  testnet: boolean = true
+): string {
+  const len = hashOrAddress.length;
+
+  if ((len !== 42 && len !== 66) || !HEX_REGEX.test(hashOrAddress)) {
+    throw new Error('Invalid address or transaction hash.');
+  }
+
+  if (type !== undefined && type !== 'address' && type !== 'tx') {
+    throw new Error('Invalid type parameter.');
+  }
+
+  const baseUrl = testnet ? SEPOLIA_BASESCAN_URL : MAINNET_BASESCAN_URL;
+  const pathType = type !== undefined ? type : (len === 42 ? 'address' : 'tx');
+
+  return baseUrl + pathType + '/' + hashOrAddress;
+}
+
+function getBaseScanUrlOpt(
+  hashOrAddress: string,
+  type?: 'address' | 'tx',
+  testnet: boolean = true
+): string {
+  const len = hashOrAddress.length;
+
+  // Let's test removing the string concatenation
+  if ((len !== 42 && len !== 66) || !HEX_REGEX.test(hashOrAddress)) {
+    throw new Error('Invalid address or transaction hash.');
+  }
+
+  if (type !== undefined && type !== 'address' && type !== 'tx') {
+    throw new Error('Invalid type parameter.');
+  }
+
+  // The original has string concatenation. Can we avoid the ternary if we use logic?
+  // Wait, no. The memory journal says:
+  // "Combining boolean validations also avoids variable assignment overhead, increasing execution speed by ~20%. Action: Default to boolean operators || for chained fast-fail validations. Default to direct string concatenation instead of template strings for simple URL or path construction in high-frequency utilities."
+
+  // What else is here? We already optimized string concatenation in getBaseScanUrl!
+
+  const baseUrl = testnet ? SEPOLIA_BASESCAN_URL : MAINNET_BASESCAN_URL;
+  // Let's use if statements instead of ternary for pathType
+  let pathType = type;
+  if (pathType === undefined) {
+    if (len === 42) pathType = 'address';
+    else pathType = 'tx';
+  }
+
+  return baseUrl + pathType + '/' + hashOrAddress;
+}
+
+
+const addr1 = "0x1234567890abcdef1234567890abcdef12345678";
+const tx1 = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef";
+
+const start1 = performance.now();
+for (let i = 0; i < 1000000; i++) {
+  getBaseScanUrlOrig(addr1);
+  getBaseScanUrlOrig(tx1);
+}
+console.log("Original:", performance.now() - start1);
+
+const start2 = performance.now();
+for (let i = 0; i < 1000000; i++) {
+  getBaseScanUrlOpt(addr1);
+  getBaseScanUrlOpt(tx1);
+}
+console.log("Opt:", performance.now() - start2);
