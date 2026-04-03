@@ -76,7 +76,6 @@ export function parseUSDC(amount: string | number): bigint {
     throw new Error('Invalid USDC amount format: Input too long.');
   }
 
-  let dotIndex = -1;
   let start = 0;
   let isNegative = false;
 
@@ -85,18 +84,31 @@ export function parseUSDC(amount: string | number): bigint {
     start = 1;
   }
 
-  // Validate chars and find dot
+  let intPart = 0n;
+  let fracPart = 0n;
+  let fracLen = 0;
+  let inFraction = false;
+  let hasDigits = false;
+
   for (let i = start; i < len; i++) {
     const code = amount.charCodeAt(i);
 
     // Optimization: Check for digits first as they are the most common
     if (code >= 48 && code <= 57) {
-      continue;
-    }
-
-    if (code === 46) { // '.'
-      if (dotIndex !== -1) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
-      dotIndex = i;
+      hasDigits = true;
+      const digit = BigInt(code - 48);
+      if (!inFraction) {
+        intPart = intPart * 10n + digit;
+      } else {
+        fracPart = fracPart * 10n + digit;
+        fracLen++;
+        if (fracLen > USDC_DECIMALS) {
+          throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
+        }
+      }
+    } else if (code === 46) { // '.'
+      if (inFraction) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
+      inFraction = true;
     } else if (code === 44) { // ','
       throw new Error('Invalid USDC amount format: Commas are not allowed.');
     } else if (code === 36) { // '$'
@@ -108,38 +120,14 @@ export function parseUSDC(amount: string | number): bigint {
     }
   }
 
-  let integerPartStr: string;
-  let fractionPartStr: string;
-
-  if (dotIndex === -1) {
-    integerPartStr = start === 0 ? amount : amount.substring(start);
-    fractionPartStr = "";
-  } else {
-    integerPartStr = amount.substring(start, dotIndex);
-    fractionPartStr = amount.substring(dotIndex + 1);
-  }
-
-  if (integerPartStr === "" && fractionPartStr === "") {
+  // Ensure inputs containing only formatting characters (like `.` or `-`) throw
+  if (!hasDigits) {
     throw new Error('Invalid USDC amount format');
   }
 
-  const fracLen = fractionPartStr.length;
-  if (fracLen > USDC_DECIMALS) {
-    throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
-  }
-
-  // Optimize: Avoid string concatenation and padding by using math
-  const intPart = integerPartStr === '' ? 0n : BigInt(integerPartStr);
-
-  let val: bigint;
-  if (fractionPartStr === '') {
-    val = intPart * USDC_MULTIPLIER_BIGINT;
-  } else {
-    const fracPart = BigInt(fractionPartStr);
-    // Use pre-calculated power to scale fraction correctly
-    const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
-    val = intPart * USDC_MULTIPLIER_BIGINT + fracPart * power;
-  }
+  // Use pre-calculated power to scale fraction correctly
+  const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
+  const val = intPart * USDC_MULTIPLIER_BIGINT + fracPart * power;
 
   return isNegative ? -val : val;
 }
@@ -152,7 +140,7 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
 ): string {
   const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
@@ -192,35 +180,29 @@ export function formatUSDC(
       // We want to keep up to 2 decimals for compact notation by default
       // but we need to respect the input's actual value
 
-      // Calculate whole part
       const scaledWhole = absAmount / divisor;
-
-      // Calculate fractional part (simulate 2 decimal places for compact)
-      // Multiply remainder by 100 to get next 2 digits
       const remainder = absAmount % divisor;
-      // We need to scale remainder based on the divisor
-      // remainder / divisor is the fraction.
-      // To get 2 decimal places: (remainder * 100) / divisor
+      const fractionVal = (remainder * 100n) / divisor;
 
-      let decimals = 2; // Default to 2 decimals for compact
-
-      const fractionVal = (remainder * BigInt(10 ** decimals)) / divisor;
-      let fractionStr = fractionVal.toString();
-
-      // Pad with zeros if needed (e.g. 05)
-      fractionStr = fractionStr.padStart(decimals, '0');
-
-      // Trim trailing zeros
-      let i = fractionStr.length - 1;
-      while (i >= 0 && fractionStr[i] === '0') {
-        i--;
+      let decimalPart = '';
+      if (fractionVal > 0n) {
+        if (fractionVal % 10n === 0n) {
+           decimalPart = (fractionVal / 10n).toString();
+        } else {
+           decimalPart = fractionVal < 10n ? '0' + fractionVal.toString() : fractionVal.toString();
+        }
       }
-      fractionStr = fractionStr.substring(0, i + 1);
 
-      const sign = amount < 0n ? '-' : '';
-      const decimalPart = fractionStr.length > 0 ? `.${fractionStr}` : '';
+      if (minDecimals > 0) {
+        decimalPart = decimalPart.padEnd(minDecimals, '0');
+      }
 
-      return `${sign}${prefix}${scaledWhole}${decimalPart}${unit}${suffix}`;
+      if (decimalPart !== '') {
+        decimalPart = '.' + decimalPart;
+      }
+
+      const sign = amount < 0n ? '-' : (amount > 0n && options?.showPlusSign ? '+' : '');
+      return sign + prefix + scaledWhole + decimalPart + unit + suffix;
     }
   }
 
@@ -238,7 +220,7 @@ export function formatUSDC(
     // Trim trailing zeros for cleaner display
     // Optimization: Manual loop is ~60% faster than regex replace(/0+$/, '')
     let i = fractionStr.length - 1;
-    while (i >= 0 && fractionStr[i] === '0') {
+    while (i >= 0 && fractionStr.charCodeAt(i) === 48) { // 48 is '0'
       i--;
     }
     fractionStr = fractionStr.substring(0, i + 1);
@@ -248,7 +230,7 @@ export function formatUSDC(
     fractionStr = fractionStr.padEnd(minDecimals, '0');
   }
 
-  const sign = amount < 0n ? '-' : '';
+  const sign = amount < 0n ? '-' : (amount > 0n && options?.showPlusSign ? '+' : '');
 
   // Performance optimization: Manual comma insertion is ~2.7x faster than toLocaleString
   let wholeStr = whole.toString();
@@ -266,10 +248,12 @@ export function formatUSDC(
   }
 
   if (fractionStr === '') {
-    return `${sign}${prefix}${wholeStr}${suffix}`;
+    // Optimization: Direct string concatenation is faster than template literals
+    return sign + prefix + wholeStr + suffix;
   }
 
-  return `${sign}${prefix}${wholeStr}.${fractionStr}${suffix}`;
+  // Optimization: Direct string concatenation is faster than template literals
+  return sign + prefix + wholeStr + '.' + fractionStr + suffix;
 }
 
 /**
@@ -280,14 +264,18 @@ export function formatUSDC(
  */
 export function formatBps(
   bps: number,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; showPlusSign?: boolean }
 ): string {
+  if (!Number.isFinite(bps)) {
+    throw new Error('Basis points must be a finite number');
+  }
+
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
-  const sign = bps < 0 ? '-' : '';
+  const sign = bps < 0 ? '-' : (bps > 0 && options?.showPlusSign ? '+' : '');
   const absBps = Math.abs(bps);
   const percentage = absBps / 100;
   let formatted = percentage.toString();
@@ -301,7 +289,8 @@ export function formatBps(
     }
   }
 
-  return `${sign}${prefix}${formatted}${suffix}`;
+  // Optimization: Direct string concatenation is faster than template literals
+  return sign + prefix + formatted + suffix;
 }
 
 /**
@@ -381,14 +370,15 @@ export function calculateLPP(rewardAmount: bigint): bigint {
  * @returns Expiration timestamp (bigint)
  */
 export function calculateExpiresAt(durationSeconds: number): bigint {
+  if (!Number.isFinite(durationSeconds)) {
+    throw new Error('Duration must be a finite number');
+  }
   if (!Number.isInteger(durationSeconds)) {
-    throw new Error(
-      `Invalid duration: ${durationSeconds} seconds. Duration must be an integer.`
-    );
+    throw new Error('Duration must be an integer.');
   }
   if (durationSeconds < MIN_DURATION || durationSeconds > MAX_DURATION) {
     throw new Error(
-      `Invalid duration: ${durationSeconds} seconds. Duration must be between ${MIN_DURATION} and ${MAX_DURATION} seconds.`
+      `Duration must be between ${MIN_DURATION} and ${MAX_DURATION} seconds.`
     );
   }
   return BigInt(Math.floor(Date.now() / 1000) + durationSeconds);
@@ -416,31 +406,51 @@ export function formatDuration(
   seconds: number,
   options?: { style?: 'short' | 'long' }
 ): string {
-  if (seconds < 0) throw new Error('Duration must be non-negative');
+  if (!Number.isFinite(seconds)) throw new Error('Duration must be a finite number');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
   if (seconds === 0) return options?.style === 'long' ? '0 seconds' : '0s';
 
-  const style = options?.style || 'short';
+  const isNegative = seconds < 0;
+  const absSeconds = Math.abs(seconds);
+
+  const isLong = options?.style === 'long';
   // Optimization: Use hoisted constants to avoid array allocation on every call
-  const timeUnits = style === 'long' ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
+  const timeUnits = isLong ? TIME_UNITS_LONG : TIME_UNITS_SHORT;
 
-  const result: string[] = [];
-  let remainingSeconds = seconds;
+  // Optimization: Direct string concatenation avoids array allocations (.push() and .join())
+  let result = isNegative ? '-' : '';
+  let remainingSeconds = absSeconds;
 
-  for (const { label, seconds: unitSeconds } of timeUnits) {
-    const count = Math.floor(remainingSeconds / unitSeconds);
-    if (count > 0) {
-      let unitLabel = label;
-      if (style === 'long' && count > 1) {
-        unitLabel += 's';
+  // Optimization: Standard for loop is slightly faster than for...of
+  for (let i = 0; i < timeUnits.length; i++) {
+    const unit = timeUnits[i];
+    const unitSeconds = unit.seconds;
+
+    // Optimization: Quick check prevents unnecessary Math.floor and division
+    if (remainingSeconds >= unitSeconds) {
+      const count = Math.floor(remainingSeconds / unitSeconds);
+
+      if (result !== '' && result !== '-') result += ' ';
+      result += count;
+
+      if (isLong) {
+        result += ' ' + unit.label + (count > 1 ? 's' : '');
+      } else {
+        result += unit.label;
       }
-      result.push(`${count}${style === 'long' ? ' ' : ''}${unitLabel}`);
+
       remainingSeconds %= unitSeconds;
+
+      // Optimization: Early exit if we have perfectly divided the remaining time
+      if (remainingSeconds === 0) break;
     }
   }
 
-  return result.join(' ');
+  return result;
 }
+
+// Optimization: Hoisted regex for hex validation to avoid instantiation on every call
+const HEX_OPT_REGEX = /^0x[0-9a-fA-F]*$/;
 
 /**
  * Convert string to bytes32 (for IPFS hashes, etc.)
@@ -448,33 +458,37 @@ export function formatDuration(
  * @returns bytes32 hex string
  */
 export function toBytes32(str: string): `0x${string}` {
+  const len = str.length;
   // If already a hex string with 0x prefix
-  if (str.startsWith('0x')) {
-    const hex = str.slice(2);
-    if (hex.length > 64) {
+  // Optimization: charCodeAt check is faster than startsWith
+  if (len >= 2 && str.charCodeAt(0) === 48 && str.charCodeAt(1) === 120) {
+    if (len > 66) {
       throw new Error(
-        `String too long for bytes32: ${Math.ceil(hex.length / 2)} bytes (max 32)`
+        `String too long for bytes32: ${Math.ceil((len - 2) / 2)} bytes (max 32)`
       );
     }
     // Validate hex characters
-    if (!/^[0-9a-fA-F]*$/.test(hex)) {
+    // Optimization: Avoid string slice allocation and just test the full string.
+    if (!HEX_OPT_REGEX.test(str)) {
       throw new Error('Invalid hex string.');
     }
-    return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+    return str.padEnd(66, '0') as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
-  if (bytes.length > 32) {
+  const bytesLen = bytes.length;
+  if (bytesLen > 32) {
     throw new Error(
-      `String too long for bytes32: ${bytes.length} bytes (max 32)`
+      `String too long for bytes32: ${bytesLen} bytes (max 32)`
     );
   }
-  let hex = '';
+  // Optimization: Concatenate '0x' upfront to avoid template literal overhead
+  let hex = '0x';
   // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
-  for (let i = 0; i < bytes.length; i++) {
+  for (let i = 0; i < bytesLen; i++) {
     hex += HEX_STRINGS[bytes[i]];
   }
-  return `0x${hex.padEnd(64, '0')}` as `0x${string}`;
+  return hex.padEnd(66, '0') as `0x${string}`;
 }
 
 /**
@@ -504,16 +518,20 @@ export function formatAddress(
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
+    const len = address.length;
     // If address is shorter than or equal to the truncated parts, return as is
-    if (address.length <= start + end) return address;
+    if (len <= start + end) return address;
 
-    const endStr = end === 0 ? '' : address.slice(-end);
-    return `${address.slice(0, start)}...${endStr}`;
+    // Optimization: substring and direct string concatenation are faster than slice and template literals
+    const endStr = end === 0 ? '' : address.substring(len - end);
+    return address.substring(0, start) + '...' + endStr;
   }
 
   // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
   if (address.length !== 42) return address;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+
+  // Optimization: direct string concat and substring instead of slice
+  return address.substring(0, 6) + '...' + address.substring(38);
 }
 
 // Optimization: Hoisted regex for hex validation to avoid instantiation on every call
@@ -526,6 +544,10 @@ const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
  * @param testnet Whether to use testnet explorer
  * @returns Full BaseScan URL
  */
+// Optimization: Pre-compute base URLs with trailing slashes to avoid template literals later
+const SEPOLIA_BASESCAN_URL = 'https://sepolia.basescan.org/';
+const MAINNET_BASESCAN_URL = 'https://basescan.org/';
+
 export function getBaseScanUrl(
   hashOrAddress: string,
   type?: 'address' | 'tx',
@@ -534,29 +556,22 @@ export function getBaseScanUrl(
   // Security: Strict validation to prevent path traversal and XSS
   // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
   const len = hashOrAddress.length;
-  let isAddress = false;
-  let isTx = false;
 
-  // Optimization: Fast length check before running regex is ~3x faster
-  if (len === 42 || len === 66) {
-    if (HEX_REGEX.test(hashOrAddress)) {
-      if (len === 42) isAddress = true;
-      else isTx = true;
-    }
-  }
-
-  if (!isAddress && !isTx) {
+  // Optimization: Combine length checks and regex test into one short-circuiting expression
+  // Fast length check before running regex is ~3x faster
+  if ((len !== 42 && len !== 66) || !HEX_REGEX.test(hashOrAddress)) {
     throw new Error('Invalid address or transaction hash.');
   }
 
-  const baseUrl = testnet
-    ? 'https://sepolia.basescan.org'
-    : 'https://basescan.org';
-
-  let resolvedType = type;
-  if (!resolvedType) {
-    resolvedType = isTx ? 'tx' : 'address';
+  // Security: Prevent path traversal via type parameter (as TypeScript types are not runtime safeguards)
+  if (type !== undefined && type !== 'address' && type !== 'tx') {
+    throw new Error('Invalid type parameter.');
   }
 
-  return `${baseUrl}/${resolvedType}/${hashOrAddress}`;
+  // Optimization: Pre-compute base URL with slash and direct string concatenation
+  // to avoid template literal overhead
+  const baseUrl = testnet ? SEPOLIA_BASESCAN_URL : MAINNET_BASESCAN_URL;
+  const pathType = type !== undefined ? type : (len === 42 ? 'address' : 'tx');
+
+  return baseUrl + pathType + '/' + hashOrAddress;
 }
