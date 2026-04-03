@@ -69,6 +69,19 @@ describe('formatUSDC UX Improvements', () => {
     assert.strictEqual(formatUSDC(1000000n, { commas: false }), '1');
   });
 
+  it('should handle showPlusSign option', () => {
+    assert.strictEqual(formatUSDC(10000000n, { showPlusSign: true }), '+10');
+    assert.strictEqual(formatUSDC(10000000n, { showPlusSign: false }), '10');
+    assert.strictEqual(formatUSDC(-10000000n, { showPlusSign: true }), '-10');
+    assert.strictEqual(formatUSDC(0n, { showPlusSign: true }), '0');
+  });
+
+  it('should handle showPlusSign with prefix and suffix', () => {
+    assert.strictEqual(formatUSDC(10000000n, { showPlusSign: true, prefix: '$', suffix: ' USDC' }), '+$10 USDC');
+    assert.strictEqual(formatUSDC(-10000000n, { showPlusSign: true, prefix: '$', suffix: ' USDC' }), '-$10 USDC');
+    assert.strictEqual(formatUSDC(0n, { showPlusSign: true, prefix: '$', suffix: ' USDC' }), '$0 USDC');
+  });
+
   it('should combine options correctly', () => {
     // -$1,234.50
     assert.strictEqual(
