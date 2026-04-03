@@ -34,3 +34,7 @@
 ## 2026-03-14 - [String Concatenation in Return Statements]
 **Learning:** In utility functions that format strings like `formatBps` and `formatUSDC`, replacing final return template literals (e.g., `` `${sign}${prefix}${wholeStr}${suffix}` ``) with direct string concatenation (`sign + prefix + wholeStr + suffix`) reduces execution time by ~25-40% depending on the function. This is consistent with previous learnings, as the V8 engine optimizes direct string concatenation heavily compared to the allocation overhead of parsing template arrays.
 **Action:** Always prefer direct string concatenation (`+`) over template literals (`${}`) for simple variable joining in high-throughput formatting functions.
+
+## 2024-12-05 - formatDuration Early Exit
+**Learning:** In loops that subtract or divide down a value (like time formatting), once the value reaches zero, continuing to iterate through smaller units is wasted CPU time.
+**Action:** Always add an early exit condition (`if (remaining === 0) break;`) to formatting loops to skip unnecessary iterations.
