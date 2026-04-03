@@ -440,6 +440,9 @@ export function formatDuration(
       }
 
       remainingSeconds %= unitSeconds;
+
+      // Optimization: Early exit if we have perfectly divided the remaining time
+      if (remainingSeconds === 0) break;
     }
   }
 
