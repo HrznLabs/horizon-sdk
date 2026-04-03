@@ -62,4 +62,15 @@ describe('formatBps UX Improvements', () => {
     assert.throws(() => formatBps(Infinity), /Basis points must be a finite number/);
     assert.throws(() => formatBps(-Infinity), /Basis points must be a finite number/);
   });
+
+  it('should handle showPlusSign option correctly', () => {
+    // Positive number should get a + sign
+    assert.strictEqual(formatBps(150, { showPlusSign: true }), '+1.5%');
+    // Negative number should still get a - sign (not +-)
+    assert.strictEqual(formatBps(-150, { showPlusSign: true }), '-1.5%');
+    // Zero should not get any sign
+    assert.strictEqual(formatBps(0, { showPlusSign: true }), '0%');
+    // Should combine with prefix cleanly
+    assert.strictEqual(formatBps(150, { prefix: '$', showPlusSign: true, suffix: '' }), '+$1.5');
+  });
 });
