@@ -89,4 +89,16 @@ describe('formatUSDC UX Improvements', () => {
     assert.strictEqual(formatUSDC(10000000n, { prefix: '$', suffix: ' USD' }), '$10 USD');
     assert.strictEqual(formatUSDC(-10000000n, { suffix: ' USDC' }), '-10 USDC');
   });
+
+  it('should handle showPlusSign option correctly', () => {
+    // Positive number should get a + sign
+    assert.strictEqual(formatUSDC(1500000n, { showPlusSign: true }), '+1.5');
+    // Negative number should still get a - sign (not +-)
+    assert.strictEqual(formatUSDC(-1500000n, { showPlusSign: true }), '-1.5');
+    // Zero should not get any sign
+    assert.strictEqual(formatUSDC(0n, { showPlusSign: true }), '0');
+    // Should combine with prefix cleanly
+    assert.strictEqual(formatUSDC(1500000n, { prefix: '$', showPlusSign: true }), '+$1.5');
+    assert.strictEqual(formatUSDC(1500000000n, { prefix: '$', compact: true, showPlusSign: true }), '+$1.5K');
+  });
 });

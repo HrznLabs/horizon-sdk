@@ -49,3 +49,7 @@
 ## 2025-06-05 - [Consistent UI Alignment in Compact Formats]
 **Learning:** Utilities that automatically abbreviate large numbers (e.g., K, M, B, T) often hardcode their decimal truncation logic, ignoring parameters like `minDecimals`. This causes visual misalignment in UI tables when developers need consistent string lengths (e.g., '1.00M' instead of '1M').
 **Action:** Number formatting utilities that support `compact` modes must explicitly respect `minDecimals` by padding zeros (`padEnd`) to the fractional part before appending the unit suffix.
+
+## 2025-06-10 - [Explicit Positive Change Display]
+**Learning:** Frontend developers often manually prepend `+` signs to formatted numbers to indicate positive PnL or balance changes. This causes visual layout issues when a prefix (like `$`) is present because the manual `+` lands outside the prefix (e.g., `+$1.50` instead of `+$1.50`), looking broken.
+**Action:** Add a `showPlusSign` configuration option to financial formatting utilities (`formatUSDC` and `formatBps`) to cleanly handle placing the explicit positive sign relative to any user-provided prefix.
