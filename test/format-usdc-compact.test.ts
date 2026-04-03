@@ -69,4 +69,16 @@ describe('formatUSDC Compact Notation', () => {
     // 1,000,000 -> 1.000M
     assert.strictEqual(formatUSDC(1000000000000n, { compact: true, minDecimals: 3 }), '1.000M');
   });
+
+  it('should handle showPlusSign in compact mode', () => {
+    assert.strictEqual(formatUSDC(1500000000n, { compact: true, showPlusSign: true }), '+1.5K');
+    assert.strictEqual(formatUSDC(1500000000n, { compact: true, showPlusSign: false }), '1.5K');
+    assert.strictEqual(formatUSDC(-1500000000n, { compact: true, showPlusSign: true }), '-1.5K');
+    assert.strictEqual(formatUSDC(0n, { compact: true, showPlusSign: true }), '0');
+  });
+
+  it('should handle showPlusSign with minDecimals in compact mode', () => {
+    assert.strictEqual(formatUSDC(1000000000000n, { compact: true, minDecimals: 2, showPlusSign: true }), '+1.00M');
+    assert.strictEqual(formatUSDC(-1000000000000n, { compact: true, minDecimals: 2, showPlusSign: true }), '-1.00M');
+  });
 });

@@ -38,6 +38,18 @@ describe('formatBps UX Improvements', () => {
     assert.strictEqual(formatBps(100, { suffix: '' }), '1');
   });
 
+  it('should handle showPlusSign option', () => {
+    assert.strictEqual(formatBps(150, { showPlusSign: true }), '+1.5%');
+    assert.strictEqual(formatBps(150, { showPlusSign: false }), '1.5%');
+    assert.strictEqual(formatBps(-150, { showPlusSign: true }), '-1.5%');
+    assert.strictEqual(formatBps(0, { showPlusSign: true }), '0%');
+  });
+
+  it('should handle showPlusSign with prefix and suffix', () => {
+    assert.strictEqual(formatBps(150, { showPlusSign: true, prefix: 'fee: ', suffix: '' }), '+fee: 1.5');
+    assert.strictEqual(formatBps(-150, { showPlusSign: true, prefix: 'fee: ', suffix: '' }), '-fee: 1.5');
+  });
+
   it('should combine options', () => {
     assert.strictEqual(formatBps(150, { minDecimals: 2, prefix: '+', suffix: '' }), '+1.50');
   });

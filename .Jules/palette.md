@@ -49,3 +49,7 @@
 ## 2025-06-05 - [Consistent UI Alignment in Compact Formats]
 **Learning:** Utilities that automatically abbreviate large numbers (e.g., K, M, B, T) often hardcode their decimal truncation logic, ignoring parameters like `minDecimals`. This causes visual misalignment in UI tables when developers need consistent string lengths (e.g., '1.00M' instead of '1M').
 **Action:** Number formatting utilities that support `compact` modes must explicitly respect `minDecimals` by padding zeros (`padEnd`) to the fractional part before appending the unit suffix.
+
+## 2025-06-15 - [Explicit Positive Feedback in UX]
+**Learning:** For financial or gamified displays (like payouts, rewards, or fees), showing a naked positive number (e.g. `10`) lacks the semantic impact of an explicitly signed number (`+10`). Relying on consumers to manually prepend `+` leads to edge-case bugs like `+-10` when the value is negative, or `+0` which looks incorrect.
+**Action:** Number formatting utilities should natively support a `showPlusSign` option to properly prepend `+` only for positive numbers, ensuring correct output across all values (positive, negative, and zero) without requiring error-prone string concatenation by the consumer.
