@@ -33,6 +33,13 @@ describe('formatBps UX Improvements', () => {
     assert.strictEqual(formatBps(-150, { prefix: '$' }), '-$1.5%');
   });
 
+  it('should support explicit positive signs for PnL displays', () => {
+    assert.strictEqual(formatBps(250, { showPlus: true }), '+2.5%');
+    assert.strictEqual(formatBps(-250, { showPlus: true }), '-2.5%');
+    assert.strictEqual(formatBps(0, { showPlus: true }), '0%');
+    assert.strictEqual(formatBps(250, { showPlus: true, prefix: 'Yield: ' }), '+Yield: 2.5%');
+  });
+
   it('should handle suffix option', () => {
     assert.strictEqual(formatBps(150, { suffix: ' percent' }), '1.5 percent');
     assert.strictEqual(formatBps(100, { suffix: '' }), '1');

@@ -140,7 +140,7 @@ export function parseUSDC(amount: string | number): bigint {
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlus?: boolean }
 ): string {
   const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
@@ -201,7 +201,7 @@ export function formatUSDC(
         decimalPart = '.' + decimalPart;
       }
 
-      const sign = amount < 0n ? '-' : '';
+      const sign = amount < 0n ? '-' : (amount > 0n && options?.showPlus ? '+' : '');
       return sign + prefix + scaledWhole + decimalPart + unit + suffix;
     }
   }
@@ -230,7 +230,7 @@ export function formatUSDC(
     fractionStr = fractionStr.padEnd(minDecimals, '0');
   }
 
-  const sign = amount < 0n ? '-' : '';
+  const sign = amount < 0n ? '-' : (amount > 0n && options?.showPlus ? '+' : '');
 
   // Performance optimization: Manual comma insertion is ~2.7x faster than toLocaleString
   let wholeStr = whole.toString();
@@ -264,7 +264,7 @@ export function formatUSDC(
  */
 export function formatBps(
   bps: number,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string }
+  options?: { minDecimals?: number; prefix?: string; suffix?: string; showPlus?: boolean }
 ): string {
   if (!Number.isFinite(bps)) {
     throw new Error('Basis points must be a finite number');
@@ -275,7 +275,7 @@ export function formatBps(
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
-  const sign = bps < 0 ? '-' : '';
+  const sign = bps < 0 ? '-' : (bps > 0 && options?.showPlus ? '+' : '');
   const absBps = Math.abs(bps);
   const percentage = absBps / 100;
   let formatted = percentage.toString();

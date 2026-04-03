@@ -49,3 +49,7 @@
 ## 2025-06-05 - [Consistent UI Alignment in Compact Formats]
 **Learning:** Utilities that automatically abbreviate large numbers (e.g., K, M, B, T) often hardcode their decimal truncation logic, ignoring parameters like `minDecimals`. This causes visual misalignment in UI tables when developers need consistent string lengths (e.g., '1.00M' instead of '1M').
 **Action:** Number formatting utilities that support `compact` modes must explicitly respect `minDecimals` by padding zeros (`padEnd`) to the fractional part before appending the unit suffix.
+
+## 2025-06-06 - [Explicit Signage in Financial Displays]
+**Learning:** Financial dashboards frequently display positive changes (gains) with an explicit `+` sign. Developers manually prepending `+` to formatted output often place it incorrectly relative to currency symbols (e.g., `$+100` instead of `+$100`), resulting in inconsistent and typographically incorrect UIs.
+**Action:** Add a `showPlus` boolean option to number and currency formatting utilities to handle explicit positive signs natively, ensuring they are placed correctly before any prefixes.
