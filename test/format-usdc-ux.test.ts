@@ -83,6 +83,32 @@ describe('formatUSDC UX Improvements', () => {
     );
   });
 
+  it('should support explicit positive signs for PnL displays', () => {
+    // +$1,000.50
+    assert.strictEqual(
+      formatUSDC(1000500000n, { showPlus: true, prefix: '$', minDecimals: 2 }),
+      '+$1,000.50'
+    );
+
+    // Should not add + if negative
+    assert.strictEqual(
+      formatUSDC(-1000500000n, { showPlus: true, prefix: '$', minDecimals: 2 }),
+      '-$1,000.50'
+    );
+
+    // Should not add + for zero
+    assert.strictEqual(
+      formatUSDC(0n, { showPlus: true, prefix: '$', minDecimals: 2 }),
+      '$0.00'
+    );
+
+    // Compact mode support for explicitly signed displays
+    assert.strictEqual(
+      formatUSDC(1500000000n, { compact: true, showPlus: true, prefix: '$' }),
+      '+$1.5K'
+    );
+  });
+
   it('should handle suffix option', () => {
     assert.strictEqual(formatUSDC(10000000n, { suffix: ' USDC' }), '10 USDC');
     assert.strictEqual(formatUSDC(10500000n, { suffix: ' USDC' }), '10.5 USDC');
