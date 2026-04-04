@@ -132,6 +132,12 @@ export function parseUSDC(amount: string | number): bigint {
   return isNegative ? -val : val;
 }
 
+// Optimization: Pre-calculate compact formatting thresholds
+const COMPACT_ONE_THOUSAND = 1000n * USDC_MULTIPLIER_BIGINT;
+const COMPACT_ONE_MILLION = 1000000n * USDC_MULTIPLIER_BIGINT;
+const COMPACT_ONE_BILLION = 1000000000n * USDC_MULTIPLIER_BIGINT;
+const COMPACT_ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
+
 /**
  * Format USDC amount from bigint to human-readable string with commas and trimmed zeros
  * @param amount Amount in USDC base units
@@ -153,25 +159,20 @@ export function formatUSDC(
 
   // Compact notation handling (K, M, B, T)
   if (compact) {
-    const ONE_THOUSAND = 1000n * USDC_MULTIPLIER_BIGINT;
-    const ONE_MILLION = 1000000n * USDC_MULTIPLIER_BIGINT;
-    const ONE_BILLION = 1000000000n * USDC_MULTIPLIER_BIGINT;
-    const ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
-
     let divisor = 1n;
     let unit = '';
 
-    if (absAmount >= ONE_TRILLION) {
-      divisor = ONE_TRILLION;
+    if (absAmount >= COMPACT_ONE_TRILLION) {
+      divisor = COMPACT_ONE_TRILLION;
       unit = 'T';
-    } else if (absAmount >= ONE_BILLION) {
-      divisor = ONE_BILLION;
+    } else if (absAmount >= COMPACT_ONE_BILLION) {
+      divisor = COMPACT_ONE_BILLION;
       unit = 'B';
-    } else if (absAmount >= ONE_MILLION) {
-      divisor = ONE_MILLION;
+    } else if (absAmount >= COMPACT_ONE_MILLION) {
+      divisor = COMPACT_ONE_MILLION;
       unit = 'M';
-    } else if (absAmount >= ONE_THOUSAND) {
-      divisor = ONE_THOUSAND;
+    } else if (absAmount >= COMPACT_ONE_THOUSAND) {
+      divisor = COMPACT_ONE_THOUSAND;
       unit = 'K';
     }
 
