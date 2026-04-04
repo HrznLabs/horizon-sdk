@@ -75,4 +75,11 @@ describe('formatAddress', () => {
     // start=6, end=0 -> 0x1234...
     assert.strictEqual(formatAddress(address, { start: 6, end: 0 }), '0x1234...');
   });
+
+  it('should throw an error for non-string inputs', () => {
+    assert.throws(() => formatAddress(null as any), /Address must be a string/);
+    assert.throws(() => formatAddress(undefined as any), /Address must be a string/);
+    assert.throws(() => formatAddress(123 as any), /Address must be a string/);
+    assert.throws(() => formatAddress({} as any), /Address must be a string/);
+  });
 });
