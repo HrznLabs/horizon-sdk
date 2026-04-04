@@ -515,6 +515,10 @@ export function formatAddress(
   address: string,
   options?: { start?: number; end?: number }
 ): string {
+  if (typeof address !== 'string') {
+    throw new Error('Address must be a string');
+  }
+
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
