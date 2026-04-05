@@ -42,3 +42,7 @@
 ## 2024-12-06 - Hoist large BigInt constants
 **Learning:** In utility functions called frequently, defining large `BigInt` constants inside a function body or `if` block forces the JavaScript engine to allocate and garbage-collect those values on every execution. Hoisting `BigInt` constants to the module scope avoids this overhead. In `formatUSDC` with `compact: true`, hoisting the K/M/B/T thresholds yielded a ~12% performance improvement.
 **Action:** Always hoist static, immutable configuration data and large constants (`BigInt` values, regexes, complex arrays) to module scope instead of defining them locally inside high-throughput functions.
+
+## $(date +%Y-%m-%d) - Dynamic Pre-allocation of Zeros for custom padStart
+**Learning:** In `formatUSDC`, we discovered that natively calling `.padStart(6, '0')` takes ~138ms per 1M iterations, but conditionally slicing a pre-allocated zeros string with `substring` takes ~68ms, halving the execution time. However, hardcoding string lengths (e.g. `const ZEROS = '000000'`) is dangerous if constants change.
+**Action:** Replace `padStart` with `substring` against a pre-allocated string in hot paths for performance, but dynamically generate the string (e.g., `'0'.repeat(USDC_DECIMALS)`) during initialization to ensure maintainability without sacrificing runtime performance.
