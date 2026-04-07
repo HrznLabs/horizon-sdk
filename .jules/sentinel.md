@@ -52,3 +52,8 @@
 **Vulnerability:** `getBaseScanUrl` accepted any value for the `type` parameter (e.g., bypassing type constraints via `as any`), allowing path traversal and XSS via `type` (e.g., `"address/../../evil"`).
 **Learning:** Even if a parameter's type is strictly defined in TypeScript (e.g., `'address' | 'tx'`), malicious input can be passed during runtime. You cannot rely on TS types alone for input validation, especially for functions generating external URLs.
 **Prevention:** Always validate all parameters that are incorporated into a URL, not just the "main" input. Ensure the `type` parameter strictly matches allowed values (`'address'` or `'tx'`) and throw a generic error if it does not.
+
+## 2026-03-10 - Missing Runtime Type Checks in Utility Functions
+**Vulnerability:** Several utility functions (`parseUSDC`, `formatUSDC`, `toBytes32`, `getBaseScanUrl`) expected `string` or `bigint` types but lacked explicit runtime type checking. When passed invalid types (like `null` or an object) from untyped external callers, they threw unhandled `TypeError` exceptions (e.g., "Cannot read properties of null (reading 'length')").
+**Learning:** TypeScript type annotations do not exist at runtime. If an SDK utility function is consumed by plain JavaScript or `any`-typed contexts, passing unexpected types can cause unhandled crashes rather than secure validation errors.
+**Prevention:** Always implement explicit runtime type checking (e.g., `typeof input !== 'string'`) as the very first validation step in utility functions, throwing static error messages to fail gracefully.
