@@ -16,6 +16,10 @@ const MAX_USDC_STRING_LENGTH = 32;
 // Maximum allowed decimals for formatting to prevent DoS
 const MAX_DECIMALS = 100;
 
+// Optimization: Pre-allocate a string of zeroes for fast padding
+// Using substring on this is significantly faster than padStart/padEnd
+const ZEROES = '0'.repeat(MAX_DECIMALS);
+
 // Optimization: Pre-calculate powers of 10 for parseUSDC
 const POWERS_OF_10: bigint[] = [
   1n,
@@ -195,7 +199,10 @@ export function formatUSDC(
       }
 
       if (minDecimals > 0) {
-        decimalPart = decimalPart.padEnd(minDecimals, '0');
+        // Optimization: substring and string concat is faster than padEnd
+        if (decimalPart.length < minDecimals) {
+          decimalPart += ZEROES.substring(0, minDecimals - decimalPart.length);
+        }
       }
 
       if (decimalPart !== '') {
@@ -216,7 +223,11 @@ export function formatUSDC(
   if (fraction === 0n) {
     fractionStr = '';
   } else {
-    fractionStr = fraction.toString().padStart(USDC_DECIMALS, '0');
+    fractionStr = fraction.toString();
+    // Optimization: substring and string concat is faster than padStart
+    if (fractionStr.length < USDC_DECIMALS) {
+      fractionStr = ZEROES.substring(0, USDC_DECIMALS - fractionStr.length) + fractionStr;
+    }
 
     // Trim trailing zeros for cleaner display
     // Optimization: Manual loop is ~60% faster than regex replace(/0+$/, '')
@@ -228,7 +239,10 @@ export function formatUSDC(
   }
 
   if (minDecimals > 0) {
-    fractionStr = fractionStr.padEnd(minDecimals, '0');
+    // Optimization: substring and string concat is faster than padEnd
+    if (fractionStr.length < minDecimals) {
+      fractionStr += ZEROES.substring(0, minDecimals - fractionStr.length);
+    }
   }
 
   const sign = amount < 0n ? '-' : (amount > 0n && options?.showPlusSign ? '+' : '');
