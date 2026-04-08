@@ -326,6 +326,9 @@ export function calculateFeeSplit(
   rewardAmount: bigint,
   guildFeeBps: number = 0
 ): FeeSplit {
+  if (typeof rewardAmount !== 'bigint') {
+    throw new Error('Reward amount must be a bigint');
+  }
   // Validate inputs
   if (rewardAmount < 0n) {
     throw new Error('Reward amount must be non-negative');
@@ -369,6 +372,9 @@ export function calculateFeeSplit(
  * @returns DDR amount each party must deposit
  */
 export function calculateDDR(rewardAmount: bigint): bigint {
+  if (typeof rewardAmount !== 'bigint') {
+    throw new Error('Reward amount must be a bigint');
+  }
   if (rewardAmount < 0n) {
     throw new Error('Reward amount must be non-negative');
   }
@@ -381,6 +387,9 @@ export function calculateDDR(rewardAmount: bigint): bigint {
  * @returns LPP amount
  */
 export function calculateLPP(rewardAmount: bigint): bigint {
+  if (typeof rewardAmount !== 'bigint') {
+    throw new Error('Reward amount must be a bigint');
+  }
   if (rewardAmount < 0n) {
     throw new Error('Reward amount must be non-negative');
   }
@@ -413,6 +422,9 @@ export function calculateExpiresAt(durationSeconds: number): bigint {
  * @returns True if expired
  */
 export function isMissionExpired(expiresAt: bigint): boolean {
+  if (typeof expiresAt !== 'bigint') {
+    throw new Error('Expiration timestamp must be a bigint');
+  }
   // Optimization: Comparison using Number is faster and avoids BigInt allocation for current time
   // Equivalent to: BigInt(Math.floor(Date.now() / 1000)) > expiresAt
   // Safe until year 285,616 AD (Number.MAX_SAFE_INTEGER)
