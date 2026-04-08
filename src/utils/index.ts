@@ -74,6 +74,10 @@ export function parseUSDC(amount: string | number): bigint {
     return parseUSDC(amount.toString());
   }
 
+  if (typeof amount !== 'string') {
+    throw new Error('Invalid USDC amount format');
+  }
+
   const len = amount.length;
   if (len === 0) throw new Error('Invalid USDC amount format');
   if (len > MAX_USDC_STRING_LENGTH) {
@@ -152,6 +156,10 @@ export function formatUSDC(
   amount: bigint,
   options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
 ): string {
+  if (typeof amount !== 'bigint') {
+    throw new Error('Amount must be a bigint');
+  }
+
   const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
@@ -473,6 +481,10 @@ const HEX_OPT_REGEX = /^0x[0-9a-fA-F]*$/;
  * @returns bytes32 hex string
  */
 export function toBytes32(str: string): `0x${string}` {
+  if (typeof str !== 'string') {
+    throw new Error('Input must be a string');
+  }
+
   const len = str.length;
   // If already a hex string with 0x prefix
   // Optimization: charCodeAt check is faster than startsWith
@@ -572,6 +584,11 @@ export function getBaseScanUrl(
   type?: 'address' | 'tx',
   testnet: boolean = true
 ): string {
+  // Security: Explicit runtime type check to prevent TypeError
+  if (typeof hashOrAddress !== 'string') {
+    throw new Error('Invalid address or transaction hash.');
+  }
+
   // Security: Strict validation to prevent path traversal and XSS
   // Only allow valid 0x-prefixed hex strings of correct length (42 for address, 66 for tx)
   const len = hashOrAddress.length;
