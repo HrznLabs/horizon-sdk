@@ -92,8 +92,7 @@ export function parseUSDC(amount: string | number): bigint {
     start = 1;
   }
 
-  let intPart = 0n;
-  let fracPart = 0n;
+  let totalVal = 0n;
   let fracLen = 0;
   let inFraction = false;
   let hasDigits = false;
@@ -105,10 +104,8 @@ export function parseUSDC(amount: string | number): bigint {
     if (code >= 48 && code <= 57) {
       hasDigits = true;
       const digit = BigInt(code - 48);
-      if (!inFraction) {
-        intPart = intPart * 10n + digit;
-      } else {
-        fracPart = fracPart * 10n + digit;
+      totalVal = totalVal * 10n + digit;
+      if (inFraction) {
         fracLen++;
         if (fracLen > USDC_DECIMALS) {
           throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
@@ -135,7 +132,7 @@ export function parseUSDC(amount: string | number): bigint {
 
   // Use pre-calculated power to scale fraction correctly
   const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
-  const val = intPart * USDC_MULTIPLIER_BIGINT + fracPart * power;
+  const val = totalVal * power;
 
   return isNegative ? -val : val;
 }

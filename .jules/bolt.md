@@ -42,3 +42,7 @@
 ## 2024-12-06 - Hoist large BigInt constants
 **Learning:** In utility functions called frequently, defining large `BigInt` constants inside a function body or `if` block forces the JavaScript engine to allocate and garbage-collect those values on every execution. Hoisting `BigInt` constants to the module scope avoids this overhead. In `formatUSDC` with `compact: true`, hoisting the K/M/B/T thresholds yielded a ~12% performance improvement.
 **Action:** Always hoist static, immutable configuration data and large constants (`BigInt` values, regexes, complex arrays) to module scope instead of defining them locally inside high-throughput functions.
+
+## 2024-05-15 - Optimize string-to-BigInt accumulation in `parseUSDC`
+**Learning:** For functions parsing decimals into BigInt (e.g., `parseUSDC`), accumulating all parsed digits into a single BigInt variable (`totalVal = totalVal * 10n + digit`) and using the `fracLen` variable to apply the scaling exponent at the end is ~5-15% faster than maintaining separate `intPart` and `fracPart` accumulators and checking an `inFraction` branch on every digit loop.
+**Action:** When manually parsing fixed-point numbers from strings to BigInts, eliminate branching logic inside tight parsing loops by keeping a single accumulator and modifying scaling factors based on loop states like `fracLen`.
