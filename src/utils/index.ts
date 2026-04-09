@@ -252,16 +252,17 @@ export function formatUSDC(
 
   const sign = amount < 0n ? '-' : (amount > 0n && options?.showPlusSign ? '+' : '');
 
-  // Performance optimization: Manual comma insertion is ~2.7x faster than toLocaleString
+  // Performance optimization: Manual comma insertion is ~2.7x faster than toLocaleString.
+  // Optimization: substring is faster than slice for string concatenation in V8.
   let wholeStr = whole.toString();
   if (useCommas) {
     const len = wholeStr.length;
     if (len > 3) {
       let start = len % 3;
       if (start === 0) start = 3;
-      let formatted = wholeStr.slice(0, start);
+      let formatted = wholeStr.substring(0, start);
       for (let i = start; i < len; i += 3) {
-        formatted += ',' + wholeStr.slice(i, i + 3);
+        formatted += ',' + wholeStr.substring(i, i + 3);
       }
       wholeStr = formatted;
     }
