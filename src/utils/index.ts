@@ -509,7 +509,8 @@ export function toBytes32(str: string): `0x${string}` {
     if (!HEX_OPT_REGEX.test(str)) {
       throw new Error('Invalid hex string.');
     }
-    return str.padEnd(66, '0') as `0x${string}`;
+    // Optimization: substring and string concat is faster than padEnd
+    return (str + ZEROES.substring(0, 66 - len)) as `0x${string}`;
   }
   // Convert string to hex
   const bytes = TEXT_ENCODER.encode(str);
@@ -525,7 +526,8 @@ export function toBytes32(str: string): `0x${string}` {
   for (let i = 0; i < bytesLen; i++) {
     hex += HEX_STRINGS[bytes[i]];
   }
-  return hex.padEnd(66, '0') as `0x${string}`;
+  // Optimization: substring and string concat is faster than padEnd
+  return (hex + ZEROES.substring(0, 66 - hex.length)) as `0x${string}`;
 }
 
 /**
