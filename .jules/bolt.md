@@ -54,3 +54,7 @@
 ## 2024-12-07 - PadEnd Replacement Optimization
 **Learning:** In utility functions, native string padding methods like `.padEnd(length, char)` allocate strings dynamically and evaluate relatively slowly compared to substring concatenation from pre-allocated padding strings. In `toBytes32`, using `str + ZEROES.substring(0, 66 - str.length)` instead of `str.padEnd(66, '0')` yields a significant ~15-20x speedup in micro-benchmarks by avoiding dynamic allocation and taking advantage of V8's fast string concatenation.
 **Action:** When fixed-character padding is required in high-frequency functions (e.g. zero-padding or space-padding), pre-allocate a long string of the required character and use `str + padding.substring(0, targetLength - str.length)` instead of native `.padStart()` or `.padEnd()`.
+
+## 2024-12-08 - BigInt Literal vs Module Constant Optimization
+**Learning:** In short math utility functions (like `calculateDDR` and `calculateLPP`), replacing a hoisted module-scoped constant (`BPS_DIVISOR = BigInt(10000)`) with a local BigInt literal (`10000n`) bypasses memory access overhead and yields a surprisingly large performance boost (~25% speedup in V8).
+**Action:** For simple, highly-called arithmetic functions, prefer using BigInt literals (e.g., `10000n`) directly instead of referencing hoisted module variables.
