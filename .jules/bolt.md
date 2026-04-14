@@ -58,3 +58,7 @@
 ## 2024-12-08 - BigInt Literal vs Module Constant Optimization
 **Learning:** In short math utility functions (like `calculateDDR` and `calculateLPP`), replacing a hoisted module-scoped constant (`BPS_DIVISOR = BigInt(10000)`) with a local BigInt literal (`10000n`) bypasses memory access overhead and yields a surprisingly large performance boost (~25% speedup in V8).
 **Action:** For simple, highly-called arithmetic functions, prefer using BigInt literals (e.g., `10000n`) directly instead of referencing hoisted module variables.
+
+## 2024-05-14 - BigInt Conversion and Short-Circuiting
+**Learning:** In V8, converting a variable to `BigInt` (e.g. `BigInt(guildFeeBps)`) inside a mathematical operation that often evaluates to zero is surprisingly expensive. Using `BigInt(10000)` instead of the literal `10000n` also adds constructor overhead.
+**Action:** When performing BigInt math with a variable that is frequently `0` (like `guildFeeBps`), implement a short-circuit (e.g. `guildFeeBps === 0 ? 0n : ...`) to skip the `BigInt` conversion and math entirely. Always use `n` literals (e.g., `10000n`) for BigInt constants instead of the `BigInt()` constructor.

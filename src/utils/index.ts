@@ -339,9 +339,8 @@ export function calculateFeeSplit(
     );
   }
 
-  // Use local BigInt(10000) instead of module constant as it benchmarks significantly faster
-  // in this specific function (V8 optimization quirk).
-  const bpsDivisor = BigInt(10000);
+  // Optimization: Using local literal 10000n avoids BigInt conversion overhead
+  const bpsDivisor = 10000n;
   const protocolAmount = (rewardAmount * PROTOCOL_BPS_BIGINT) / bpsDivisor;
 
   // Optimization: Avoid redundant calculation if BPS values are identical
@@ -350,7 +349,11 @@ export function calculateFeeSplit(
     : (rewardAmount * LABS_BPS_BIGINT) / bpsDivisor;
 
   const resolverAmount = (rewardAmount * RESOLVER_BPS_BIGINT) / bpsDivisor;
-  const guildAmount = (rewardAmount * BigInt(guildFeeBps)) / bpsDivisor;
+
+  // Optimization: Short-circuit when guildFeeBps is 0 (the common case)
+  // to avoid costly BigInt conversion and multiplication overhead in V8
+  const guildAmount = guildFeeBps === 0 ? 0n : (rewardAmount * BigInt(guildFeeBps)) / bpsDivisor;
+
   const performerAmount =
     rewardAmount - protocolAmount - labsAmount - resolverAmount - guildAmount;
 
