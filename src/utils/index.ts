@@ -44,6 +44,9 @@ for (let i = 0; i < 256; i++) {
   HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
 }
 
+// Performance optimization: Pre-allocate buffer for toBytes32 string encoding to avoid allocations
+const TO_BYTES_32_BUFFER = new Uint8Array(33); // 32 max bytes + 1 for overflow detection
+
 // Performance optimization: Shared buffer for randomBytes32 to avoid allocation on every call
 const RANDOM_BYTES_BUFFER = new Uint8Array(32);
 
@@ -519,18 +522,23 @@ export function toBytes32(str: string): `0x${string}` {
     return (str + ZEROES.substring(0, 66 - len)) as `0x${string}`;
   }
   // Convert string to hex
-  const bytes = TEXT_ENCODER.encode(str);
-  const bytesLen = bytes.length;
-  if (bytesLen > 32) {
+
+  // Optimization: Use encodeInto with a pre-allocated buffer to avoid dynamic allocation overhead
+  const { read, written } = TEXT_ENCODER.encodeInto(str, TO_BYTES_32_BUFFER);
+
+  // If read is less than str.length, or written is greater than 32, it overflows the 32 byte limit
+  if ((read !== undefined && read < len) || (written !== undefined && written > 32)) {
+    // Get exact length for accurate error message by doing standard encode
+    const exactLen = TEXT_ENCODER.encode(str).length;
     throw new Error(
-      `String too long for bytes32: ${bytesLen} bytes (max 32)`
+      `String too long for bytes32: ${exactLen} bytes (max 32)`
     );
   }
   // Optimization: Concatenate '0x' upfront to avoid template literal overhead
   let hex = '0x';
   // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
-  for (let i = 0; i < bytesLen; i++) {
-    hex += HEX_STRINGS[bytes[i]];
+  for (let i = 0; i < (written as number); i++) {
+    hex += HEX_STRINGS[TO_BYTES_32_BUFFER[i]];
   }
   // Optimization: substring and string concat is faster than padEnd
   return (hex + ZEROES.substring(0, 66 - hex.length)) as `0x${string}`;
