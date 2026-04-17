@@ -53,3 +53,7 @@
 ## 2025-06-10 - [Explicit Positive Change Display]
 **Learning:** Frontend developers often manually prepend `+` signs to formatted numbers to indicate positive PnL or balance changes. This causes visual layout issues when a prefix (like `$`) is present because the manual `+` lands outside the prefix (e.g., `+$1.50` instead of `+$1.50`), looking broken.
 **Action:** Add a `showPlusSign` configuration option to financial formatting utilities (`formatUSDC` and `formatBps`) to cleanly handle placing the explicit positive sign relative to any user-provided prefix.
+
+## 2025-06-25 - [Accessible String Truncation]
+**Learning:** Hard-coding three dots (`...`) for string truncation causes screen readers to read it literally as "dot dot dot," which is poor accessibility and takes up unnecessary horizontal space. The typographic ellipsis character (`…`) is a single character that is correctly interpreted by screen readers.
+**Action:** When creating truncation utilities (like `formatAddress`), allow developers to configure the truncation separator so they can opt-in to the accessible, typographic ellipsis (`…`) while maintaining backward compatibility with standard defaults.

@@ -66,8 +66,8 @@ async function main() {
       functionName: 'getRuntime',
     });
 
-    console.log(`   Escrow: ${formatAddress(escrowAddress)}`);
-    console.log(`   Poster: ${formatAddress(params.poster, { start: 6, end: 4 })}`);
+    console.log(`   Escrow: ${formatAddress(escrowAddress, { separator: '…' })}`);
+    console.log(`   Poster: ${formatAddress(params.poster, { start: 6, end: 4, separator: '…' })}`);
     console.log(`   Reward: ${formatUSDC(params.rewardAmount)} USDC`);
     console.log(`   State: ${MissionState[runtime.state]}`);
     console.log(`   BaseScan: ${getBaseScanUrl(escrowAddress, 'address', true)}\n`);
