@@ -505,6 +505,11 @@ export function toBytes32(str: string): `0x${string}` {
   }
 
   const len = str.length;
+  // Security: Prevent memory exhaustion DoS when calculating exact error lengths
+  if (len > 256) {
+    throw new Error('String too long for bytes32: exceeds maximum input length');
+  }
+
   // If already a hex string with 0x prefix
   // Optimization: charCodeAt check is faster than startsWith
   if (len >= 2 && str.charCodeAt(0) === 48 && str.charCodeAt(1) === 120) {
