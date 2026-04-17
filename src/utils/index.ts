@@ -566,7 +566,7 @@ export function randomBytes32(): `0x${string}` {
  */
 export function formatAddress(
   address: string,
-  options?: { start?: number; end?: number }
+  options?: { start?: number; end?: number; separator?: string }
 ): string {
   if (typeof address !== 'string') {
     throw new Error('Address must be a string');
@@ -575,20 +575,21 @@ export function formatAddress(
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
+    const separator = options.separator ?? '...';
     const len = address.length;
     // If address is shorter than or equal to the truncated parts, return as is
     if (len <= start + end) return address;
 
     // Optimization: substring and direct string concatenation are faster than slice and template literals
     const endStr = end === 0 ? '' : address.substring(len - end);
-    return address.substring(0, start) + '...' + endStr;
+    return address.substring(0, start) + separator + endStr;
   }
 
   // Legacy behavior: Only truncate if strictly 42 chars (standard EVM address)
   if (address.length !== 42) return address;
 
   // Optimization: direct string concat and substring instead of slice
-  return address.substring(0, 6) + '...' + address.substring(38);
+  return address.substring(0, 6) + '…' + address.substring(38);
 }
 
 // Optimization: Hoisted regex for hex validation to avoid instantiation on every call

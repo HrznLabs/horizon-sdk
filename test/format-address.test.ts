@@ -6,8 +6,8 @@ describe('formatAddress', () => {
   it('should truncate 42-character address correctly (default)', () => {
     const address = '0x1234567890123456789012345678901234567890';
     assert.strictEqual(address.length, 42);
-    // 0x1234...7890 (6...4)
-    const expected = '0x1234...7890';
+    // 0x1234…7890 (6…4)
+    const expected = '0x1234…7890';
     assert.strictEqual(formatAddress(address), expected);
   });
 
@@ -74,6 +74,14 @@ describe('formatAddress', () => {
     const address = '0x1234567890123456789012345678901234567890';
     // start=6, end=0 -> 0x1234...
     assert.strictEqual(formatAddress(address, { start: 6, end: 0 }), '0x1234...');
+  });
+
+  it('should support custom separators', () => {
+    const address = '0x1234567890123456789012345678901234567890';
+    // Typographic ellipsis
+    assert.strictEqual(formatAddress(address, { separator: '…' }), '0x1234…7890');
+    // Custom dash
+    assert.strictEqual(formatAddress(address, { start: 4, end: 4, separator: '-' }), '0x12-7890');
   });
 
   it('should throw an error for non-string inputs', () => {
