@@ -57,8 +57,8 @@ describe('formatAddress', () => {
     assert.strictEqual(formatAddress(short, {}), 'Alice');
 
     // Even if we ask for very short truncation
-    // start=1, end=1 -> 2. 5 > 2. So 'A...e'
-    assert.strictEqual(formatAddress(short, { start: 1, end: 1 }), 'A...e');
+    // start=1, end=1, separator='...' -> 5. 5 <= 5. Return as is.
+    assert.strictEqual(formatAddress(short, { start: 1, end: 1 }), 'Alice');
 
     // start=2, end=3 -> 5. 5 <= 5. Return as is.
     assert.strictEqual(formatAddress(short, { start: 2, end: 3 }), 'Alice');
