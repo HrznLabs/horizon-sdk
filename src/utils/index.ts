@@ -476,7 +476,7 @@ export function formatDuration(
       result += count;
 
       if (isLong) {
-        result += ' ' + unit.label + (count > 1 ? 's' : '');
+        result += ' ' + unit.label + (count !== 1 ? 's' : '');
       } else {
         result += unit.label;
       }
@@ -582,8 +582,8 @@ export function formatAddress(
     const end = options.end ?? 4;
     const separator = options.separator ?? '...';
     const len = address.length;
-    // If address is shorter than or equal to the truncated parts, return as is
-    if (len <= start + end) return address;
+    // UX: Only truncate if the resulting string is strictly shorter than the original
+    if (len <= start + end + separator.length) return address;
 
     // Optimization: substring and direct string concatenation are faster than slice and template literals
     const endStr = end === 0 ? '' : address.substring(len - end);

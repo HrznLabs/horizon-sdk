@@ -57,3 +57,7 @@
 ## 2025-06-25 - [Accessible String Truncation]
 **Learning:** Hard-coding three dots (`...`) for string truncation causes screen readers to read it literally as "dot dot dot," which is poor accessibility and takes up unnecessary horizontal space. The typographic ellipsis character (`…`) is a single character that is correctly interpreted by screen readers.
 **Action:** When creating truncation utilities (like `formatAddress`), allow developers to configure the truncation separator so they can opt-in to the accessible, typographic ellipsis (`…`) while maintaining backward compatibility with standard defaults.
+
+## 2025-07-28 - [Meaningful String Truncation]
+**Learning:** Truncating short strings (like ENS names or short custom addresses) with standard separators (like `...`) can result in a truncated string that is actually longer than the original (e.g., `vitalik.eth` -> `vitali....eth`). This creates visual clutter and defeats the purpose of truncation.
+**Action:** When implementing string truncation, always check if the original length is less than or equal to the combined length of the start, end, and separator (`len <= start + end + separator.length`). Only truncate if it actively saves space.
