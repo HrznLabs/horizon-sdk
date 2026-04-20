@@ -446,7 +446,7 @@ export function isMissionExpired(expiresAt: bigint): boolean {
  */
 export function formatDuration(
   seconds: number,
-  options?: { style?: 'short' | 'long' }
+  options?: { style?: 'short' | 'long'; maxParts?: number }
 ): string {
   if (!Number.isFinite(seconds)) throw new Error('Duration must be a finite number');
   if (!Number.isInteger(seconds)) throw new Error('Duration must be an integer');
@@ -462,6 +462,7 @@ export function formatDuration(
   // Optimization: Direct string concatenation avoids array allocations (.push() and .join())
   let result = isNegative ? '-' : '';
   let remainingSeconds = absSeconds;
+  let partsCount = 0;
 
   // Optimization: Standard for loop is slightly faster than for...of
   for (let i = 0; i < timeUnits.length; i++) {
@@ -482,9 +483,10 @@ export function formatDuration(
       }
 
       remainingSeconds %= unitSeconds;
+      partsCount++;
 
-      // Optimization: Early exit if we have perfectly divided the remaining time
-      if (remainingSeconds === 0) break;
+      // Optimization: Early exit if we have perfectly divided the remaining time or reached max parts
+      if (remainingSeconds === 0 || (options?.maxParts !== undefined && partsCount >= options.maxParts)) break;
     }
   }
 
