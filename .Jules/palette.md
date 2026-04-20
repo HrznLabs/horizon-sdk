@@ -61,3 +61,7 @@
 ## 2025-07-28 - [Meaningful String Truncation]
 **Learning:** Truncating short strings (like ENS names or short custom addresses) with standard separators (like `...`) can result in a truncated string that is actually longer than the original (e.g., `vitalik.eth` -> `vitali....eth`). This creates visual clutter and defeats the purpose of truncation.
 **Action:** When implementing string truncation, always check if the original length is less than or equal to the combined length of the start, end, and separator (`len <= start + end + separator.length`). Only truncate if it actively saves space.
+
+## 2025-08-01 - [Controlling Duration Formatting Granularity]
+**Learning:** Displaying overly granular duration formats (like "1d 2h 5m 10s") can introduce visual noise and cognitive load for users when they only care about the most significant units (e.g. "about 1 day").
+**Action:** Provide developers the ability to control output granularity with a `maxParts` option, allowing them to trim extraneous trailing time units for cleaner and simpler displays.

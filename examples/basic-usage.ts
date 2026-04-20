@@ -23,6 +23,7 @@ import {
   calculateDDR,
   MissionState,
   getBaseScanUrl,
+  formatDuration,
 } from '../src';
 
 async function main() {
@@ -92,6 +93,12 @@ async function main() {
   console.log(`\n   DDR (Dispute Reserve): ${formatUSDC(ddr)} USDC per party`);
 
   // 4. Demonstrate compact formatting
+  console.log('\n⏱️ Duration Formatting Example:');
+  const durationSecs = 86400 + 3600 + 60; // 1d 1h 1m
+  console.log(`   Original: ${formatDuration(durationSecs)}`);
+  console.log(`   Max Parts (1): ${formatDuration(durationSecs, { maxParts: 1 })}`);
+  console.log(`   Max Parts (2): ${formatDuration(durationSecs, { maxParts: 2 })}`);
+
   console.log('\n📐 Compact Formatting Example:');
   const largeAmount = parseUSDC(1500000); // 1.5M USDC
   console.log(`   Original: ${formatUSDC(largeAmount)} USDC`);
