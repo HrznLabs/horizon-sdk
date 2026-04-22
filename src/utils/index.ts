@@ -557,12 +557,13 @@ export function toBytes32(str: string): `0x${string}` {
  */
 export function randomBytes32(): `0x${string}` {
   crypto.getRandomValues(RANDOM_BYTES_BUFFER);
-  let hex = '';
+  // Optimization: Prepend '0x' upfront to avoid template literal overhead
+  let hex = '0x';
   // Optimization: Loop with lookup table
   for (let i = 0; i < 32; i++) {
     hex += HEX_STRINGS[RANDOM_BYTES_BUFFER[i]];
   }
-  return `0x${hex}` as `0x${string}`;
+  return hex as `0x${string}`;
 }
 
 /**
