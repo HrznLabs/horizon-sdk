@@ -432,10 +432,9 @@ export function isMissionExpired(expiresAt: bigint): boolean {
   if (typeof expiresAt !== 'bigint') {
     throw new Error('Expiration timestamp must be a bigint');
   }
-  // Optimization: Comparison using Number is faster and avoids BigInt allocation for current time
-  // Equivalent to: BigInt(Math.floor(Date.now() / 1000)) > expiresAt
-  // Safe until year 285,616 AD (Number.MAX_SAFE_INTEGER)
-  return Date.now() >= (Number(expiresAt) + 1) * 1000;
+  // Security: Avoid casting BigInt to Number for time comparisons to prevent
+  // silent precision loss vulnerabilities with exceedingly large timestamps.
+  return BigInt(Math.floor(Date.now() / 1000)) > expiresAt;
 }
 
 /**

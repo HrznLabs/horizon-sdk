@@ -67,3 +67,8 @@
 **Vulnerability:** The `toBytes32` function contained an error path for oversized strings that used `TEXT_ENCODER.encode(str).length` to generate a precise error message. If an attacker provided an extremely long string (e.g., 500MB), this unbounded encoding operation would allocate massive amounts of memory, blocking the Node.js event loop for seconds (or running out of memory), causing a Denial of Service (DoS).
 **Learning:** Error paths can themselves be vectors for DoS if they perform unbounded operations (like memory-heavy allocations) to generate descriptive error messages. Security limits must be applied *before* any unbounded operation, not during error message construction.
 **Prevention:** Implement a hard limit on input string lengths (e.g., `if (str.length > 256)`) at the very start of utility functions that handle unbounded memory operations to prevent exhaustion attacks.
+
+## 2026-05-18 - Silent Precision Loss in Timestamp Validation
+**Vulnerability:** The `isMissionExpired` function cast the `expiresAt` parameter (a `bigint`) to a `Number` to perform time comparisons. This casting of `BigInt` to `Number` could lead to silent precision loss for exceedingly large timestamps, potentially causing incorrect expiration evaluations.
+**Learning:** Never cast `BigInt` variables to `Number` in validation functions, especially for timestamps or financial calculations, as this introduces risks of silent precision loss.
+**Prevention:** Use strict, native `BigInt` math operations for time comparisons and validations involving `bigint` inputs.
