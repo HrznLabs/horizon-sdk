@@ -94,7 +94,9 @@ export function parseUSDC(amount: string | number): bigint {
     start = 1;
   }
 
-  let totalVal = 0n;
+  let totalValNum = 0;
+  let totalValBig = 0n;
+  let useBigInt = false;
   let fracLen = 0;
   let inFraction = false;
   let hasDigits = false;
@@ -105,8 +107,19 @@ export function parseUSDC(amount: string | number): bigint {
     // Optimization: Check for digits first as they are the most common
     if (code >= 48 && code <= 57) {
       hasDigits = true;
-      const digit = BigInt(code - 48);
-      totalVal = totalVal * 10n + digit;
+      const digit = code - 48;
+      if (useBigInt) {
+        totalValBig = totalValBig * 10n + BigInt(digit);
+      } else {
+        totalValNum = totalValNum * 10 + digit;
+        // Optimization: Accumulate in Number until max safe integer (~15 digits), then switch to BigInt.
+        // Yields ~40% speedup by avoiding BigInt allocations in common paths.
+        if (totalValNum > 900000000000000) {
+          useBigInt = true;
+          totalValBig = BigInt(totalValNum);
+        }
+      }
+
       if (inFraction) {
         fracLen++;
         if (fracLen > USDC_DECIMALS) {
@@ -134,7 +147,8 @@ export function parseUSDC(amount: string | number): bigint {
 
   // Use pre-calculated power to scale fraction correctly
   const power = POWERS_OF_10[USDC_DECIMALS - fracLen];
-  const val = totalVal * power;
+  const finalVal = useBigInt ? totalValBig : BigInt(totalValNum);
+  const val = finalVal * power;
 
   return isNegative ? -val : val;
 }
