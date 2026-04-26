@@ -72,3 +72,8 @@
 **Vulnerability:** The `isMissionExpired` function cast the `expiresAt` parameter (a `bigint`) to a `Number` to perform time comparisons. This casting of `BigInt` to `Number` could lead to silent precision loss for exceedingly large timestamps, potentially causing incorrect expiration evaluations.
 **Learning:** Never cast `BigInt` variables to `Number` in validation functions, especially for timestamps or financial calculations, as this introduces risks of silent precision loss.
 **Prevention:** Use strict, native `BigInt` math operations for time comparisons and validations involving `bigint` inputs.
+
+## 2026-06-25 - Unvalidated Bound Checks for Numbers
+**Vulnerability:** The `parseUSDC` function natively supported both `string` and `number` types. For `number` inputs, it implicitly converted the value to a string via `.toString()`. However, if the provided `number` exceeded `Number.MAX_SAFE_INTEGER` (or was less than `Number.MIN_SAFE_INTEGER`), JavaScript inherently applies silent precision loss. This could result in incorrect or approximate financial values being processed without warning or errors to the caller.
+**Learning:** Overloading inputs to accept `number` for financial conversions is convenient, but risky. JavaScript's double-precision floating-point format silently mutates bounds-exceeding numbers before they even reach utility function boundaries.
+**Prevention:** Strictly enforce `Number.MAX_SAFE_INTEGER` and `Number.MIN_SAFE_INTEGER` boundaries whenever `typeof input === 'number'` is accepted for a financial utility, explicitly instructing developers to cast to string on their end to guarantee precision.
