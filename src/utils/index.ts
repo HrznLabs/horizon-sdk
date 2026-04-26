@@ -73,6 +73,9 @@ const TIME_UNITS_LONG = [
  */
 export function parseUSDC(amount: string | number): bigint {
   if (typeof amount === 'number') {
+    if (amount > Number.MAX_SAFE_INTEGER || amount < Number.MIN_SAFE_INTEGER) {
+      throw new Error('Number exceeds safe integer limits. Pass as string to avoid precision loss.');
+    }
     return parseUSDC(amount.toString());
   }
 
