@@ -170,7 +170,7 @@ const COMPACT_ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
+  options?: { minDecimals?: number; maxDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
 ): string {
   if (typeof amount !== 'bigint') {
     throw new Error('Amount must be a bigint');
@@ -179,6 +179,11 @@ export function formatUSDC(
   const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
+
+  let maxDecimals = options?.maxDecimals !== undefined ? options.maxDecimals : USDC_DECIMALS;
+  if (maxDecimals > MAX_DECIMALS) maxDecimals = MAX_DECIMALS;
+  if (maxDecimals < minDecimals) maxDecimals = minDecimals;
+
   const prefix = options?.prefix || '';
   const suffix = options?.suffix || '';
   const useCommas = options?.commas !== false;
@@ -222,6 +227,10 @@ export function formatUSDC(
         }
       }
 
+      if (decimalPart.length > maxDecimals) {
+        decimalPart = decimalPart.substring(0, maxDecimals);
+      }
+
       if (minDecimals > 0) {
         // Optimization: substring and string concat is faster than padEnd
         if (decimalPart.length < minDecimals) {
@@ -253,10 +262,14 @@ export function formatUSDC(
       fractionStr = ZEROES.substring(0, USDC_DECIMALS - fractionStr.length) + fractionStr;
     }
 
+    if (fractionStr.length > maxDecimals) {
+      fractionStr = fractionStr.substring(0, maxDecimals);
+    }
+
     // Trim trailing zeros for cleaner display
     // Optimization: Manual loop is ~60% faster than regex replace(/0+$/, '')
     let i = fractionStr.length - 1;
-    while (i >= 0 && fractionStr.charCodeAt(i) === 48) { // 48 is '0'
+    while (i >= minDecimals && fractionStr.charCodeAt(i) === 48) { // 48 is '0'
       i--;
     }
     fractionStr = fractionStr.substring(0, i + 1);

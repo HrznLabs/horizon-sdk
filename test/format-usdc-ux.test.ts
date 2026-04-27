@@ -101,4 +101,26 @@ describe('formatUSDC UX Improvements', () => {
     assert.strictEqual(formatUSDC(1500000n, { prefix: '$', showPlusSign: true }), '+$1.5');
     assert.strictEqual(formatUSDC(1500000000n, { prefix: '$', compact: true, showPlusSign: true }), '+$1.5K');
   });
+
+  it('should respect maxDecimals option', () => {
+    // Standard format truncation without rounding
+    assert.strictEqual(formatUSDC(1555555n, { maxDecimals: 2 }), '1.55');
+    assert.strictEqual(formatUSDC(1555555n, { maxDecimals: 0 }), '1');
+    assert.strictEqual(formatUSDC(1555555n, { maxDecimals: 4 }), '1.5555');
+
+    // Should not trim more than requested if there are zeros inside
+    assert.strictEqual(formatUSDC(1005000n, { maxDecimals: 2 }), '1'); // .00 becomes empty string
+
+    // Test that minDecimals supersedes lower maxDecimals input
+    assert.strictEqual(formatUSDC(1555555n, { minDecimals: 3, maxDecimals: 2 }), '1.555');
+
+    // Test maxDecimals in compact notation
+    // 1555000n * 100n / 1000000n = 155500000n / 1000000n = 155n.
+    // Wait, compact with M uses divisor 1_000_000_000_000n (for 1M USDC).
+    // Let's test 1.555M
+    const millionVal = 1555555n * 1000000n; // 1,555,555 USDC
+    assert.strictEqual(formatUSDC(millionVal, { compact: true }), '1.55M'); // Default max 2 for compact
+    assert.strictEqual(formatUSDC(millionVal, { compact: true, maxDecimals: 1 }), '1.5M');
+    assert.strictEqual(formatUSDC(millionVal, { compact: true, maxDecimals: 0 }), '1M');
+  });
 });
