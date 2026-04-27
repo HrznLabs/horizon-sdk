@@ -211,7 +211,8 @@ export function formatUSDC(
 
       const scaledWhole = absAmount / divisor;
       const remainder = absAmount % divisor;
-      const fractionVal = (remainder * 100n) / divisor;
+      // Optimization: Short-circuit remainder calculation to avoid expensive BigInt math
+      const fractionVal = remainder === 0n ? 0n : (remainder * 100n) / divisor;
 
       let decimalPart = '';
       if (fractionVal > 0n) {
