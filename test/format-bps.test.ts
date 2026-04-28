@@ -57,6 +57,16 @@ describe('formatBps UX Improvements', () => {
     assert.strictEqual(formatBps(150.5, { minDecimals: 4 }), '1.5050%'); // Should pad
   });
 
+  it('should respect maxDecimals option', () => {
+    assert.strictEqual(formatBps(150.5, { maxDecimals: 2 }), '1.50%');
+    assert.strictEqual(formatBps(150.5, { maxDecimals: 0 }), '1%');
+    assert.strictEqual(formatBps(150.5, { maxDecimals: 5 }), '1.505%');
+  });
+
+  it('should respect minDecimals and maxDecimals combined', () => {
+    assert.strictEqual(formatBps(150.5, { minDecimals: 2, maxDecimals: 2 }), '1.50%');
+  });
+
   it('should throw error for non-finite basis points', () => {
     assert.throws(() => formatBps(NaN), /Basis points must be a finite number/);
     assert.throws(() => formatBps(Infinity), /Basis points must be a finite number/);

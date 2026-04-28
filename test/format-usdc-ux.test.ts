@@ -57,6 +57,25 @@ describe('formatUSDC UX Improvements', () => {
     assert.strictEqual(formatUSDC(1000000n, { minDecimals: 0 }), '1');
   });
 
+  it('should respect maxDecimals option', () => {
+    // 1.555 USDC -> 1.55 (truncates instead of rounding)
+    assert.strictEqual(formatUSDC(1555000n, { maxDecimals: 2 }), '1.55');
+
+    // 1.5 USDC -> 1.5 (should not pad if maxDecimals > actual decimals)
+    assert.strictEqual(formatUSDC(1500000n, { maxDecimals: 2 }), '1.5');
+
+    // 1.555 USDC -> 1 (truncates all decimals)
+    assert.strictEqual(formatUSDC(1555000n, { maxDecimals: 0 }), '1');
+  });
+
+  it('should respect minDecimals and maxDecimals combined', () => {
+    // 1.555 USDC -> min=2, max=2 -> 1.55
+    assert.strictEqual(formatUSDC(1555000n, { minDecimals: 2, maxDecimals: 2 }), '1.55');
+
+    // 1.5 USDC -> min=2, max=2 -> 1.50
+    assert.strictEqual(formatUSDC(1500000n, { minDecimals: 2, maxDecimals: 2 }), '1.50');
+  });
+
   it('should handle prefix option', () => {
     assert.strictEqual(formatUSDC(10000000n, { prefix: '$' }), '$10');
     assert.strictEqual(formatUSDC(-10000000n, { prefix: '$' }), '-$10');

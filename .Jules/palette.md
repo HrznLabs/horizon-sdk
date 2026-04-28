@@ -65,3 +65,7 @@
 ## 2025-08-01 - [Controlling Duration Formatting Granularity]
 **Learning:** Displaying overly granular duration formats (like "1d 2h 5m 10s") can introduce visual noise and cognitive load for users when they only care about the most significant units (e.g. "about 1 day").
 **Action:** Provide developers the ability to control output granularity with a `maxParts` option, allowing them to trim extraneous trailing time units for cleaner and simpler displays.
+
+## 2025-08-01 - [Consistent UI Alignment with maxDecimals]
+**Learning:** For financial user interfaces and tabular data layouts, leaving arbitrary trailing decimals on non-integer values causes visual clutter and misalignment.
+**Action:** Providing an explicit mechanism to truncate maximum decimal precision (`maxDecimals`) across formatting utilities (`formatUSDC`, `formatBps`) ensures visual alignment and consistency, improving readability.

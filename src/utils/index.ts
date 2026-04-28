@@ -170,7 +170,7 @@ const COMPACT_ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
+  options?: { minDecimals?: number; maxDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
 ): string {
   if (typeof amount !== 'bigint') {
     throw new Error('Amount must be a bigint');
@@ -179,6 +179,8 @@ export function formatUSDC(
   const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
+  let maxDecimals = options?.maxDecimals;
+  if (maxDecimals !== undefined && maxDecimals > MAX_DECIMALS) maxDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
   const suffix = options?.suffix || '';
   const useCommas = options?.commas !== false;
@@ -229,6 +231,10 @@ export function formatUSDC(
         }
       }
 
+      if (maxDecimals !== undefined && decimalPart.length > maxDecimals) {
+        decimalPart = decimalPart.substring(0, maxDecimals);
+      }
+
       if (decimalPart !== '') {
         decimalPart = '.' + decimalPart;
       }
@@ -269,6 +275,10 @@ export function formatUSDC(
     }
   }
 
+  if (maxDecimals !== undefined && fractionStr.length > maxDecimals) {
+    fractionStr = fractionStr.substring(0, maxDecimals);
+  }
+
   const sign = amount < 0n ? '-' : (amount > 0n && options?.showPlusSign ? '+' : '');
 
   // Performance optimization: Manual comma insertion is ~2.7x faster than toLocaleString.
@@ -304,7 +314,7 @@ export function formatUSDC(
  */
 export function formatBps(
   bps: number,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; showPlusSign?: boolean }
+  options?: { minDecimals?: number; maxDecimals?: number; prefix?: string; suffix?: string; showPlusSign?: boolean }
 ): string {
   if (!Number.isFinite(bps)) {
     throw new Error('Basis points must be a finite number');
@@ -312,6 +322,8 @@ export function formatBps(
 
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
+  let maxDecimals = options?.maxDecimals;
+  if (maxDecimals !== undefined && maxDecimals > MAX_DECIMALS) maxDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
@@ -326,6 +338,20 @@ export function formatBps(
     const decimals = dotIndex === -1 ? 0 : formatted.length - dotIndex - 1;
     if (decimals < minDecimals) {
       formatted = percentage.toFixed(minDecimals);
+    }
+  }
+
+  if (maxDecimals !== undefined) {
+    const dotIndex = formatted.indexOf('.');
+    if (dotIndex !== -1) {
+      const decimals = formatted.length - dotIndex - 1;
+      if (decimals > maxDecimals) {
+        if (maxDecimals === 0) {
+          formatted = formatted.substring(0, dotIndex);
+        } else {
+          formatted = formatted.substring(0, dotIndex + 1 + maxDecimals);
+        }
+      }
     }
   }
 
