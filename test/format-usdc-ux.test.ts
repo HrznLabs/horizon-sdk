@@ -47,6 +47,25 @@ describe('formatUSDC UX Improvements', () => {
     assert.strictEqual(formatUSDC(0n, { minDecimals: 2 }), '0.00');
   });
 
+  it('should respect maxDecimals option', () => {
+    // 1.555 USDC -> 1.55
+    assert.strictEqual(formatUSDC(1555000n, { maxDecimals: 2 }), '1.55');
+
+    // 1.555 USDC -> 1.5
+    assert.strictEqual(formatUSDC(1555000n, { maxDecimals: 1 }), '1.5');
+
+    // 1.555 USDC -> 1 (if maxDecimals is 0)
+    assert.strictEqual(formatUSDC(1555000n, { maxDecimals: 0 }), '1');
+  });
+
+  it('should combine minDecimals and maxDecimals correctly', () => {
+    // 1.5 USDC -> 1.50 (minDecimals pads, maxDecimals doesn't truncate)
+    assert.strictEqual(formatUSDC(1500000n, { minDecimals: 2, maxDecimals: 2 }), '1.50');
+
+    // 1.555 USDC -> 1.55 (maxDecimals truncates)
+    assert.strictEqual(formatUSDC(1555000n, { minDecimals: 2, maxDecimals: 2 }), '1.55');
+  });
+
   it('should handle negative numbers with minDecimals', () => {
     // -1 -> -1.00
     assert.strictEqual(formatUSDC(-1000000n, { minDecimals: 2 }), '-1.00');

@@ -61,6 +61,20 @@ describe('formatUSDC Compact Notation', () => {
     assert.strictEqual(formatUSDC(1234560000n, { compact: true }), '1.23K');
   });
 
+  it('should respect maxDecimals in compact mode', () => {
+    // 1,234 -> 1.2K
+    assert.strictEqual(formatUSDC(1234560000n, { compact: true, maxDecimals: 1 }), '1.2K');
+    // 1,234 -> 1K
+    assert.strictEqual(formatUSDC(1234560000n, { compact: true, maxDecimals: 0 }), '1K');
+  });
+
+  it('should combine minDecimals and maxDecimals in compact mode', () => {
+    // 1,000 -> 1.00K
+    assert.strictEqual(formatUSDC(1000000000n, { compact: true, minDecimals: 2, maxDecimals: 2 }), '1.00K');
+    // 1,234 -> 1.23K
+    assert.strictEqual(formatUSDC(1234560000n, { compact: true, minDecimals: 2, maxDecimals: 2 }), '1.23K');
+  });
+
   it('should respect minDecimals in compact mode', () => {
     // 1,000 -> 1.00K
     assert.strictEqual(formatUSDC(1000000000n, { compact: true, minDecimals: 2 }), '1.00K');

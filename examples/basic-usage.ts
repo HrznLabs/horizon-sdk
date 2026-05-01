@@ -105,6 +105,7 @@ async function main() {
   console.log(`   Compact:  ${formatUSDC(largeAmount, { compact: true })} USDC`);
   console.log(`   Compact (Prefix): ${formatUSDC(largeAmount, { compact: true, prefix: '$' })}`);
   console.log(`   Compact (Plus Sign): ${formatUSDC(largeAmount, { compact: true, prefix: '$', showPlusSign: true })}`);
+  console.log(`   Max Decimals (Truncated): ${formatUSDC(parseUSDC('1.555'), { maxDecimals: 2 })} USDC`);
 
   // 5. Contract addresses
   console.log('\n📜 Contract Addresses (Base Sepolia):');

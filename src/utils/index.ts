@@ -170,7 +170,7 @@ const COMPACT_ONE_TRILLION = 1000000000000n * USDC_MULTIPLIER_BIGINT;
  */
 export function formatUSDC(
   amount: bigint,
-  options?: { minDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
+  options?: { minDecimals?: number; maxDecimals?: number; prefix?: string; suffix?: string; commas?: boolean; compact?: boolean; showPlusSign?: boolean }
 ): string {
   if (typeof amount !== 'bigint') {
     throw new Error('Amount must be a bigint');
@@ -222,6 +222,10 @@ export function formatUSDC(
         }
       }
 
+      if (options?.maxDecimals !== undefined && decimalPart.length > options.maxDecimals) {
+        decimalPart = decimalPart.substring(0, options.maxDecimals);
+      }
+
       if (minDecimals > 0) {
         // Optimization: substring and string concat is faster than padEnd
         if (decimalPart.length < minDecimals) {
@@ -260,6 +264,10 @@ export function formatUSDC(
       i--;
     }
     fractionStr = fractionStr.substring(0, i + 1);
+  }
+
+  if (options?.maxDecimals !== undefined && fractionStr.length > options.maxDecimals) {
+    fractionStr = fractionStr.substring(0, options.maxDecimals);
   }
 
   if (minDecimals > 0) {
