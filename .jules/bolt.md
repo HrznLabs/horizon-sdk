@@ -77,3 +77,6 @@
 ## 2026-04-26 - [Optimize Hex String Validation]
 **Learning:** For short, fixed-pattern string validations on frequent hot paths (like checking if a string contains only valid hex characters in `toBytes32`), a manual `charCodeAt` loop with simple bound checks (e.g., `code >= 48 && code <= 57`) is faster than a hoisted Regular Expression (`/^0x[0-9a-fA-F]*$/`). In local benchmarks, removing the Regex in favor of the loop reduced execution time by ~25% because it bypasses the Regex engine overhead and can exit early without any internal allocations.
 **Action:** When validating simple string formats in high-frequency utilities, prefer manual `for` loops with `charCodeAt` evaluations over `RegExp.test`, even if the Regex is pre-compiled and hoisted.
+## 2024-12-10 - [Optimize formatUSDC compact remainder]
+**Learning:** In the `formatUSDC` compact formatting path, exact multiples (e.g. 500K) produce a zero remainder. Because calculating `(0n * 100n) / divisor` involves potentially costly BigInt arithmetic without value, wrapping the fractional value calculation in a ternary short-circuit `remainder === 0n ? 0n : (remainder * 100n) / divisor` yields a significant speedup for numbers that cleanly divide into K/M/B/T thresholds.
+**Action:** Always short-circuit BigInt multiplication and division paths when operands are known to be zero in frequent paths.
