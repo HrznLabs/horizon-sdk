@@ -77,3 +77,7 @@
 ## 2026-04-26 - [Optimize Hex String Validation]
 **Learning:** For short, fixed-pattern string validations on frequent hot paths (like checking if a string contains only valid hex characters in `toBytes32`), a manual `charCodeAt` loop with simple bound checks (e.g., `code >= 48 && code <= 57`) is faster than a hoisted Regular Expression (`/^0x[0-9a-fA-F]*$/`). In local benchmarks, removing the Regex in favor of the loop reduced execution time by ~25% because it bypasses the Regex engine overhead and can exit early without any internal allocations.
 **Action:** When validating simple string formats in high-frequency utilities, prefer manual `for` loops with `charCodeAt` evaluations over `RegExp.test`, even if the Regex is pre-compiled and hoisted.
+
+## 2024-05-16 - ParseUSDC Digit Extraction Optimization
+**Learning:** In tight string parsing loops (like `parseUSDC`), combining ASCII digit validation and extraction using a bitwise XOR (`const digit = code ^ 48; if (digit <= 9)`) is faster than using standard dual-range checks and subtraction (`code >= 48 && code <= 57; const digit = code - 48`). It reduces branch complexity and overhead, yielding a measurable performance gain.
+**Action:** When manually parsing numeric strings character-by-character, prefer bitwise XOR for validating and extracting ASCII digits.

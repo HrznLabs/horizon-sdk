@@ -108,9 +108,10 @@ export function parseUSDC(amount: string | number): bigint {
     const code = amount.charCodeAt(i);
 
     // Optimization: Check for digits first as they are the most common
-    if (code >= 48 && code <= 57) {
+    // Optimization: bitwise XOR combines validation and extraction into a single expression
+    const digit = code ^ 48;
+    if (digit <= 9) {
       hasDigits = true;
-      const digit = code - 48;
       if (useBigInt) {
         totalValBig = totalValBig * 10n + BigInt(digit);
       } else {
