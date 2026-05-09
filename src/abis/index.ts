@@ -19,11 +19,13 @@ export const MissionFactoryABI = [
     type: 'function',
     name: 'createMission',
     inputs: [
+      { name: 'paymentToken', type: 'address' },
       { name: 'rewardAmount', type: 'uint256' },
       { name: 'expiresAt', type: 'uint256' },
       { name: 'guild', type: 'address' },
       { name: 'metadataHash', type: 'bytes32' },
       { name: 'locationHash', type: 'bytes32' },
+      { name: 'minReputation', type: 'uint256' },
     ],
     outputs: [{ name: 'missionId', type: 'uint256' }],
     stateMutability: 'nonpayable',
