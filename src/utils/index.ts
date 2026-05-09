@@ -223,10 +223,13 @@ export function formatUSDC(
 
       let decimalPart = '';
       if (fractionVal > 0n) {
-        if (fractionVal % 10n === 0n) {
-           decimalPart = (fractionVal / 10n).toString();
+        // Optimization: fractionVal is strictly < 100, fitting safely in a native JS Number.
+        // Casting to Number avoids slow BigInt string allocation overhead in V8.
+        const num = Number(fractionVal);
+        if (num % 10 === 0) {
+           decimalPart = (num / 10).toString();
         } else {
-           decimalPart = fractionVal < 10n ? '0' + fractionVal.toString() : fractionVal.toString();
+           decimalPart = num < 10 ? '0' + num : num.toString();
         }
       }
 
@@ -259,7 +262,9 @@ export function formatUSDC(
   if (fraction === 0n) {
     fractionStr = '';
   } else {
-    fractionStr = fraction.toString();
+    // Optimization: Since USDC_DECIMALS is 6, fraction is strictly < 1,000,000.
+    // Casting to Number avoids slow BigInt string allocation overhead in V8.
+    fractionStr = Number(fraction).toString();
     // Optimization: substring and string concat is faster than padStart
     if (fractionStr.length < USDC_DECIMALS) {
       fractionStr = ZEROES.substring(0, USDC_DECIMALS - fractionStr.length) + fractionStr;
