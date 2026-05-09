@@ -143,31 +143,52 @@ export interface NetworkConfig {
  * Contract addresses for a network
  */
 export interface ContractAddresses {
+  // Core v2.2
   paymentRouter: `0x${string}`;
   missionFactory: `0x${string}`;
+  missionEscrowImpl: `0x${string}`;
   guildFactory: `0x${string}`;
-  reputationAttestations: `0x${string}`;
   disputeResolver: `0x${string}`;
   achievements: `0x${string}`;
+  // Tokens
   usdc: `0x${string}`;
-  // M5 Token Economics (addresses filled after testnet deploy)
+  eurc: `0x${string}`;
+  // M5 Token Economics
   horizonToken: `0x${string}`;
   sHRZNVault: `0x${string}`;
   feeDistributor: `0x${string}`;
-  horizonVesting: `0x${string}`;
   horizonGovernor: `0x${string}`;
-  horizonTimelock: `0x${string}`;
+  governorTimelock: `0x${string}`;
+  buybackExecutor: `0x${string}`;
+  teamVesting: `0x${string}`;
+  advisorVesting: `0x${string}`;
+  // iTake Vertical
+  iTakeGuildFactory: `0x${string}`;
+  iTakePaymentRouter: `0x${string}`;
+  reputationOracle: `0x${string}`;
+  deliveryMissionFactory: `0x${string}`;
+  deliveryEscrowImpl: `0x${string}`;
+  deliveriesDAO: `0x${string}`;
+  iTakeMetaDAO: `0x${string}`;
+  atobaDAO: `0x${string}`;
+  lisboacafe: `0x${string}`;
+  // Treasuries
+  protocolDAO: `0x${string}`;
+  resolversDAO: `0x${string}`;
+  labsDAO: `0x${string}`;
 }
 
 /**
  * Create mission parameters
  */
 export interface CreateMissionParams {
+  paymentToken: `0x${string}`;
   rewardAmount: bigint;
   expiresAt: bigint;
   guild?: `0x${string}`;
   metadataHash: `0x${string}`;
   locationHash: `0x${string}`;
+  minReputation?: bigint;
 }
 
 /**

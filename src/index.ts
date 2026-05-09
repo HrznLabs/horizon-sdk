@@ -86,7 +86,6 @@ export {
   randomBytes32,
   formatAddress,
   getBaseScanUrl,
-  formatDuration,
 } from './utils';
 
 

@@ -68,24 +68,44 @@ export const APPEAL_PERIOD = 48 * 3600;
  */
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as const;
 
+// Last synced: 2026-05-10 from monorepo packages/shared/src/constants/index.ts (Phase 13 redeploy 2026-03-10)
 /**
- * Base Sepolia testnet contract addresses (v2.2 deployment)
+ * Base Sepolia testnet contract addresses (Phase 13 redeployment 2026-03-10)
  */
 export const BASE_SEPOLIA_CONTRACTS: ContractAddresses = {
-  paymentRouter: '0x94fb7908257ec36f701d2605b51eefed4326ddf5',
-  missionFactory: '0xee9234954b134c39c17a75482da78e46b16f466c',
-  guildFactory: '0xfeae3538a4a1801e47b6d16104aa8586edb55f00',
-  reputationAttestations: '0xedae9682a0fb6fb3c18d6865461f67db7d748002',
-  disputeResolver: '0xb00ac4278129928aecc72541b0bcd69d94c1691e',
-  achievements: '0x568e0e3102bfa1f4045d3f62559c0f9823b469bc',
+  // Core v2.2
+  missionFactory: '0x6d97964E9BE016A8AABA2f99F0bA419464Fb88D9',
+  paymentRouter: '0x3013db6C92EF956f86EBC0aDFECe70b80FA73600',
+  missionEscrowImpl: '0x3b02a7eac30Bc4a800Eebd69Fed75c818dB92099',
+  guildFactory: '0x7349Cd1A4f7C1a74Db730743d873de98A2f3a32F',
+  disputeResolver: '0xdE37Ff10A487c852941DC842987dd8d5d8b9E855',
+  achievements: '0xfCC5971C3704C7a1F1c9E4acFdC7eEd60D4e4949',
+  // Tokens
   usdc: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+  eurc: '0x808456652fdb597867f38412077A9182bf77359F',
   // M5 Token Economics — deployed 2026-02-21
-  horizonToken: '0xE6044147c8Af0206b027d845eD8E62796C95e092' as `0x${string}`,
-  sHRZNVault: '0x4f7d551a2482Ba27c7477fEdF62b491DE3156aB6' as `0x${string}`,
-  feeDistributor: '0x4f1b954A293c36C762F81276357c8Dd8438485BC' as `0x${string}`,
-  horizonVesting: '0xa7F10148D14cb3D8459ebf94A64E4e05F4bB95f4' as `0x${string}`,
-  horizonGovernor: '0x4246b5d58960D796F3d562A3ECE333f51e2bFdCc' as `0x${string}`,
-  horizonTimelock: '0xBB50b9987e93E831Fd1C0C54c2C952bF5B7D87d7' as `0x${string}`,
+  horizonToken: '0xe4f29a413c24B6020FE344C412D9f82Df15809aF',
+  sHRZNVault: '0xf3D693616d6b185b36D4a2e36663E5932d351758',
+  feeDistributor: '0x75F875D3c1d01F9A31C7Bd85A5098bD9448b6440',
+  horizonGovernor: '0xE52CCaa9980f0aD00F48BebCbB7294c3c5F644A7',
+  governorTimelock: '0xD0112d484B3261b26D8721e074dC82866A85977C',
+  buybackExecutor: '0x57Bad3A5871BAEAB2e8aee1D5017Aa272f6564FA',
+  teamVesting: '0x7ce88218e511af2A676d5e9992D985BCa067F284',
+  advisorVesting: '0x2483829bd61Da59dF3eD728aE8Db778a7Af9eca7',
+  // iTake Vertical — deployed 2026-02-19
+  iTakeGuildFactory: '0xB54795f8049De1acf729160bcD9184e50E4f267E',
+  iTakePaymentRouter: '0x539408777865c7a3Ac702a350BEb4C04b8618eF2',
+  reputationOracle: '0x7b2617a841B1c3c39Bba454387167A8948301CA8',
+  deliveryMissionFactory: '0x77DD51c63A3fEE0442f4383B5a9D91d470BD04F5',
+  deliveryEscrowImpl: '0x21Fd1D6f66BFf3B084FdA428C75b659A46446f4b',
+  deliveriesDAO: '0xaB2F7787b72FcFfEA8E543375FE2db44D9C6ae53',
+  iTakeMetaDAO: '0x883B7D8CA234912B82AC9718664c2dF224c98a67',
+  atobaDAO: '0x85fB5f85FeC3c18a47e21f22AB69A9bBB09d913f',
+  lisboacafe: '0xAA0096E1038449220dB872c19BDF9CD6d619b7BA',
+  // Treasuries (shared address)
+  protocolDAO: '0x2b30efBA367D669c9cd7723587346a79b67A42DB',
+  resolversDAO: '0x2b30efBA367D669c9cd7723587346a79b67A42DB',
+  labsDAO: '0x2b30efBA367D669c9cd7723587346a79b67A42DB',
 };
 
 /**
@@ -103,20 +123,39 @@ export const BASE_SEPOLIA: NetworkConfig = {
  * Base Mainnet contract addresses (not yet deployed)
  */
 export const BASE_MAINNET_CONTRACTS: ContractAddresses = {
+  // Core v2.2 (pending mainnet deploy)
   paymentRouter: '0x0000000000000000000000000000000000000000',
   missionFactory: '0x0000000000000000000000000000000000000000',
+  missionEscrowImpl: '0x0000000000000000000000000000000000000000',
   guildFactory: '0x0000000000000000000000000000000000000000',
-  reputationAttestations: '0x0000000000000000000000000000000000000000',
   disputeResolver: '0x0000000000000000000000000000000000000000',
   achievements: '0x0000000000000000000000000000000000000000',
+  // Tokens
   usdc: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // Base mainnet USDC
+  eurc: '0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42', // Base mainnet EURC
   // M5 Token Economics (addresses to be filled after mainnet deploy)
   horizonToken: '' as `0x${string}`,
   sHRZNVault: '' as `0x${string}`,
   feeDistributor: '' as `0x${string}`,
-  horizonVesting: '' as `0x${string}`,
   horizonGovernor: '' as `0x${string}`,
-  horizonTimelock: '' as `0x${string}`,
+  governorTimelock: '' as `0x${string}`,
+  buybackExecutor: '' as `0x${string}`,
+  teamVesting: '' as `0x${string}`,
+  advisorVesting: '' as `0x${string}`,
+  // iTake Vertical (pending mainnet deploy)
+  iTakeGuildFactory: '' as `0x${string}`,
+  iTakePaymentRouter: '' as `0x${string}`,
+  reputationOracle: '' as `0x${string}`,
+  deliveryMissionFactory: '' as `0x${string}`,
+  deliveryEscrowImpl: '' as `0x${string}`,
+  deliveriesDAO: '' as `0x${string}`,
+  iTakeMetaDAO: '' as `0x${string}`,
+  atobaDAO: '' as `0x${string}`,
+  lisboacafe: '' as `0x${string}`,
+  // Treasuries (pending mainnet deploy)
+  protocolDAO: '' as `0x${string}`,
+  resolversDAO: '' as `0x${string}`,
+  labsDAO: '' as `0x${string}`,
 };
 
 /**
