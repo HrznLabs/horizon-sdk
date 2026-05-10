@@ -1,5 +1,7 @@
 # Horizon Protocol SDK
 
+**What's new in v0.2.0** (2026-05-10): Base Sepolia addresses synced to Phase 13 redeployment (2026-03-10); `MissionFactory.createMission` ABI now includes `paymentToken` (first arg) and `minReputation` (last arg); `ContractAddresses` expanded with iTake vertical, treasury, and full M5 token fields.
+
 **TypeScript SDK** for developers integrating Horizon Protocol into applications on Base L2.
 
 ## When to Use This SDK
