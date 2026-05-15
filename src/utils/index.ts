@@ -100,13 +100,14 @@ export function parseUSDC(amount: string | number): bigint {
   let totalValNum = 0;
   let totalValBig = 0n;
   let useBigInt = false;
-  let fracLen = 0;
-  let inFraction = false;
+  let decimalIndex = -1;
   let hasDigits = false;
 
   // Optimization: If the string length indicates it safely fits in a native JS Number
   // (<= 15 digits), we can completely skip the `useBigInt` conditional branching inside the
   // tight loop, yielding a ~5-10% execution speedup for standard sized amounts.
+  // Optimization: Instead of checking `if (inFraction)` inside the loop, we track `decimalIndex`
+  // and compute `fracLen` at the end to avoid branch prediction failures.
   if (len - start <= 15) {
     for (let i = start; i < len; i++) {
       const code = amount.charCodeAt(i);
@@ -114,13 +115,9 @@ export function parseUSDC(amount: string | number): bigint {
       if (digit <= 9) {
         hasDigits = true;
         totalValNum = totalValNum * 10 + digit;
-        if (inFraction) {
-          fracLen++;
-          if (fracLen > USDC_DECIMALS) throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
-        }
       } else if (code === 46) {
-        if (inFraction) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
-        inFraction = true;
+        if (decimalIndex !== -1) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
+        decimalIndex = i;
       } else if (code === 44) throw new Error('Invalid USDC amount format: Commas are not allowed.');
       else if (code === 36) throw new Error('Invalid USDC amount format: Currency symbols are not allowed.');
       else if (code === 32) throw new Error('Invalid USDC amount format: Spaces are not allowed.');
@@ -141,13 +138,9 @@ export function parseUSDC(amount: string | number): bigint {
             totalValBig = BigInt(totalValNum);
           }
         }
-        if (inFraction) {
-          fracLen++;
-          if (fracLen > USDC_DECIMALS) throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
-        }
       } else if (code === 46) {
-        if (inFraction) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
-        inFraction = true;
+        if (decimalIndex !== -1) throw new Error('Invalid USDC amount format: Multiple decimal points found.');
+        decimalIndex = i;
       } else if (code === 44) throw new Error('Invalid USDC amount format: Commas are not allowed.');
       else if (code === 36) throw new Error('Invalid USDC amount format: Currency symbols are not allowed.');
       else if (code === 32) throw new Error('Invalid USDC amount format: Spaces are not allowed.');
@@ -158,6 +151,12 @@ export function parseUSDC(amount: string | number): bigint {
   // Ensure inputs containing only formatting characters (like `.` or `-`) throw
   if (!hasDigits) {
     throw new Error('Invalid USDC amount format');
+  }
+
+  let fracLen = 0;
+  if (decimalIndex !== -1) {
+    fracLen = len - 1 - decimalIndex;
+    if (fracLen > USDC_DECIMALS) throw new Error(`Too many decimals (max ${USDC_DECIMALS})`);
   }
 
   // Use pre-calculated power to scale fraction correctly
