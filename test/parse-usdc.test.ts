@@ -80,4 +80,16 @@ describe('parseUSDC Security Checks', () => {
     // 0.57 previously failed safe integer check due to float math, but toString() fixes it
     assert.strictEqual(parseUSDC(0.57), 570000n);
   });
+
+  it('should throw error for non-finite inputs', () => {
+    assert.throws(() => parseUSDC(NaN), {
+      message: /Amount must be a finite number/
+    });
+    assert.throws(() => parseUSDC(Infinity), {
+      message: /Amount must be a finite number/
+    });
+    assert.throws(() => parseUSDC(-Infinity), {
+      message: /Amount must be a finite number/
+    });
+  });
 });
