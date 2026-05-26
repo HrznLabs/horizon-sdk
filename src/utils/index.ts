@@ -190,6 +190,16 @@ export function formatUSDC(
     throw new Error('Amount must be a bigint');
   }
 
+  // Optimization: Short-circuit for zero amount bypasses string allocation entirely
+  if (amount === 0n) {
+    let minDec = options?.minDecimals || 0;
+    if (minDec > MAX_DECIMALS) minDec = MAX_DECIMALS;
+    const pre = options?.prefix || '';
+    const suf = options?.suffix || '';
+    if (minDec === 0) return pre + '0' + suf;
+    return pre + '0.' + ZEROES.substring(0, minDec) + suf;
+  }
+
   const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
@@ -396,6 +406,17 @@ export function calculateFeeSplit(
     throw new Error(
       `Guild fee must be between 0 and ${FEES.MAX_GUILD_BPS} bps`
     );
+  }
+
+  // Optimization: Short-circuit for zero amount bypasses all math entirely
+  if (rewardAmount === 0n) {
+    return {
+      protocolAmount: 0n,
+      labsAmount: 0n,
+      resolverAmount: 0n,
+      guildAmount: 0n,
+      userAmount: 0n,
+    };
   }
 
   // Optimization: Using local literal 10000n avoids BigInt conversion overhead
