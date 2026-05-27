@@ -190,6 +190,15 @@ export function formatUSDC(
     throw new Error('Amount must be a bigint');
   }
 
+  // Optimization: Short-circuit for zero amounts entirely bypasses unnecessary math, string allocation, and parsing
+  if (amount === 0n) {
+    let minDecimals = options?.minDecimals || 0;
+    if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
+    const prefix = options?.prefix || '';
+    const suffix = options?.suffix || '';
+    return prefix + '0' + (minDecimals > 0 ? '.' + ZEROES.substring(0, minDecimals) : '') + suffix;
+  }
+
   const compact = options?.compact === true;
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
