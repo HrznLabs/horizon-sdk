@@ -358,6 +358,12 @@ export function formatBps(
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
+  // Optimization: Short-circuit zero to bypass string allocation and math entirely
+  if (bps === 0) {
+    if (minDecimals === 0) return prefix + '0' + suffix;
+    return prefix + '0.' + ZEROES.substring(0, minDecimals) + suffix;
+  }
+
   const sign = bps < 0 ? '-' : (bps > 0 && options?.showPlusSign ? '+' : '');
   const absBps = Math.abs(bps);
   const percentage = absBps / 100;
