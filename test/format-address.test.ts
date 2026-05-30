@@ -90,4 +90,15 @@ describe('formatAddress', () => {
     assert.throws(() => formatAddress(123 as any), /Address must be a string/);
     assert.throws(() => formatAddress({} as any), /Address must be a string/);
   });
+
+  it('should throw error for excessively long string exceeding max limit', () => {
+    // 300 characters
+    const input = 'a'.repeat(300);
+    assert.throws(
+      () => formatAddress(input),
+      {
+        message: 'Address too long: exceeds maximum input length',
+      }
+    );
+  });
 });

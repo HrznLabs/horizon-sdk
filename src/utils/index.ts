@@ -663,6 +663,11 @@ export function formatAddress(
     throw new Error('Address must be a string');
   }
 
+  // Security: Prevent memory exhaustion DoS from excessively long string inputs
+  if (address.length > 256) {
+    throw new Error('Address too long: exceeds maximum input length');
+  }
+
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
