@@ -361,6 +361,16 @@ export function formatBps(
     throw new Error('Basis points must be a finite number');
   }
 
+  // Optimization: Short-circuit for zero bps bypasses string allocation and formatting
+  if (bps === 0) {
+    let minDec = options?.minDecimals || 0;
+    if (minDec > MAX_DECIMALS) minDec = MAX_DECIMALS;
+    const pre = options?.prefix || '';
+    const suf = options?.suffix !== undefined ? options.suffix : '%';
+    if (minDec === 0) return pre + '0' + suf;
+    return pre + '0.' + ZEROES.substring(0, minDec) + suf;
+  }
+
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
