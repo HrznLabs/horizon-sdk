@@ -87,3 +87,11 @@ describe('formatAddress', () => {
     );
   });
 });
+
+
+describe('formatAddress security checks', () => {
+  it('should throw an error for excessively long addresses to prevent memory exhaustion', () => {
+    const longAddress = '0x' + '1'.repeat(300);
+    assert.throws(() => formatAddress(longAddress), /Address too long: exceeds maximum input length/);
+  });
+});
