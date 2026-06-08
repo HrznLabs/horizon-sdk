@@ -693,9 +693,12 @@ const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
  * @param testnet Whether to use testnet explorer
  * @returns Full BaseScan URL
  */
-// Optimization: Pre-compute base URLs with trailing slashes to avoid template literals later
-const SEPOLIA_BASESCAN_URL = 'https://sepolia.basescan.org/';
-const MAINNET_BASESCAN_URL = 'https://basescan.org/';
+// Optimization: Pre-compute entire static path structures to avoid intermediate
+// string evaluation overhead during dynamic concatenation.
+const SEPOLIA_BASESCAN_URL_ADDRESS = 'https://sepolia.basescan.org/address/';
+const SEPOLIA_BASESCAN_URL_TX = 'https://sepolia.basescan.org/tx/';
+const MAINNET_BASESCAN_URL_ADDRESS = 'https://basescan.org/address/';
+const MAINNET_BASESCAN_URL_TX = 'https://basescan.org/tx/';
 
 export function getBaseScanUrl(
   hashOrAddress: string,
@@ -722,10 +725,12 @@ export function getBaseScanUrl(
     throw new Error('Invalid type parameter.');
   }
 
-  // Optimization: Pre-compute base URL with slash and direct string concatenation
-  // to avoid template literal overhead
-  const baseUrl = testnet ? SEPOLIA_BASESCAN_URL : MAINNET_BASESCAN_URL;
-  const pathType = type !== undefined ? type : (len === 42 ? 'address' : 'tx');
+  // Optimization: Direct string concatenation with pre-computed paths avoids template literal overhead
+  const isAddress = type !== undefined ? type === 'address' : len === 42;
 
-  return baseUrl + pathType + '/' + hashOrAddress;
+  if (testnet) {
+    return (isAddress ? SEPOLIA_BASESCAN_URL_ADDRESS : SEPOLIA_BASESCAN_URL_TX) + hashOrAddress;
+  } else {
+    return (isAddress ? MAINNET_BASESCAN_URL_ADDRESS : MAINNET_BASESCAN_URL_TX) + hashOrAddress;
+  }
 }
