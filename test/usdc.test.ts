@@ -1,35 +1,35 @@
 
-import { test, describe, it } from 'node:test';
-import assert from 'node:assert';
+
+import { describe, it, expect } from 'vitest';
 import { parseUSDC, formatUSDC } from '../src/utils/index';
 
 describe('USDC Utility Security Checks', () => {
   describe('parseUSDC', () => {
     it('should parse valid integers correctly', () => {
-      assert.strictEqual(parseUSDC('100'), 100000000n);
+      expect(parseUSDC('100')).toBe(100000000n);
     });
 
     it('should parse valid decimals correctly', () => {
-      assert.strictEqual(parseUSDC('10.5'), 10500000n);
+      expect(parseUSDC('10.5')).toBe(10500000n);
     });
 
     it('should throw error for inputs with commas', () => {
       // Currently this parses as 1, which is dangerous
-      assert.throws(() => {
+      expect(() => {
         parseUSDC('1,000');
-      }, /Commas are not allowed/);
+      }).toThrow(/Commas are not allowed/);
     });
 
     it('should throw error for inputs with multiple decimals', () => {
-      assert.throws(() => {
+      expect(() => {
         parseUSDC('10.5.5');
-      }, /Multiple decimal points found/);
+      }).toThrow(/Multiple decimal points found/);
     });
 
     it('should throw error for non-numeric characters', () => {
-      assert.throws(() => {
+      expect(() => {
         parseUSDC('100abc');
-      }, /Invalid character found/);
+      }).toThrow(/Invalid character found/);
     });
 
     it('should throw error for negative numbers if not supported (or just parse correctly)', () => {
@@ -41,19 +41,19 @@ describe('USDC Utility Security Checks', () => {
 
   describe('formatUSDC', () => {
     it('should format correctly', () => {
-      assert.strictEqual(formatUSDC(10500000n), '10.5');
+      expect(formatUSDC(10500000n)).toBe('10.5');
     });
 
     it('should format integer amounts without decimals', () => {
-      assert.strictEqual(formatUSDC(100000000n), '100');
+      expect(formatUSDC(100000000n)).toBe('100');
     });
 
     it('should format negative numbers correctly', () => {
-      assert.strictEqual(formatUSDC(-1500000n), '-1.5');
+      expect(formatUSDC(-1500000n)).toBe('-1.5');
     });
 
     it('should format zero correctly', () => {
-      assert.strictEqual(formatUSDC(0n), '0');
+      expect(formatUSDC(0n)).toBe('0');
     });
   });
 });
