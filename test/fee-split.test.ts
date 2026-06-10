@@ -1,33 +1,33 @@
 
-import { test, describe, it } from 'node:test';
-import assert from 'node:assert';
+
+import { describe, it, expect } from 'vitest';
 import { calculateFeeSplit } from '../src/utils/index';
 import { FEES } from '../src/constants';
 
 describe('calculateFeeSplit Security Checks', () => {
   it('should throw error if guildFeeBps exceeds MAX_GUILD_BPS', () => {
     const invalidFee = FEES.MAX_GUILD_BPS + 1;
-    assert.throws(() => {
+    expect(() => {
       calculateFeeSplit(BigInt(1000), invalidFee);
-    }, /Guild fee must be between 0 and 1500 bps/);
+    }).toThrow(/Guild fee must be between 0 and 1500 bps/);
   });
 
   it('should throw error if guildFeeBps is negative', () => {
-    assert.throws(() => {
+    expect(() => {
       calculateFeeSplit(BigInt(1000), -1);
-    }, /Guild fee must be between 0 and 1500 bps/);
+    }).toThrow(/Guild fee must be between 0 and 1500 bps/);
   });
 
   it('should throw error if guildFeeBps is not an integer', () => {
-    assert.throws(() => {
+    expect(() => {
       calculateFeeSplit(BigInt(1000), 10.5);
-    }, /Guild fee must be an integer/);
+    }).toThrow(/Guild fee must be an integer/);
   });
 
   it('should throw error if rewardAmount is negative', () => {
-    assert.throws(() => {
+    expect(() => {
       calculateFeeSplit(-100n, 0);
-    }, /Reward amount must be non-negative/);
+    }).toThrow(/Reward amount must be non-negative/);
   });
 
   it('should calculate correctly for valid inputs', () => {
@@ -37,10 +37,10 @@ describe('calculateFeeSplit Security Checks', () => {
     // 10% of 10000 = 1000
     // Performer: 10000 - 1000 = 9000
     const split = calculateFeeSplit(reward, 300);
-    assert.strictEqual(split.protocolAmount, 250n);
-    assert.strictEqual(split.labsAmount, 250n);
-    assert.strictEqual(split.resolverAmount, 200n);
-    assert.strictEqual(split.guildAmount, 300n);
-    assert.strictEqual(split.performerAmount, 9000n);
+    expect(split.protocolAmount).toBe(250n);
+    expect(split.labsAmount).toBe(250n);
+    expect(split.resolverAmount).toBe(200n);
+    expect(split.guildAmount).toBe(300n);
+    expect(split.performerAmount).toBe(9000n);
   });
 });

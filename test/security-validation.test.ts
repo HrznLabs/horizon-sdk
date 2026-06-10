@@ -1,20 +1,20 @@
-import { test, describe, it } from 'node:test';
-import assert from 'node:assert';
-import { formatBps, getBaseScanUrl, calculateDDR, calculateLPP, calculateFeeSplit, calculateExpiresAt, formatDuration } from '../src/utils/index';
+
+import { describe, it, expect } from 'vitest';
+import { formatBps, calculateExpiresAt, formatDuration } from '../src/utils/index';
 
 describe('Security Validation across utils', () => {
   it('formatBps should handle NaN and Infinity securely', () => {
-    assert.throws(() => formatBps(NaN));
-    assert.throws(() => formatBps(Infinity));
+    expect(() => formatBps(NaN)).toThrow();
+    expect(() => formatBps(Infinity)).toThrow();
   });
 
   it('calculateExpiresAt should handle NaN and Infinity securely', () => {
-    assert.throws(() => calculateExpiresAt(NaN));
-    assert.throws(() => calculateExpiresAt(Infinity));
+    expect(() => calculateExpiresAt(NaN)).toThrow();
+    expect(() => calculateExpiresAt(Infinity)).toThrow();
   });
 
   it('formatDuration should handle NaN and Infinity securely', () => {
-    assert.throws(() => formatDuration(NaN));
-    assert.throws(() => formatDuration(Infinity));
+    expect(() => formatDuration(NaN)).toThrow();
+    expect(() => formatDuration(Infinity)).toThrow();
   });
 });
