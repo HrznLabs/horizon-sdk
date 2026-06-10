@@ -1,27 +1,27 @@
-import { test, describe, it } from 'node:test';
-import assert from 'node:assert';
+
+import { describe, it, expect } from 'vitest';
 import { formatBps, getBaseScanUrl, calculateDDR, calculateLPP, calculateFeeSplit, calculateExpiresAt, formatDuration, isMissionExpired } from '../src/utils/index';
 
 describe('Security Validation across utils', () => {
   it('formatBps should handle NaN and Infinity securely', () => {
-    assert.throws(() => formatBps(NaN));
-    assert.throws(() => formatBps(Infinity));
+    expect(() => formatBps(NaN)).toThrow();
+    expect(() => formatBps(Infinity)).toThrow();
   });
 
   it('calculateExpiresAt should handle NaN and Infinity securely', () => {
-    assert.throws(() => calculateExpiresAt(NaN));
-    assert.throws(() => calculateExpiresAt(Infinity));
+    expect(() => calculateExpiresAt(NaN)).toThrow();
+    expect(() => calculateExpiresAt(Infinity)).toThrow();
   });
 
   it('formatDuration should handle NaN and Infinity securely', () => {
-    assert.throws(() => formatDuration(NaN));
-    assert.throws(() => formatDuration(Infinity));
+    expect(() => formatDuration(NaN)).toThrow();
+    expect(() => formatDuration(Infinity)).toThrow();
   });
 
   it('calculateDDR, calculateLPP, calculateFeeSplit, and isMissionExpired should fail securely for invalid types', () => {
-    assert.throws(() => calculateDDR('100' as any), { message: 'Reward amount must be a bigint' });
-    assert.throws(() => calculateLPP('100' as any), { message: 'Reward amount must be a bigint' });
-    assert.throws(() => calculateFeeSplit('100' as any, 100), { message: 'Reward amount must be a bigint' });
-    assert.throws(() => isMissionExpired('100' as any), { message: 'Expiration timestamp must be a bigint' });
+    expect(() => calculateDDR('100' as any)).toThrow('Reward amount must be a bigint');
+    expect(() => calculateLPP('100' as any)).toThrow('Reward amount must be a bigint');
+    expect(() => calculateFeeSplit('100' as any, 100)).toThrow('Reward amount must be a bigint');
+    expect(() => isMissionExpired('100' as any)).toThrow('Expiration timestamp must be a bigint');
   });
 });

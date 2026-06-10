@@ -1,18 +1,17 @@
-import { test, describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import { parseUSDC, toBytes32, getBaseScanUrl, formatAddress, formatUSDC } from '../src/utils/index';
 
 describe('Security Type Validation', () => {
   it('parseUSDC should throw for invalid types', () => {
-    assert.throws(() => parseUSDC(null as any), /Invalid USDC amount format/);
+    expect(() => parseUSDC(null as any)).toThrow(/Invalid USDC amount format/);
   });
   it('formatUSDC should throw for invalid types', () => {
-    assert.throws(() => formatUSDC(null as any), /Amount must be a bigint/);
+    expect(() => formatUSDC(null as any)).toThrow(/Amount must be a bigint/);
   });
   it('toBytes32 should throw for invalid types', () => {
-    assert.throws(() => toBytes32(null as any), /Input must be a string/);
+    expect(() => toBytes32(null as any)).toThrow(/Input must be a string/);
   });
   it('getBaseScanUrl should throw for invalid types', () => {
-    assert.throws(() => getBaseScanUrl(null as any), /Invalid address or transaction hash./);
+    expect(() => getBaseScanUrl(null as any)).toThrow(/Invalid address or transaction hash./);
   });
 });

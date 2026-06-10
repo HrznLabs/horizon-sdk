@@ -1,93 +1,78 @@
-import { test, describe, it } from 'node:test';
-import assert from 'node:assert';
+
+import { describe, it, expect } from 'vitest';
 import { formatAddress } from '../src/utils';
 
 describe('formatAddress', () => {
   it('should truncate 42-character address correctly (default)', () => {
     const address = '0x1234567890123456789012345678901234567890';
-    assert.strictEqual(address.length, 42);
-    // 0x1234…7890 (6…4)
+    expect(address.length).toBe(42);
+    // Legacy no-options path uses typographic ellipsis (…)
     const expected = '0x1234…7890';
-    assert.strictEqual(formatAddress(address), expected);
+    expect(formatAddress(address)).toBe(expected);
   });
 
   it('should return non-42-character strings as-is (legacy behavior)', () => {
     const short = '0x123';
-    assert.strictEqual(formatAddress(short), short);
+    expect(formatAddress(short)).toBe(short);
 
     const long = '0x' + '1'.repeat(64); // 66 chars
-    assert.strictEqual(long.length, 66);
-    assert.strictEqual(formatAddress(long), long);
+    expect(long.length).toBe(66);
+    expect(formatAddress(long)).toBe(long);
   });
 
   it('should support custom start length', () => {
     const address = '0x1234567890123456789012345678901234567890';
-    // start=8, end=4 (default)
-    // 0x123456...7890
-    assert.strictEqual(formatAddress(address, { start: 8 }), '0x123456...7890');
+    expect(formatAddress(address, { start: 8 })).toBe('0x123456...7890');
   });
 
   it('should support custom end length', () => {
     const address = '0x1234567890123456789012345678901234567890';
-    // start=6 (default), end=6
-    // 0x1234...567890
-    assert.strictEqual(formatAddress(address, { end: 6 }), '0x1234...567890');
+    expect(formatAddress(address, { end: 6 })).toBe('0x1234...567890');
   });
 
   it('should support custom start and end length', () => {
     const address = '0x1234567890123456789012345678901234567890';
-    // start=4, end=2
-    // 0x12...90
-    assert.strictEqual(formatAddress(address, { start: 4, end: 2 }), '0x12...90');
+    expect(formatAddress(address, { start: 4, end: 2 })).toBe('0x12...90');
   });
 
   it('should truncate non-42-character strings if options provided', () => {
     const long = '0x' + '1'.repeat(64); // 66 chars (e.g. tx hash)
-    // Should truncate with default 6...4 if empty options provided
-    assert.strictEqual(formatAddress(long, {}), `0x1111...1111`);
-
-    // Custom options
-    // 0x11...11
-    assert.strictEqual(formatAddress(long, { start: 4, end: 2 }), '0x11...11');
+    expect(formatAddress(long, {})).toBe('0x1111...1111');
+    expect(formatAddress(long, { start: 4, end: 2 })).toBe('0x11...11');
   });
 
   it('should handle short strings gracefully with options', () => {
     const short = 'Alice';
-    // 5 chars <= 6+4 (10), so should return as is
-    assert.strictEqual(formatAddress(short, {}), 'Alice');
-
-    // Even if we ask for very short truncation
-    // start=1, end=1, separator='...' -> 5. 5 <= 5. Return as is.
-    assert.strictEqual(formatAddress(short, { start: 1, end: 1 }), 'Alice');
-
-    // start=2, end=3 -> 5. 5 <= 5. Return as is.
-    assert.strictEqual(formatAddress(short, { start: 2, end: 3 }), 'Alice');
+    // len=5, start=6 (default), end=4 (default), sep='...' (3): 5 <= 13 → return as-is
+    expect(formatAddress(short, {})).toBe('Alice');
+    // len=5, start=1, end=1, sep='...' (3): 5 <= 1+1+3=5 → return as-is (short-circuit)
+    expect(formatAddress(short, { start: 1, end: 1 })).toBe('Alice');
+    // len=5, start=2, end=3, sep='...' (3): 5 <= 2+3+3=8 → return as-is
+    expect(formatAddress(short, { start: 2, end: 3 })).toBe('Alice');
   });
 
   it('should handle empty options object (defaults)', () => {
     const address = '0x1234567890123456789012345678901234567890';
-    // Equivalent to no options but uses new logic branch
-    assert.strictEqual(formatAddress(address, {}), '0x1234...7890');
+    expect(formatAddress(address, {})).toBe('0x1234...7890');
   });
 
   it('should handle end: 0 correctly (truncate suffix completely)', () => {
     const address = '0x1234567890123456789012345678901234567890';
-    // start=6, end=0 -> 0x1234...
-    assert.strictEqual(formatAddress(address, { start: 6, end: 0 }), '0x1234...');
+    expect(formatAddress(address, { start: 6, end: 0 })).toBe('0x1234...');
   });
 
   it('should support custom separators', () => {
     const address = '0x1234567890123456789012345678901234567890';
     // Typographic ellipsis
-    assert.strictEqual(formatAddress(address, { separator: '…' }), '0x1234…7890');
+    expect(formatAddress(address, { separator: '…' })).toBe('0x1234…7890');
     // Custom dash
-    assert.strictEqual(formatAddress(address, { start: 4, end: 4, separator: '-' }), '0x12-7890');
+    expect(formatAddress(address, { start: 4, end: 4, separator: '-' })).toBe('0x12-7890');
   });
 
   it('should throw an error for non-string inputs', () => {
-    assert.throws(() => formatAddress(null as any), /Address must be a string/);
-    assert.throws(() => formatAddress(undefined as any), /Address must be a string/);
-    assert.throws(() => formatAddress(123 as any), /Address must be a string/);
-    assert.throws(() => formatAddress({} as any), /Address must be a string/);
+    expect(() => formatAddress(null as any)).toThrow(/Address must be a string/);
+    expect(() => formatAddress(undefined as any)).toThrow(/Address must be a string/);
+    expect(() => formatAddress(123 as any)).toThrow(/Address must be a string/);
+    expect(() => formatAddress({} as any)).toThrow(/Address must be a string/);
   });
 });

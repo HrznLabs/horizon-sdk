@@ -1,6 +1,6 @@
 
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+
+import { describe, it, expect } from 'vitest';
 import { toBytes32 } from '../src/utils/index';
 
 describe('toBytes32 Hex Validation', () => {
@@ -15,13 +15,7 @@ describe('toBytes32 Hex Validation', () => {
     ];
 
     for (const input of invalidInputs) {
-      assert.throws(
-        () => toBytes32(input),
-        {
-          message: /Invalid hex string/
-        },
-        `Should throw for input: ${input}`
-      );
+      expect(() => toBytes32(input), `Should throw for input: ${input}`).toThrow(/Invalid hex string/);
     }
   });
 
@@ -35,19 +29,14 @@ describe('toBytes32 Hex Validation', () => {
     ];
 
     for (const input of validInputs) {
-      assert.doesNotThrow(
-        () => toBytes32(input),
-        `Should not throw for input: ${input}`
-      );
+      expect(() => toBytes32(input), `Should not throw for input: ${input}`).not.toThrow();
       const result = toBytes32(input);
-      assert.ok(result.startsWith('0x'), `Result should start with 0x: ${result}`);
-      assert.strictEqual(result.length, 66, `Result length should be 66 (0x + 64 chars): ${result}`);
+      expect(result.startsWith('0x'), `Result should start with 0x: ${result}`).toBeTruthy();
+      expect(result.length, `Result length should be 66 (0x + 64 chars): ${result}`).toBe(66);
     }
   });
 
   it('should accept strings without 0x prefix (treated as utf8)', () => {
-    // These are treated as raw strings to be encoded, not hex strings
-    // So they should NOT throw "Invalid hex string" even if they contain non-hex chars
     const rawStrings = [
       'hello world',
       'ZZ',
@@ -55,13 +44,10 @@ describe('toBytes32 Hex Validation', () => {
     ];
 
     for (const input of rawStrings) {
-      assert.doesNotThrow(
-        () => toBytes32(input),
-        `Should not throw for raw string: ${input}`
-      );
+      expect(() => toBytes32(input), `Should not throw for raw string: ${input}`).not.toThrow();
       const result = toBytes32(input);
-      assert.ok(result.startsWith('0x'), `Result should start with 0x: ${result}`);
-      assert.strictEqual(result.length, 66, `Result length should be 66: ${result}`);
+      expect(result.startsWith('0x'), `Result should start with 0x: ${result}`).toBeTruthy();
+      expect(result.length, `Result length should be 66: ${result}`).toBe(66);
     }
   });
 });
