@@ -134,28 +134,28 @@ export const BASE_MAINNET_CONTRACTS: ContractAddresses = {
   usdc: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', // Base mainnet USDC
   eurc: '0x60a3E35Cc302bFA44Cb288Bc5a4F316Fdb1adb42', // Base mainnet EURC
   // M5 Token Economics (addresses to be filled after mainnet deploy)
-  horizonToken: '' as `0x${string}`,
-  sHRZNVault: '' as `0x${string}`,
-  feeDistributor: '' as `0x${string}`,
-  horizonGovernor: '' as `0x${string}`,
-  governorTimelock: '' as `0x${string}`,
-  buybackExecutor: '' as `0x${string}`,
-  teamVesting: '' as `0x${string}`,
-  advisorVesting: '' as `0x${string}`,
+  horizonToken: ZERO_ADDRESS,
+  sHRZNVault: ZERO_ADDRESS,
+  feeDistributor: ZERO_ADDRESS,
+  horizonGovernor: ZERO_ADDRESS,
+  governorTimelock: ZERO_ADDRESS,
+  buybackExecutor: ZERO_ADDRESS,
+  teamVesting: ZERO_ADDRESS,
+  advisorVesting: ZERO_ADDRESS,
   // iTake Vertical (pending mainnet deploy)
-  iTakeGuildFactory: '' as `0x${string}`,
-  iTakePaymentRouter: '' as `0x${string}`,
-  reputationOracle: '' as `0x${string}`,
-  deliveryMissionFactory: '' as `0x${string}`,
-  deliveryEscrowImpl: '' as `0x${string}`,
-  deliveriesDAO: '' as `0x${string}`,
-  iTakeMetaDAO: '' as `0x${string}`,
-  atobaDAO: '' as `0x${string}`,
-  lisboacafe: '' as `0x${string}`,
+  iTakeGuildFactory: ZERO_ADDRESS,
+  iTakePaymentRouter: ZERO_ADDRESS,
+  reputationOracle: ZERO_ADDRESS,
+  deliveryMissionFactory: ZERO_ADDRESS,
+  deliveryEscrowImpl: ZERO_ADDRESS,
+  deliveriesDAO: ZERO_ADDRESS,
+  iTakeMetaDAO: ZERO_ADDRESS,
+  atobaDAO: ZERO_ADDRESS,
+  lisboacafe: ZERO_ADDRESS,
   // Treasuries (pending mainnet deploy)
-  protocolDAO: '' as `0x${string}`,
-  resolversDAO: '' as `0x${string}`,
-  labsDAO: '' as `0x${string}`,
+  protocolDAO: ZERO_ADDRESS,
+  resolversDAO: ZERO_ADDRESS,
+  labsDAO: ZERO_ADDRESS,
 };
 
 /**
@@ -190,6 +190,38 @@ export function getNetwork(chainId: number): NetworkConfig | undefined {
 export function getContracts(chainId: number): ContractAddresses | undefined {
   return getNetwork(chainId)?.contracts;
 }
+
+/**
+ * HRZN token fee discount in basis points (25% off protocol fees)
+ */
+export const HRZN_FEE_DISCOUNT_BPS = 2500;
+
+/**
+ * FeeDistributor allocation splits in basis points
+ * Must sum to 10000 (100%)
+ */
+export const FEE_DISTRIBUTOR_SPLITS = {
+  /** Stakers share: 40% */
+  STAKERS_BPS: 4000,
+  /** Guilds share: 30% */
+  GUILDS_BPS: 3000,
+  /** Protocol treasury share: 20% */
+  TREASURY_BPS: 2000,
+  /** Resolvers share: 10% */
+  RESOLVERS_BPS: 1000,
+} as const;
+
+/**
+ * HorizonGovernor on-chain governance parameters
+ */
+export const GOVERNANCE_PARAMS = {
+  /** Quorum: 4% of total supply required */
+  QUORUM_NUMERATOR: 4,
+  /** Voting period: 5 days in blocks (at ~2s/block on Base) */
+  VOTING_PERIOD_BLOCKS: 216000,
+  /** Voting delay: 1 day in blocks */
+  VOTING_DELAY_BLOCKS: 43200,
+} as const;
 
 
 
