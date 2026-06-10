@@ -92,19 +92,29 @@ const contracts = getContracts(84532);
 
 // Direct access
 console.log(BASE_SEPOLIA.contracts.missionFactory);
-// 0xee9234954b134c39c17a75482da78e46b16f466c
+// 0x6d97964E9BE016A8AABA2f99F0bA419464Fb88D9
 ```
 
 ## Contract Addresses (Base Sepolia)
 
+Phase 13 redeployment (2026-03-10). Source of truth: `src/constants.ts`.
+
 | Contract | Address |
 |----------|---------|
-| MissionFactory | `0xee9234954b134c39c17a75482da78e46b16f466c` |
-| GuildFactory | `0xfeae3538a4a1801e47b6d16104aa8586edb55f00` |
-| PaymentRouter | `0x94fb7908257ec36f701d2605b51eefed4326ddf5` |
-| ReputationAttestations | `0xedae9682a0fb6fb3c18d6865461f67db7d748002` |
-| DisputeResolver | `0xb00ac4278129928aecc72541b0bcd69d94c1691e` |
-| HorizonAchievements | `0x568e0e3102bfa1f4045d3f62559c0f9823b469bc` |
+| MissionFactory | `0x6d97964E9BE016A8AABA2f99F0bA419464Fb88D9` |
+| MissionEscrowImpl | `0x3b02a7eac30Bc4a800Eebd69Fed75c818dB92099` |
+| GuildFactory | `0x7349Cd1A4f7C1a74Db730743d873de98A2f3a32F` |
+| PaymentRouter | `0x3013db6C92EF956f86EBC0aDFECe70b80FA73600` |
+| DisputeResolver | `0xdE37Ff10A487c852941DC842987dd8d5d8b9E855` |
+| HorizonAchievements | `0xfCC5971C3704C7a1F1c9E4acFdC7eEd60D4e4949` |
+| HorizonToken (HRZN) | `0xe4f29a413c24B6020FE344C412D9f82Df15809aF` |
+| sHRZNVault | `0xf3D693616d6b185b36D4a2e36663E5932d351758` |
+| FeeDistributor | `0x75F875D3c1d01F9A31C7Bd85A5098bD9448b6440` |
+| HorizonGovernor | `0xE52CCaa9980f0aD00F48BebCbB7294c3c5F644A7` |
+| GovernorTimelock | `0xD0112d484B3261b26D8721e074dC82866A85977C` |
+| BuybackExecutor | `0x57Bad3A5871BAEAB2e8aee1D5017Aa272f6564FA` |
+| USDC (Base Sepolia) | `0x036CbD53842c5426634e7929541eC2318f3dCF7e` |
+| EURC (Base Sepolia) | `0x808456652fdb597867f38412077A9182bf77359F` |
 
 ## Utilities
 
@@ -133,7 +143,7 @@ const lpp = calculateLPP(parseUSDC(100));  // 2% = 2 USDC
 ```ts
 import { calculateExpiresAt, isMissionExpired } from 'horizon-protocol-sdk';
 
-const expiresAt = calculateExpiresAt(7);  // 7 days from now
+const expiresAt = calculateExpiresAt(7 * 24 * 60 * 60);  // 7 days from now (in seconds)
 const expired = isMissionExpired(expiresAt);
 ```
 

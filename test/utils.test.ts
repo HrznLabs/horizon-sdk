@@ -1,24 +1,24 @@
-import { test, describe, it } from 'node:test';
-import assert from 'node:assert';
+
+import { describe, it, expect } from 'vitest';
 import { formatUSDC } from '../src/utils/index';
 import { USDC_DECIMALS } from '../src/constants';
 
 describe('formatUSDC', () => {
   it('should format simple amounts', () => {
-    assert.strictEqual(formatUSDC(1000000n), '1');
-    assert.strictEqual(formatUSDC(10000000n), '10');
+    expect(formatUSDC(1000000n)).toBe('1');
+    expect(formatUSDC(10000000n)).toBe('10');
   });
 
   it('should format amounts with commas', () => {
-    assert.strictEqual(formatUSDC(1000000000n), '1,000');
-    assert.strictEqual(formatUSDC(1000000000000n), '1,000,000');
+    expect(formatUSDC(1000000000n)).toBe('1,000');
+    expect(formatUSDC(1000000000000n)).toBe('1,000,000');
   });
 
   it('should format small amounts correctly', () => {
-    assert.strictEqual(formatUSDC(500000n), '0.5');
+    expect(formatUSDC(500000n)).toBe('0.5');
   });
 
   it('should handle zero', () => {
-    assert.strictEqual(formatUSDC(0n), '0');
+    expect(formatUSDC(0n)).toBe('0');
   });
 });
