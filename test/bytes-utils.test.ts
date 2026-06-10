@@ -35,4 +35,15 @@ describe('Byte Utils Tests', () => {
     const input = '0x' + '1'.repeat(65);
     expect(() => toBytes32(input)).toThrow('String too long for bytes32');
   });
+
+  it('should throw error for excessively long string exceeding max limit', () => {
+    // 300 characters
+    const input = 'a'.repeat(300);
+    assert.throws(
+      () => toBytes32(input),
+      {
+        message: 'String too long for bytes32: exceeds maximum input length',
+      }
+    );
+  });
 });

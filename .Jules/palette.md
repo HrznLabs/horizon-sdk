@@ -53,3 +53,18 @@
 ## 2025-06-10 - [Explicit Positive Change Display]
 **Learning:** Frontend developers often manually prepend `+` signs to formatted numbers to indicate positive PnL or balance changes. This causes visual layout issues when a prefix (like `$`) is present because the manual `+` lands outside the prefix (e.g., `+$1.50` instead of `+$1.50`), looking broken.
 **Action:** Add a `showPlusSign` configuration option to financial formatting utilities (`formatUSDC` and `formatBps`) to cleanly handle placing the explicit positive sign relative to any user-provided prefix.
+
+## 2025-06-25 - [Accessible String Truncation]
+**Learning:** Hard-coding three dots (`...`) for string truncation causes screen readers to read it literally as "dot dot dot," which is poor accessibility and takes up unnecessary horizontal space. The typographic ellipsis character (`…`) is a single character that is correctly interpreted by screen readers.
+**Action:** When creating truncation utilities (like `formatAddress`), allow developers to configure the truncation separator so they can opt-in to the accessible, typographic ellipsis (`…`) while maintaining backward compatibility with standard defaults.
+
+## 2025-07-28 - [Meaningful String Truncation]
+**Learning:** Truncating short strings (like ENS names or short custom addresses) with standard separators (like `...`) can result in a truncated string that is actually longer than the original (e.g., `vitalik.eth` -> `vitali....eth`). This creates visual clutter and defeats the purpose of truncation.
+**Action:** When implementing string truncation, always check if the original length is less than or equal to the combined length of the start, end, and separator (`len <= start + end + separator.length`). Only truncate if it actively saves space.
+
+## 2025-08-01 - [Controlling Duration Formatting Granularity]
+**Learning:** Displaying overly granular duration formats (like "1d 2h 5m 10s") can introduce visual noise and cognitive load for users when they only care about the most significant units (e.g. "about 1 day").
+**Action:** Provide developers the ability to control output granularity with a `maxParts` option, allowing them to trim extraneous trailing time units for cleaner and simpler displays.
+## 2024-04-27 - Implement maxDecimals in formatUSDC
+**Learning:** For financial user interfaces and tabular data layouts, relying solely on default full-precision outputs (e.g., leaving arbitrary trailing decimals on non-integer values) creates visual clutter and often breaks tabular alignment constraints when large numbers or compact suffixes (M/K) are present.
+**Action:** Always provide explicit mechanisms to truncate maximum decimal precision (`maxDecimals`), while cleanly handling zero-padding logic (`minDecimals`). This prevents precision overflow in the UI without fundamentally corrupting the underlying dataset logic.

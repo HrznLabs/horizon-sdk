@@ -39,6 +39,20 @@ describe('formatDuration', () => {
     expect(formatDuration(2592000, { style: 'long' })).toBe('30 days');
   });
 
+  it('should respect maxParts option', () => {
+    const duration = 86400 + 3600 + 60 + 1; // 1d 1h 1m 1s
+    assert.strictEqual(formatDuration(duration, { maxParts: 1 }), '1d');
+    assert.strictEqual(formatDuration(duration, { maxParts: 2 }), '1d 1h');
+    assert.strictEqual(formatDuration(duration, { maxParts: 3 }), '1d 1h 1m');
+    assert.strictEqual(formatDuration(duration, { maxParts: 4 }), '1d 1h 1m 1s');
+
+    // With long style
+    assert.strictEqual(formatDuration(duration, { style: 'long', maxParts: 2 }), '1 day 1 hour');
+
+    // When remaining seconds reach 0 before maxParts is hit
+    assert.strictEqual(formatDuration(3600, { maxParts: 3 }), '1h');
+  });
+
   it('should handle singular vs plural correctly in long style', () => {
     expect(formatDuration(1, { style: 'long' })).toBe('1 second');
     expect(formatDuration(2, { style: 'long' })).toBe('2 seconds');

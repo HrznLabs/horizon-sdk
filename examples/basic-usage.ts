@@ -23,6 +23,7 @@ import {
   calculateDDR,
   MissionState,
   getBaseScanUrl,
+  formatDuration,
 } from '../src';
 
 async function main() {
@@ -66,8 +67,8 @@ async function main() {
       functionName: 'getRuntime',
     });
 
-    console.log(`   Escrow: ${formatAddress(escrowAddress)}`);
-    console.log(`   Poster: ${formatAddress(params.poster, { start: 6, end: 4 })}`);
+    console.log(`   Escrow: ${formatAddress(escrowAddress, { separator: '…' })}`);
+    console.log(`   Poster: ${formatAddress(params.poster, { start: 6, end: 4, separator: '…' })}`);
     console.log(`   Reward: ${formatUSDC(params.rewardAmount)} USDC`);
     console.log(`   State: ${MissionState[runtime.state]}`);
     console.log(`   BaseScan: ${getBaseScanUrl(escrowAddress, 'address', true)}\n`);
@@ -92,6 +93,12 @@ async function main() {
   console.log(`\n   DDR (Dispute Reserve): ${formatUSDC(ddr)} USDC per party`);
 
   // 4. Demonstrate compact formatting
+  console.log('\n⏱️ Duration Formatting Example:');
+  const durationSecs = 86400 + 3600 + 60; // 1d 1h 1m
+  console.log(`   Original: ${formatDuration(durationSecs)}`);
+  console.log(`   Max Parts (1): ${formatDuration(durationSecs, { maxParts: 1 })}`);
+  console.log(`   Max Parts (2): ${formatDuration(durationSecs, { maxParts: 2 })}`);
+
   console.log('\n📐 Compact Formatting Example:');
   const largeAmount = parseUSDC(1500000); // 1.5M USDC
   console.log(`   Original: ${formatUSDC(largeAmount)} USDC`);

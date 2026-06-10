@@ -56,4 +56,19 @@ describe('formatAddress', () => {
     const address = '0x1234567890123456789012345678901234567890';
     expect(formatAddress(address, { start: 6, end: 0 })).toBe('0x1234...');
   });
+
+  it('should support custom separators', () => {
+    const address = '0x1234567890123456789012345678901234567890';
+    // Typographic ellipsis
+    expect(formatAddress(address, { separator: '…' })).toBe('0x1234…7890');
+    // Custom dash
+    expect(formatAddress(address, { start: 4, end: 4, separator: '-' })).toBe('0x12-7890');
+  });
+
+  it('should throw an error for non-string inputs', () => {
+    expect(() => formatAddress(null as any)).toThrow(/Address must be a string/);
+    expect(() => formatAddress(undefined as any)).toThrow(/Address must be a string/);
+    expect(() => formatAddress(123 as any)).toThrow(/Address must be a string/);
+    expect(() => formatAddress({} as any)).toThrow(/Address must be a string/);
+  });
 });
