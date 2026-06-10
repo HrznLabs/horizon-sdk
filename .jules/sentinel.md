@@ -52,3 +52,33 @@
 **Vulnerability:** `getBaseScanUrl` accepted any value for the `type` parameter (e.g., bypassing type constraints via `as any`), allowing path traversal and XSS via `type` (e.g., `"address/../../evil"`).
 **Learning:** Even if a parameter's type is strictly defined in TypeScript (e.g., `'address' | 'tx'`), malicious input can be passed during runtime. You cannot rely on TS types alone for input validation, especially for functions generating external URLs.
 **Prevention:** Always validate all parameters that are incorporated into a URL, not just the "main" input. Ensure the `type` parameter strictly matches allowed values (`'address'` or `'tx'`) and throw a generic error if it does not.
+
+## 2026-03-10 - Missing Runtime Type Checks in Utility Functions
+**Vulnerability:** Several utility functions (`parseUSDC`, `formatUSDC`, `toBytes32`, `getBaseScanUrl`) expected `string` or `bigint` types but lacked explicit runtime type checking. When passed invalid types (like `null` or an object) from untyped external callers, they threw unhandled `TypeError` exceptions (e.g., "Cannot read properties of null (reading 'length')").
+**Learning:** TypeScript type annotations do not exist at runtime. If an SDK utility function is consumed by plain JavaScript or `any`-typed contexts, passing unexpected types can cause unhandled crashes rather than secure validation errors.
+**Prevention:** Always implement explicit runtime type checking (e.g., `typeof input !== 'string'`) as the very first validation step in utility functions, throwing static error messages to fail gracefully.
+
+## 2024-05-20 - Enforcing BigInt Type Checks on SDK Utilities
+**Vulnerability:** Core financial calculation functions like `calculateDDR`, `calculateLPP`, `calculateFeeSplit`, and `isMissionExpired` assumed all input arguments implicitly provided to them would be `bigint` types. However, when these functions are used in loosely-typed environments (e.g. JavaScript consumers, loosely typed frontend calls) passing string types such as `"100"` led to implicit conversion attempts that would throw a cryptic "TypeError: Cannot mix BigInt and other types". This could crash consuming applications and obscure validation errors, which is a DoS vector.
+**Learning:** Even internal helper methods should enforce strict runtime typing on their inputs to prevent unchecked execution context mixing if the inputs originate from untyped external sources. Standard TypeScript type checking does not cover these runtime execution environments.
+**Prevention:** Added explicit `typeof arg !== 'bigint'` validation checks throwing clear, statically defined `Error` messages to the start of all core arithmetic operations in `src/utils/index.ts`.
+
+## 2026-04-17 - Unbounded String Parsing in toBytes32 Error Path
+**Vulnerability:** The `toBytes32` function contained an error path for oversized strings that used `TEXT_ENCODER.encode(str).length` to generate a precise error message. If an attacker provided an extremely long string (e.g., 500MB), this unbounded encoding operation would allocate massive amounts of memory, blocking the Node.js event loop for seconds (or running out of memory), causing a Denial of Service (DoS).
+**Learning:** Error paths can themselves be vectors for DoS if they perform unbounded operations (like memory-heavy allocations) to generate descriptive error messages. Security limits must be applied *before* any unbounded operation, not during error message construction.
+**Prevention:** Implement a hard limit on input string lengths (e.g., `if (str.length > 256)`) at the very start of utility functions that handle unbounded memory operations to prevent exhaustion attacks.
+
+## 2026-05-18 - Silent Precision Loss in Timestamp Validation
+**Vulnerability:** The `isMissionExpired` function cast the `expiresAt` parameter (a `bigint`) to a `Number` to perform time comparisons. This casting of `BigInt` to `Number` could lead to silent precision loss for exceedingly large timestamps, potentially causing incorrect expiration evaluations.
+**Learning:** Never cast `BigInt` variables to `Number` in validation functions, especially for timestamps or financial calculations, as this introduces risks of silent precision loss.
+**Prevention:** Use strict, native `BigInt` math operations for time comparisons and validations involving `bigint` inputs.
+
+## 2026-06-25 - Unvalidated Bound Checks for Numbers
+**Vulnerability:** The `parseUSDC` function natively supported both `string` and `number` types. For `number` inputs, it implicitly converted the value to a string via `.toString()`. However, if the provided `number` exceeded `Number.MAX_SAFE_INTEGER` (or was less than `Number.MIN_SAFE_INTEGER`), JavaScript inherently applies silent precision loss. This could result in incorrect or approximate financial values being processed without warning or errors to the caller.
+**Learning:** Overloading inputs to accept `number` for financial conversions is convenient, but risky. JavaScript's double-precision floating-point format silently mutates bounds-exceeding numbers before they even reach utility function boundaries.
+**Prevention:** Strictly enforce `Number.MAX_SAFE_INTEGER` and `Number.MIN_SAFE_INTEGER` boundaries whenever `typeof input === 'number'` is accepted for a financial utility, explicitly instructing developers to cast to string on their end to guarantee precision.
+
+## 2026-06-25 - Polymorphic Input Coercion Masking Numeric State
+**Vulnerability:** The `parseUSDC` function accepted overloaded `string | number` inputs. When processing a `number`, it failed to enforce `Number.isFinite()`. Non-finite numbers (`NaN`, `Infinity`) bypassed numeric bound checks because inequalities like `NaN > MAX_SAFE_INTEGER` evaluate to false. The function then implicitly coerced these values to strings (e.g. `"NaN"`) which threw a confusing generic parsing error later in the string-processing loop, masking the true root cause (corrupted numeric state).
+**Learning:** Type-specific validation (like ensuring finite numbers) must strictly occur *before* a polymorphic utility coerces one type into another. Implicit type coercion provides a vector for edge-cases to bypass initial validation layers and complicate error traces.
+**Prevention:** Explicitly use `Number.isFinite()` on numeric inputs before executing any coercion logic or deferring to subsequent validation paths.

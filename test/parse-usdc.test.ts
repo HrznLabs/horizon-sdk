@@ -59,4 +59,16 @@ describe('parseUSDC Security Checks', () => {
     expect(parseUSDC(100)).toBe(100000000n);
     expect(parseUSDC(0.57)).toBe(570000n);
   });
+
+  it('should throw error for non-finite inputs', () => {
+    assert.throws(() => parseUSDC(NaN), {
+      message: /Amount must be a finite number/
+    });
+    assert.throws(() => parseUSDC(Infinity), {
+      message: /Amount must be a finite number/
+    });
+    assert.throws(() => parseUSDC(-Infinity), {
+      message: /Amount must be a finite number/
+    });
+  });
 });
