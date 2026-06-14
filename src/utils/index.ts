@@ -649,6 +649,7 @@ export function toBytes32(str: string): `0x${string}` {
   if (i < lenBytes) {
     hex += HEX_STRINGS[TO_BYTES_32_BUFFER[i]];
   }
+
   // Optimization: substring and string concat is faster than padEnd
   return (hex + ZEROES.substring(0, 66 - hex.length)) as `0x${string}`;
 }
@@ -661,10 +662,13 @@ export function randomBytes32(): `0x${string}` {
   crypto.getRandomValues(RANDOM_BYTES_BUFFER);
   // Optimization: Prepend '0x' upfront to avoid template literal overhead
   let hex = '0x';
-  // Optimization: Loop with lookup table
-  for (let i = 0; i < 32; i++) {
-    hex += HEX_STRINGS[RANDOM_BYTES_BUFFER[i]];
+
+  // Optimization: Use 16-bit lookup table to process 2 bytes per iteration,
+  // halving string concatenation overhead.
+  for (let i = 0; i < 31; i += 2) {
+    hex += HEX_STRINGS_16[(RANDOM_BYTES_BUFFER[i] << 8) | RANDOM_BYTES_BUFFER[i + 1]];
   }
+
   return hex as `0x${string}`;
 }
 
