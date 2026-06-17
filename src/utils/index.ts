@@ -691,7 +691,6 @@ export function formatAddress(
     const start = options.start ?? 6;
     const end = options.end ?? 4;
     const separator = options.separator ?? '...';
-    const len = address.length;
     // UX: Only truncate if the resulting string is strictly shorter than the original
     if (len <= start + end + separator.length) return address;
 
