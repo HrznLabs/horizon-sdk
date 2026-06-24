@@ -44,6 +44,14 @@ for (let i = 0; i < 256; i++) {
   HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
 }
 
+// Performance optimization: 16-bit lookup table halves string concatenations in toBytes32
+const HEX_STRINGS_16: string[] = new Array(65536);
+for (let i = 0; i < 256; i++) {
+  for (let j = 0; j < 256; j++) {
+    HEX_STRINGS_16[(i << 8) | j] = HEX_STRINGS[i] + HEX_STRINGS[j];
+  }
+}
+
 // Performance optimization: Pre-allocate buffer for toBytes32 string encoding to avoid allocations
 const TO_BYTES_32_BUFFER = new Uint8Array(33); // 32 max bytes + 1 for overflow detection
 
@@ -626,8 +634,13 @@ export function toBytes32(str: string): `0x${string}` {
   }
   // Optimization: Concatenate '0x' upfront to avoid template literal overhead
   let hex = '0x';
-  // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
-  for (let i = 0; i < (written as number); i++) {
+  // Optimization: Loop with 16-bit lookup table halves string concatenation operations
+  const lenBytes = written as number;
+  let i = 0;
+  for (; i < lenBytes - 1; i += 2) {
+    hex += HEX_STRINGS_16[(TO_BYTES_32_BUFFER[i] << 8) | TO_BYTES_32_BUFFER[i + 1]];
+  }
+  if (i < lenBytes) {
     hex += HEX_STRINGS[TO_BYTES_32_BUFFER[i]];
   }
   // Optimization: substring and string concat is faster than padEnd
