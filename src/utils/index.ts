@@ -421,7 +421,7 @@ export function calculateFeeSplit(
       labsAmount: 0n,
       resolverAmount: 0n,
       guildAmount: 0n,
-      userAmount: 0n,
+      performerAmount: 0n,
     };
   }
 
