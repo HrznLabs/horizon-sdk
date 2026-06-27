@@ -691,7 +691,6 @@ export function formatAddress(
     const start = options.start ?? 6;
     const end = options.end ?? 4;
     const separator = options.separator ?? '...';
-    const len = address.length;
     // UX: Only truncate if the resulting string is strictly shorter than the original
     if (len <= start + end + separator.length) return address;
 
@@ -723,6 +722,12 @@ const SEPOLIA_BASESCAN_URL_ADDRESS = 'https://sepolia.basescan.org/address/';
 const SEPOLIA_BASESCAN_URL_TX = 'https://sepolia.basescan.org/tx/';
 const MAINNET_BASESCAN_URL_ADDRESS = 'https://basescan.org/address/';
 const MAINNET_BASESCAN_URL_TX = 'https://basescan.org/tx/';
+
+// Optimization: Pre-compute full paths to avoid intermediate string concatenation during URL generation
+const SEPOLIA_ADDRESS_URL = 'https://sepolia.basescan.org/address/';
+const SEPOLIA_TX_URL = 'https://sepolia.basescan.org/tx/';
+const MAINNET_ADDRESS_URL = 'https://basescan.org/address/';
+const MAINNET_TX_URL = 'https://basescan.org/tx/';
 
 export function getBaseScanUrl(
   hashOrAddress: string,
