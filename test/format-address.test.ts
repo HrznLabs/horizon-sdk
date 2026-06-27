@@ -86,6 +86,11 @@ describe('formatAddress', () => {
       }
     );
   });
+
+  it('should throw an error for strings exceeding maximum length', () => {
+    const longStr = 'a'.repeat(257);
+    assert.throws(() => formatAddress(longStr), /Address too long/);
+  });
 });
 
 
