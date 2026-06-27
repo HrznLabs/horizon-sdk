@@ -113,3 +113,7 @@
 ## 2024-12-12 - [Optimize formatBps zero amount short-circuit]
 **Learning:** In string formatting utility functions like `formatBps`, processing a zero input pushes the value through the entire logic chain (absolute calculations, float division by 100, string conversion, and decimal padding). By adding a simple explicit short-circuit at the beginning of the function (`if (bps === 0) { ... }`), we entirely bypass these steps and reduce execution time by approximately ~75% for zero values. This matches the same optimization pattern found in `formatUSDC`.
 **Action:** Always short-circuit zero amounts upfront in formatting functions to bypass unnecessary string allocations and mathematical overhead.
+
+## 2026-05-10 - [8-bit vs 16-bit lookup for crypto arrays]
+**Learning:** While a 16-bit lookup table (65,536 elements) improves hex encoding speed for `TextEncoder` buffers in `toBytes32`, applying it to `crypto.getRandomValues()` buffers (e.g., `randomBytes32`) surprisingly degrades performance. An 8-bit lookup table is ~10% faster for random bytes, likely due to cache line and array access overhead.
+**Action:** Do not blindly apply 16-bit lookup table optimizations to all byte array encodings, especially those populated by cryptographic APIs.
