@@ -649,6 +649,7 @@ export function toBytes32(str: string): `0x${string}` {
   if (i < lenBytes) {
     hex += HEX_STRINGS[TO_BYTES_32_BUFFER[i]];
   }
+
   // Optimization: substring and string concat is faster than padEnd
   return (hex + ZEROES.substring(0, 66 - hex.length)) as `0x${string}`;
 }
