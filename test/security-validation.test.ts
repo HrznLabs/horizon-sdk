@@ -1,8 +1,17 @@
 
 import { describe, it, expect } from 'vitest';
-import { formatBps, getBaseScanUrl, calculateDDR, calculateLPP, calculateFeeSplit, calculateExpiresAt, formatDuration, isMissionExpired } from '../src/utils/index';
+import { formatBps, formatUSDC, formatAddress, getBaseScanUrl, calculateDDR, calculateLPP, calculateFeeSplit, calculateExpiresAt, formatDuration, isMissionExpired } from '../src/utils/index';
 
 describe('Security Validation across utils', () => {
+  it('formatUSDC, formatBps, and formatAddress should handle unbounded option strings securely', () => {
+    const hugeString = 'A'.repeat(257);
+    expect(() => formatUSDC(100n, { prefix: hugeString })).toThrow('Prefix too long');
+    expect(() => formatUSDC(100n, { suffix: hugeString })).toThrow('Suffix too long');
+    expect(() => formatBps(100, { prefix: hugeString })).toThrow('Prefix too long');
+    expect(() => formatBps(100, { suffix: hugeString })).toThrow('Suffix too long');
+    expect(() => formatAddress('0x1234567890123456789012345678901234567890', { separator: hugeString })).toThrow('Separator too long');
+  });
+
   it('formatBps should handle NaN and Infinity securely', () => {
     expect(() => formatBps(NaN)).toThrow();
     expect(() => formatBps(Infinity)).toThrow();
