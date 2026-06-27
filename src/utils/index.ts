@@ -425,6 +425,7 @@ export function calculateFeeSplit(
   // Optimization: Short-circuit for zero amount bypasses all math entirely
   if (rewardAmount === 0n) {
     return {
+      performerAmount: 0n,
       protocolAmount: 0n,
       labsAmount: 0n,
       resolverAmount: 0n,
