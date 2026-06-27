@@ -79,17 +79,12 @@ describe('formatAddress', () => {
   it('should throw error for excessively long string exceeding max limit', () => {
     // 300 characters
     const input = 'a'.repeat(300);
-    assert.throws(
-      () => formatAddress(input),
-      {
-        message: 'Address too long: exceeds maximum input length',
-      }
-    );
+    expect(() => formatAddress(input)).toThrow('Address too long: exceeds maximum input length');
   });
 
   it('should throw an error for strings exceeding maximum length', () => {
     const longStr = 'a'.repeat(257);
-    assert.throws(() => formatAddress(longStr), /Address too long/);
+    expect(() => formatAddress(longStr)).toThrow(/Address too long/);
   });
 });
 
@@ -97,6 +92,6 @@ describe('formatAddress', () => {
 describe('formatAddress security checks', () => {
   it('should throw an error for excessively long addresses to prevent memory exhaustion', () => {
     const longAddress = '0x' + '1'.repeat(300);
-    assert.throws(() => formatAddress(longAddress), /Address too long: exceeds maximum input length/);
+    expect(() => formatAddress(longAddress)).toThrow(/Address too long: exceeds maximum input length/);
   });
 });
