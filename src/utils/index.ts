@@ -706,10 +706,10 @@ export function formatAddress(
     const end = options.end ?? 4;
     const separator = options.separator ?? '...';
     // UX: Only truncate if the resulting string is strictly shorter than the original
-    if (len <= start + end + separator.length) return address;
+    if (address.length <= start + end + separator.length) return address;
 
     // Optimization: substring and direct string concatenation are faster than slice and template literals
-    const endStr = end === 0 ? '' : address.substring(len - end);
+    const endStr = end === 0 ? '' : address.substring(address.length - end);
     return address.substring(0, start) + separator + endStr;
   }
 
@@ -737,11 +737,6 @@ const SEPOLIA_BASESCAN_URL_TX = 'https://sepolia.basescan.org/tx/';
 const MAINNET_BASESCAN_URL_ADDRESS = 'https://basescan.org/address/';
 const MAINNET_BASESCAN_URL_TX = 'https://basescan.org/tx/';
 
-// Optimization: Pre-compute full paths to avoid intermediate string concatenation during URL generation
-const SEPOLIA_ADDRESS_URL = 'https://sepolia.basescan.org/address/';
-const SEPOLIA_TX_URL = 'https://sepolia.basescan.org/tx/';
-const MAINNET_ADDRESS_URL = 'https://basescan.org/address/';
-const MAINNET_TX_URL = 'https://basescan.org/tx/';
 
 export function getBaseScanUrl(
   hashOrAddress: string,
