@@ -198,6 +198,10 @@ export function formatUSDC(
     throw new Error('Amount must be a bigint');
   }
 
+  // Security: Prevent DoS from unbounded string options
+  if (options?.prefix && options.prefix.length > 256) throw new Error('Prefix too long');
+  if (options?.suffix && options.suffix.length > 256) throw new Error('Suffix too long');
+
   // Optimization: Short-circuit for zero amount bypasses string allocation entirely
   if (amount === 0n) {
     let minDec = options?.minDecimals || 0;
@@ -360,6 +364,10 @@ export function formatBps(
   if (!Number.isFinite(bps)) {
     throw new Error('Basis points must be a finite number');
   }
+
+  // Security: Prevent DoS from unbounded string options
+  if (options?.prefix && options.prefix.length > 256) throw new Error('Prefix too long');
+  if (options?.suffix && options.suffix.length > 256) throw new Error('Suffix too long');
 
   // Optimization: Short-circuit for zero bps bypasses string allocation and formatting
   if (bps === 0) {
@@ -700,6 +708,9 @@ export function formatAddress(
   if (address.length > 256) {
     throw new Error('Address too long: exceeds maximum input length');
   }
+
+  // Security: Prevent DoS from unbounded string options
+  if (options?.separator && options.separator.length > 256) throw new Error('Separator too long');
 
   if (options) {
     const start = options.start ?? 6;
