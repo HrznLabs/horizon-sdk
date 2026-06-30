@@ -673,10 +673,10 @@ export function randomBytes32(): `0x${string}` {
   // Optimization: Prepend '0x' upfront to avoid template literal overhead
   let hex = '0x';
 
-  // Optimization: Use 16-bit lookup table to process 2 bytes per iteration,
-  // halving string concatenation overhead.
-  for (let i = 0; i < 31; i += 2) {
-    hex += HEX_STRINGS_16[(RANDOM_BYTES_BUFFER[i] << 8) | RANDOM_BYTES_BUFFER[i + 1]];
+  // Optimization: 16-bit table degraded performance for crypto buffer,
+  // revert to 8-bit table to improve performance due to cache/array access overhead.
+  for (let i = 0; i < 32; i++) {
+    hex += HEX_STRINGS[RANDOM_BYTES_BUFFER[i]];
   }
 
   return hex as `0x${string}`;
