@@ -452,8 +452,12 @@ export function calculateFeeSplit(
       performerAmount: 0n,
       protocolAmount: 0n,
       guildAmount: 0n,
+<<<<<<< HEAD
+      performerAmount: 0n,
+=======
       resolverAmount: 0n,
       labsAmount: 0n,
+>>>>>>> origin/main
     };
   }
 
