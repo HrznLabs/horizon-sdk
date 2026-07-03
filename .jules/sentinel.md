@@ -87,3 +87,8 @@
 **Vulnerability:** The `formatAddress` function accepted unbounded string inputs and performed string operations (like `substring`) on them. Although `substring` itself is not as dangerous as encoding, an attacker could supply an extremely long string (e.g., hundreds of megabytes) which could cause a Denial of Service (DoS) by allocating large intermediate strings or exhausting memory, particularly since UI functions are often called repeatedly in rendering loops.
 **Learning:** Even simple string formatting utility functions designed for UI display must enforce hard limits on their input lengths if they operate on variable-length strings, as any unbounded input processed within the application layer is a potential DoS vector.
 **Prevention:** Always enforce strict length validation (e.g., `if (address.length > 256)`) at the beginning of all string-processing utility functions, throwing an explicit error when the threshold is exceeded.
+
+## 2026-07-01 - Unbounded String DoS in Variable Length Options
+**Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` accepted unbound string length inputs for variable length options such as `prefix`, `suffix`, and `separator`. This lack of bounds checking before performing string concatenation allowed memory exhaustion DoS attacks.
+**Learning:** Hard limits on variable length string configurations must be enforced to prevent string concatenation memory exhaustion DoS attacks.
+**Prevention:** Always ensure string inputs to variable length configurations enforce a hard length limit (e.g., 256 characters) prior to performing string operations.
