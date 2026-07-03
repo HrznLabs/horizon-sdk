@@ -75,4 +75,23 @@ describe('formatAddress', () => {
     expect(() => formatAddress(123 as any)).toThrow(/Address must be a string/);
     expect(() => formatAddress({} as any)).toThrow(/Address must be a string/);
   });
+
+  it('should throw error for excessively long string exceeding max limit', () => {
+    // 300 characters
+    const input = 'a'.repeat(300);
+    expect(() => formatAddress(input)).toThrow('Address too long: exceeds maximum input length');
+  });
+
+  it('should throw an error for strings exceeding maximum length', () => {
+    const longStr = 'a'.repeat(257);
+    expect(() => formatAddress(longStr)).toThrow(/Address too long/);
+  });
+});
+
+
+describe('formatAddress security checks', () => {
+  it('should throw an error for excessively long addresses to prevent memory exhaustion', () => {
+    const longAddress = '0x' + '1'.repeat(300);
+    expect(() => formatAddress(longAddress)).toThrow(/Address too long: exceeds maximum input length/);
+  });
 });

@@ -44,6 +44,14 @@ for (let i = 0; i < 256; i++) {
   HEX_STRINGS.push(i.toString(16).padStart(2, '0'));
 }
 
+// Performance optimization: 16-bit lookup table halves string concatenations in toBytes32
+const HEX_STRINGS_16: string[] = new Array(65536);
+for (let i = 0; i < 256; i++) {
+  for (let j = 0; j < 256; j++) {
+    HEX_STRINGS_16[(i << 8) | j] = HEX_STRINGS[i] + HEX_STRINGS[j];
+  }
+}
+
 // Performance optimization: Pre-allocate buffer for toBytes32 string encoding to avoid allocations
 const TO_BYTES_32_BUFFER = new Uint8Array(33); // 32 max bytes + 1 for overflow detection
 
@@ -188,6 +196,13 @@ export function formatUSDC(
 ): string {
   if (typeof amount !== 'bigint') {
     throw new Error('Amount must be a bigint');
+  }
+
+  if (options?.prefix !== undefined && options.prefix.length > 256) {
+    throw new Error('Prefix too long: exceeds maximum length');
+  }
+  if (options?.suffix !== undefined && options.suffix.length > 256) {
+    throw new Error('Suffix too long: exceeds maximum length');
   }
 
   // Optimization: Short-circuit for zero amount bypasses string allocation entirely
@@ -353,10 +368,33 @@ export function formatBps(
     throw new Error('Basis points must be a finite number');
   }
 
+  if (options?.prefix !== undefined && options.prefix.length > 256) {
+    throw new Error('Prefix too long: exceeds maximum length');
+  }
+  if (options?.suffix !== undefined && options.suffix.length > 256) {
+    throw new Error('Suffix too long: exceeds maximum length');
+  }
+
+  // Optimization: Short-circuit for zero bps bypasses string allocation and formatting
+  if (bps === 0) {
+    let minDec = options?.minDecimals || 0;
+    if (minDec > MAX_DECIMALS) minDec = MAX_DECIMALS;
+    const pre = options?.prefix || '';
+    const suf = options?.suffix !== undefined ? options.suffix : '%';
+    if (minDec === 0) return pre + '0' + suf;
+    return pre + '0.' + ZEROES.substring(0, minDec) + suf;
+  }
+
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
   const prefix = options?.prefix || '';
   const suffix = options?.suffix !== undefined ? options.suffix : '%';
+
+  // Optimization: Short-circuit zero to bypass string allocation and math entirely
+  if (bps === 0) {
+    if (minDecimals === 0) return prefix + '0' + suffix;
+    return prefix + '0.' + ZEROES.substring(0, minDecimals) + suffix;
+  }
 
   const sign = bps < 0 ? '-' : (bps > 0 && options?.showPlusSign ? '+' : '');
   const absBps = Math.abs(bps);
@@ -411,11 +449,15 @@ export function calculateFeeSplit(
   // Optimization: Short-circuit for zero amount bypasses all math entirely
   if (rewardAmount === 0n) {
     return {
-      protocolAmount: 0n,
-      labsAmount: 0n,
-      resolverAmount: 0n,
-      guildAmount: 0n,
       performerAmount: 0n,
+      protocolAmount: 0n,
+      guildAmount: 0n,
+<<<<<<< HEAD
+      performerAmount: 0n,
+=======
+      resolverAmount: 0n,
+      labsAmount: 0n,
+>>>>>>> origin/main
     };
   }
 
@@ -626,10 +668,16 @@ export function toBytes32(str: string): `0x${string}` {
   }
   // Optimization: Concatenate '0x' upfront to avoid template literal overhead
   let hex = '0x';
-  // Optimization: Loop with lookup table is significantly faster than Array.from().map().join()
-  for (let i = 0; i < (written as number); i++) {
+  // Optimization: Loop with 16-bit lookup table halves string concatenation operations
+  const lenBytes = written as number;
+  let i = 0;
+  for (; i < lenBytes - 1; i += 2) {
+    hex += HEX_STRINGS_16[(TO_BYTES_32_BUFFER[i] << 8) | TO_BYTES_32_BUFFER[i + 1]];
+  }
+  if (i < lenBytes) {
     hex += HEX_STRINGS[TO_BYTES_32_BUFFER[i]];
   }
+
   // Optimization: substring and string concat is faster than padEnd
   return (hex + ZEROES.substring(0, 66 - hex.length)) as `0x${string}`;
 }
@@ -642,10 +690,13 @@ export function randomBytes32(): `0x${string}` {
   crypto.getRandomValues(RANDOM_BYTES_BUFFER);
   // Optimization: Prepend '0x' upfront to avoid template literal overhead
   let hex = '0x';
-  // Optimization: Loop with lookup table
+
+  // Optimization: 16-bit table degraded performance for crypto buffer,
+  // revert to 8-bit table to improve performance due to cache/array access overhead.
   for (let i = 0; i < 32; i++) {
     hex += HEX_STRINGS[RANDOM_BYTES_BUFFER[i]];
   }
+
   return hex as `0x${string}`;
 }
 
@@ -663,16 +714,23 @@ export function formatAddress(
     throw new Error('Address must be a string');
   }
 
+  // Security: Prevent memory exhaustion DoS from excessively long string inputs
+  if (address.length > 256) {
+    throw new Error('Address too long: exceeds maximum input length');
+  }
+
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
     const separator = options.separator ?? '...';
-    const len = address.length;
+    if (separator.length > 256) {
+      throw new Error('Separator too long: exceeds maximum length');
+    }
     // UX: Only truncate if the resulting string is strictly shorter than the original
-    if (len <= start + end + separator.length) return address;
+    if (address.length <= start + end + separator.length) return address;
 
     // Optimization: substring and direct string concatenation are faster than slice and template literals
-    const endStr = end === 0 ? '' : address.substring(len - end);
+    const endStr = end === 0 ? '' : address.substring(address.length - end);
     return address.substring(0, start) + separator + endStr;
   }
 
@@ -693,9 +751,13 @@ const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
  * @param testnet Whether to use testnet explorer
  * @returns Full BaseScan URL
  */
-// Optimization: Pre-compute base URLs with trailing slashes to avoid template literals later
-const SEPOLIA_BASESCAN_URL = 'https://sepolia.basescan.org/';
-const MAINNET_BASESCAN_URL = 'https://basescan.org/';
+// Optimization: Pre-compute entire static path structures to avoid intermediate
+// string evaluation overhead during dynamic concatenation.
+const SEPOLIA_BASESCAN_URL_ADDRESS = 'https://sepolia.basescan.org/address/';
+const SEPOLIA_BASESCAN_URL_TX = 'https://sepolia.basescan.org/tx/';
+const MAINNET_BASESCAN_URL_ADDRESS = 'https://basescan.org/address/';
+const MAINNET_BASESCAN_URL_TX = 'https://basescan.org/tx/';
+
 
 export function getBaseScanUrl(
   hashOrAddress: string,
@@ -722,10 +784,12 @@ export function getBaseScanUrl(
     throw new Error('Invalid type parameter.');
   }
 
-  // Optimization: Pre-compute base URL with slash and direct string concatenation
-  // to avoid template literal overhead
-  const baseUrl = testnet ? SEPOLIA_BASESCAN_URL : MAINNET_BASESCAN_URL;
-  const pathType = type !== undefined ? type : (len === 42 ? 'address' : 'tx');
+  // Optimization: Direct string concatenation with pre-computed paths avoids template literal overhead
+  const isAddress = type !== undefined ? type === 'address' : len === 42;
 
-  return baseUrl + pathType + '/' + hashOrAddress;
+  if (testnet) {
+    return (isAddress ? SEPOLIA_BASESCAN_URL_ADDRESS : SEPOLIA_BASESCAN_URL_TX) + hashOrAddress;
+  } else {
+    return (isAddress ? MAINNET_BASESCAN_URL_ADDRESS : MAINNET_BASESCAN_URL_TX) + hashOrAddress;
+  }
 }
