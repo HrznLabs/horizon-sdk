@@ -198,10 +198,12 @@ export function formatUSDC(
     throw new Error('Amount must be a bigint');
   }
 
-  if (options?.prefix !== undefined && options.prefix.length > 256) {
+  const prefix = options?.prefix !== undefined ? String(options.prefix) : '';
+  if (prefix.length > 256) {
     throw new Error('Prefix too long: exceeds maximum length');
   }
-  if (options?.suffix !== undefined && options.suffix.length > 256) {
+  const suffix = options?.suffix !== undefined ? String(options.suffix) : '';
+  if (suffix.length > 256) {
     throw new Error('Suffix too long: exceeds maximum length');
   }
 
@@ -209,10 +211,8 @@ export function formatUSDC(
   if (amount === 0n) {
     let minDec = options?.minDecimals || 0;
     if (minDec > MAX_DECIMALS) minDec = MAX_DECIMALS;
-    const pre = options?.prefix || '';
-    const suf = options?.suffix || '';
-    if (minDec === 0) return pre + '0' + suf;
-    return pre + '0.' + ZEROES.substring(0, minDec) + suf;
+    if (minDec === 0) return prefix + '0' + suffix;
+    return prefix + '0.' + ZEROES.substring(0, minDec) + suffix;
   }
 
   const compact = options?.compact === true;
@@ -223,8 +223,6 @@ export function formatUSDC(
   if (maxDecimals > MAX_DECIMALS) maxDecimals = MAX_DECIMALS;
   if (maxDecimals < minDecimals) maxDecimals = minDecimals;
 
-  const prefix = options?.prefix || '';
-  const suffix = options?.suffix || '';
   const useCommas = options?.commas !== false;
 
   const absAmount = amount < 0n ? -amount : amount;
@@ -368,10 +366,12 @@ export function formatBps(
     throw new Error('Basis points must be a finite number');
   }
 
-  if (options?.prefix !== undefined && options.prefix.length > 256) {
+  const prefix = options?.prefix !== undefined ? String(options.prefix) : '';
+  if (prefix.length > 256) {
     throw new Error('Prefix too long: exceeds maximum length');
   }
-  if (options?.suffix !== undefined && options.suffix.length > 256) {
+  const suffix = options?.suffix !== undefined ? String(options.suffix) : '%';
+  if (suffix.length > 256) {
     throw new Error('Suffix too long: exceeds maximum length');
   }
 
@@ -379,16 +379,12 @@ export function formatBps(
   if (bps === 0) {
     let minDec = options?.minDecimals || 0;
     if (minDec > MAX_DECIMALS) minDec = MAX_DECIMALS;
-    const pre = options?.prefix || '';
-    const suf = options?.suffix !== undefined ? options.suffix : '%';
-    if (minDec === 0) return pre + '0' + suf;
-    return pre + '0.' + ZEROES.substring(0, minDec) + suf;
+    if (minDec === 0) return prefix + '0' + suffix;
+    return prefix + '0.' + ZEROES.substring(0, minDec) + suffix;
   }
 
   let minDecimals = options?.minDecimals || 0;
   if (minDecimals > MAX_DECIMALS) minDecimals = MAX_DECIMALS;
-  const prefix = options?.prefix || '';
-  const suffix = options?.suffix !== undefined ? options.suffix : '%';
 
   // Optimization: Short-circuit zero to bypass string allocation and math entirely
   if (bps === 0) {
@@ -452,12 +448,8 @@ export function calculateFeeSplit(
       performerAmount: 0n,
       protocolAmount: 0n,
       guildAmount: 0n,
-<<<<<<< HEAD
-      performerAmount: 0n,
-=======
       resolverAmount: 0n,
       labsAmount: 0n,
->>>>>>> origin/main
     };
   }
 
@@ -722,7 +714,7 @@ export function formatAddress(
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
-    const separator = options.separator ?? '...';
+    const separator = options.separator !== undefined ? String(options.separator) : '...';
     if (separator.length > 256) {
       throw new Error('Separator too long: exceeds maximum length');
     }

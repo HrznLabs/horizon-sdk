@@ -92,3 +92,7 @@
 **Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` accepted unbound string length inputs for variable length options such as `prefix`, `suffix`, and `separator`. This lack of bounds checking before performing string concatenation allowed memory exhaustion DoS attacks.
 **Learning:** Hard limits on variable length string configurations must be enforced to prevent string concatenation memory exhaustion DoS attacks.
 **Prevention:** Always ensure string inputs to variable length configurations enforce a hard length limit (e.g., 256 characters) prior to performing string operations.
+## 2026-07-02 - Property Override DoS in String Options
+**Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` validated string lengths via `options.prefix.length`, allowing attackers to bypass limits by passing objects with a custom `length` property and an overridden `toString` method that returned an unbounded string (e.g., `{ length: 255, toString: () => "a".repeat(1000) }`).
+**Learning:** Type checking in TypeScript does not prevent an attacker from passing objects with crafted properties that circumvent length checks but are implicitly coerced into unbounded strings during string concatenation.
+**Prevention:** Always coerce options explicitly to strings (e.g., `String(options.prefix)`) *before* applying length limits in utility functions.
