@@ -113,3 +113,7 @@
 ## 2024-12-12 - [Optimize formatBps zero amount short-circuit]
 **Learning:** In string formatting utility functions like `formatBps`, processing a zero input pushes the value through the entire logic chain (absolute calculations, float division by 100, string conversion, and decimal padding). By adding a simple explicit short-circuit at the beginning of the function (`if (bps === 0) { ... }`), we entirely bypass these steps and reduce execution time by approximately ~75% for zero values. This matches the same optimization pattern found in `formatUSDC`.
 **Action:** Always short-circuit zero amounts upfront in formatting functions to bypass unnecessary string allocations and mathematical overhead.
+
+## 2024-07-04 - formatBps zero amount short-circuit anti-pattern
+**Learning:** Adding a zero-value short-circuit (`if (bps === 0)`) to simple formatting functions like `formatBps` is an anti-pattern. While it avoids basic string formatting for zeroes, it degrades performance for the more common non-zero paths due to branching overhead. This differs from complex formatting (like `formatUSDC`), where bypassing multiple allocations and arithmetic operations yields massive speedups. Bypassing basic arithmetic and simple string interpolation yields no observable benefit and sacrifices readability.
+**Action:** Do not use zero-value short-circuits in simple formatting functions. Reserve them strictly for complex string manipulations or multi-step arithmetic operations.
