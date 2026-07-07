@@ -299,11 +299,8 @@ export function formatUSDC(
   } else {
     // Optimization: Since USDC_DECIMALS is 6, fraction is strictly < 1,000,000.
     // Casting to Number avoids slow BigInt string allocation overhead in V8.
-    fractionStr = Number(fraction).toString();
-    // Optimization: substring and string concat is faster than padStart
-    if (fractionStr.length < USDC_DECIMALS) {
-      fractionStr = ZEROES.substring(0, USDC_DECIMALS - fractionStr.length) + fractionStr;
-    }
+    // Optimization: Adding 10^6 and substringing avoids string length evaluation and concatenation
+    fractionStr = (Number(fraction) + 1000000).toString().substring(1);
 
     if (fractionStr.length > maxDecimals) {
       fractionStr = fractionStr.substring(0, maxDecimals);
@@ -539,12 +536,19 @@ export function calculateExpiresAt(durationSeconds: number): bigint {
  * @param expiresAt Expiration timestamp
  * @returns True if expired
  */
+// Optimization: Hoisted constant for fast expiration checks
+const MAX_SAFE_INTEGER_BIGINT = BigInt(Number.MAX_SAFE_INTEGER);
+
 export function isMissionExpired(expiresAt: bigint): boolean {
   if (typeof expiresAt !== 'bigint') {
     throw new Error('Expiration timestamp must be a bigint');
   }
   // Security: Avoid casting BigInt to Number for time comparisons to prevent
   // silent precision loss vulnerabilities with exceedingly large timestamps.
+  // Optimization: Convert expiresAt to Number if it safely fits to avoid BigInt allocation for Date.now()
+  if (expiresAt <= MAX_SAFE_INTEGER_BIGINT) {
+    return Math.floor(Date.now() / 1000) > Number(expiresAt);
+  }
   return BigInt(Math.floor(Date.now() / 1000)) > expiresAt;
 }
 
