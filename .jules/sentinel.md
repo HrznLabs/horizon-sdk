@@ -96,3 +96,8 @@
 **Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` validated string lengths via `options.prefix.length`, allowing attackers to bypass limits by passing objects with a custom `length` property and an overridden `toString` method that returned an unbounded string (e.g., `{ length: 255, toString: () => "a".repeat(1000) }`).
 **Learning:** Type checking in TypeScript does not prevent an attacker from passing objects with crafted properties that circumvent length checks but are implicitly coerced into unbounded strings during string concatenation.
 **Prevention:** Always coerce options explicitly to strings (e.g., `String(options.prefix)`) *before* applying length limits in utility functions.
+
+## 2026-07-03 - Implicit Execution via String Coercion DoS
+**Vulnerability:** The previous prevention strategy for property override DoS relied on `String(options.prefix)`. However, passing an object like `{ toString: () => "A".repeat(1000000000) }` causes the `String()` coercion itself to trigger the malicious `toString` method, leading to immediate memory exhaustion and DoS *before* length limits are checked.
+**Learning:** Explicitly coercing untrusted inputs via `String()` is unsafe if the input is an object, as it executes the potentially overridden `toString()` method in an unbounded manner.
+**Prevention:** Use strict runtime type checking (e.g., `typeof options.prefix !== 'string'`) to validate variable-length string options instead of relying on string coercion.
