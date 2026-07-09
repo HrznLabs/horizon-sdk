@@ -198,11 +198,17 @@ export function formatUSDC(
     throw new Error('Amount must be a bigint');
   }
 
-  const prefix = options?.prefix !== undefined ? String(options.prefix) : '';
+  if (options?.prefix !== undefined && typeof options.prefix !== 'string') {
+    throw new Error('Prefix must be a string');
+  }
+  const prefix = options?.prefix ?? '';
   if (prefix.length > 256) {
     throw new Error('Prefix too long: exceeds maximum length');
   }
-  const suffix = options?.suffix !== undefined ? String(options.suffix) : '';
+  if (options?.suffix !== undefined && typeof options.suffix !== 'string') {
+    throw new Error('Suffix must be a string');
+  }
+  const suffix = options?.suffix ?? '';
   if (suffix.length > 256) {
     throw new Error('Suffix too long: exceeds maximum length');
   }
@@ -366,11 +372,17 @@ export function formatBps(
     throw new Error('Basis points must be a finite number');
   }
 
-  const prefix = options?.prefix !== undefined ? String(options.prefix) : '';
+  if (options?.prefix !== undefined && typeof options.prefix !== 'string') {
+    throw new Error('Prefix must be a string');
+  }
+  const prefix = options?.prefix ?? '';
   if (prefix.length > 256) {
     throw new Error('Prefix too long: exceeds maximum length');
   }
-  const suffix = options?.suffix !== undefined ? String(options.suffix) : '%';
+  if (options?.suffix !== undefined && typeof options.suffix !== 'string') {
+    throw new Error('Suffix must be a string');
+  }
+  const suffix = options?.suffix ?? '%';
   if (suffix.length > 256) {
     throw new Error('Suffix too long: exceeds maximum length');
   }
@@ -714,7 +726,10 @@ export function formatAddress(
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
-    const separator = options.separator !== undefined ? String(options.separator) : '...';
+    if (options.separator !== undefined && typeof options.separator !== 'string') {
+      throw new Error('Separator must be a string');
+    }
+    const separator = options.separator ?? '...';
     if (separator.length > 256) {
       throw new Error('Separator too long: exceeds maximum length');
     }
