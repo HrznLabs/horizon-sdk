@@ -96,3 +96,8 @@
 **Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` validated string lengths via `options.prefix.length`, allowing attackers to bypass limits by passing objects with a custom `length` property and an overridden `toString` method that returned an unbounded string (e.g., `{ length: 255, toString: () => "a".repeat(1000) }`).
 **Learning:** Type checking in TypeScript does not prevent an attacker from passing objects with crafted properties that circumvent length checks but are implicitly coerced into unbounded strings during string concatenation.
 **Prevention:** Always coerce options explicitly to strings (e.g., `String(options.prefix)`) *before* applying length limits in utility functions.
+
+## 2026-07-02 - Missing Runtime Type Validation for getNetwork Inputs
+**Vulnerability:** The `getNetwork` and `getContracts` functions accepted a `chainId: number` parameter but lacked explicit runtime type checking. When passed invalid types (like a string or object) from untyped external callers, they would silently return `undefined` (for `getNetwork`) or throw a cryptic error (for `getContracts`). This could obscure validation errors and lead to unexpected behavior in consuming applications.
+**Learning:** TypeScript type annotations (`chainId: number`) do not exist at runtime. If an SDK utility function is consumed by plain JavaScript or `any`-typed contexts, passing unexpected types can cause unhandled crashes or obscure logic failures.
+**Prevention:** Always implement explicit runtime type checking (e.g., `typeof chainId !== 'number'`) at the beginning of utility functions to fail gracefully and securely with descriptive error messages.
