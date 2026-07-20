@@ -100,13 +100,8 @@ export function parseUSDC(amount: string | number): bigint {
     throw new Error('Invalid USDC amount format: Input too long.');
   }
 
-  let start = 0;
-  let isNegative = false;
-
-  if (amount.charCodeAt(0) === 45) { // '-'
-    isNegative = true;
-    start = 1;
-  }
+  const isNegative = amount.charCodeAt(0) === 45; // '-'
+  const start = isNegative ? 1 : 0;
 
   let totalValNum = 0;
   let totalValBig = 0n;
@@ -297,13 +292,10 @@ export function formatUSDC(
   if (fraction === 0n) {
     fractionStr = '';
   } else {
-    // Optimization: Since USDC_DECIMALS is 6, fraction is strictly < 1,000,000.
-    // Casting to Number avoids slow BigInt string allocation overhead in V8.
-    fractionStr = Number(fraction).toString();
-    // Optimization: substring and string concat is faster than padStart
-    if (fractionStr.length < USDC_DECIMALS) {
-      fractionStr = ZEROES.substring(0, USDC_DECIMALS - fractionStr.length) + fractionStr;
-    }
+    // Optimization: Arithmetic zero-padding is faster than string length checks and concatenation
+    // Since USDC_DECIMALS is 6, fraction is strictly < 1,000,000.
+    // Adding 1,000,000 and taking substring(1) pads it safely.
+    fractionStr = (Number(fraction) + 1000000).toString().substring(1);
 
     if (fractionStr.length > maxDecimals) {
       fractionStr = fractionStr.substring(0, maxDecimals);
@@ -663,11 +655,13 @@ export function toBytes32(str: string): `0x${string}` {
   // Optimization: Loop with 16-bit lookup table halves string concatenation operations
   const lenBytes = written as number;
   let i = 0;
+  // Optimization: Use a local reference to the buffer to avoid module-scoped memory access overhead in V8 loops
+  const buffer = TO_BYTES_32_BUFFER;
   for (; i < lenBytes - 1; i += 2) {
-    hex += HEX_STRINGS_16[(TO_BYTES_32_BUFFER[i] << 8) | TO_BYTES_32_BUFFER[i + 1]];
+    hex += HEX_STRINGS_16[(buffer[i] << 8) | buffer[i + 1]];
   }
   if (i < lenBytes) {
-    hex += HEX_STRINGS[TO_BYTES_32_BUFFER[i]];
+    hex += HEX_STRINGS[buffer[i]];
   }
 
   // Optimization: substring and string concat is faster than padEnd
