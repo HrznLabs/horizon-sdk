@@ -96,3 +96,8 @@
 **Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` validated string lengths via `options.prefix.length`, allowing attackers to bypass limits by passing objects with a custom `length` property and an overridden `toString` method that returned an unbounded string (e.g., `{ length: 255, toString: () => "a".repeat(1000) }`).
 **Learning:** Type checking in TypeScript does not prevent an attacker from passing objects with crafted properties that circumvent length checks but are implicitly coerced into unbounded strings during string concatenation.
 **Prevention:** Always coerce options explicitly to strings (e.g., `String(options.prefix)`) *before* applying length limits in utility functions.
+
+## $(date +%Y-%m-%d) - Prevent Prototype Access in Utility Lookups
+**Vulnerability:** The `getNetwork` utility function accessed the `NETWORKS` object using an unvalidated `chainId` input argument (`NETWORKS[chainId]`). If used in a plain JavaScript context, passing a string like `"__proto__"` would resolve to the object prototype rather than returning `undefined`, leading to unexpected behavior.
+**Learning:** TypeScript type annotations (like `chainId: number`) do not exist at runtime. SDK utility functions designed to perform object lookups using external inputs as keys must explicitly validate types at runtime to guarantee safety against prototype pollution or unexpected state access in plain JavaScript environments.
+**Prevention:** Always add strict runtime type checking (`typeof input !== 'number'`) before using input arguments as object keys.

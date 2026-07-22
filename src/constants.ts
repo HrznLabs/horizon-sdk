@@ -181,6 +181,7 @@ export const NETWORKS = {
  * Get network configuration by chain ID
  */
 export function getNetwork(chainId: number): NetworkConfig | undefined {
+  if (typeof chainId !== 'number') return undefined;
   return NETWORKS[chainId as keyof typeof NETWORKS];
 }
 
