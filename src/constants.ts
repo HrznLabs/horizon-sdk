@@ -181,6 +181,9 @@ export const NETWORKS = {
  * Get network configuration by chain ID
  */
 export function getNetwork(chainId: number): NetworkConfig | undefined {
+  if (typeof chainId !== 'number') {
+    throw new Error('chainId must be a number');
+  }
   return NETWORKS[chainId as keyof typeof NETWORKS];
 }
 
@@ -188,6 +191,9 @@ export function getNetwork(chainId: number): NetworkConfig | undefined {
  * Get contract addresses by chain ID
  */
 export function getContracts(chainId: number): ContractAddresses | undefined {
+  if (typeof chainId !== 'number') {
+    throw new Error('chainId must be a number');
+  }
   return getNetwork(chainId)?.contracts;
 }
 
