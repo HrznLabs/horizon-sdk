@@ -365,6 +365,9 @@ export function formatBps(
   if (!Number.isFinite(bps)) {
     throw new Error('Basis points must be a finite number');
   }
+  if (bps > Number.MAX_SAFE_INTEGER || bps < Number.MIN_SAFE_INTEGER) {
+    throw new Error('Basis points exceed safe integer limits.');
+  }
 
   const prefix = options?.prefix !== undefined ? String(options.prefix) : '';
   if (prefix.length > 256) {
