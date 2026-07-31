@@ -181,7 +181,10 @@ export const NETWORKS = {
  * Get network configuration by chain ID
  */
 export function getNetwork(chainId: number): NetworkConfig | undefined {
-  return NETWORKS[chainId as keyof typeof NETWORKS];
+  if (Object.prototype.hasOwnProperty.call(NETWORKS, chainId)) {
+    return NETWORKS[chainId as keyof typeof NETWORKS];
+  }
+  return undefined;
 }
 
 /**
