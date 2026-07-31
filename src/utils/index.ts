@@ -608,6 +608,9 @@ export function formatDuration(
  * @param str String to convert (usually hex string)
  * @returns bytes32 hex string
  */
+// Optimization: Hoisted regex for hex validation to avoid instantiation on every call
+const HEX_REGEX_ALLOW_EMPTY = /^0x[0-9a-fA-F]*$/;
+
 export function toBytes32(str: string): `0x${string}` {
   if (typeof str !== 'string') {
     throw new Error('Input must be a string');
@@ -628,18 +631,8 @@ export function toBytes32(str: string): `0x${string}` {
       );
     }
     // Validate hex characters
-    // Optimization: Loop with charCodeAt and bitwise operators is ~15% faster than bounds checking.
-    // (code ^ 48) > 9 checks for 0-9 digits.
-    // (((code | 32) - 97) >>> 0) > 5 converts A-F to a-f, subtracts 'a', and uses unsigned right shift
-    // to correctly identify non-hex characters including those with character codes < 97.
-    let i = 2;
-    for (; i < len; i++) {
-      const code = str.charCodeAt(i);
-      if ((code ^ 48) > 9 && (((code | 32) - 97) >>> 0) > 5) {
-        break;
-      }
-    }
-    if (i !== len) {
+    // Optimization: Pre-compiled regex test is significantly faster than manual character validation loops in V8
+    if (!HEX_REGEX_ALLOW_EMPTY.test(str)) {
       throw new Error('Invalid hex string.');
     }
     // Optimization: substring and string concat is faster than padEnd
