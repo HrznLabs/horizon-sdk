@@ -1,6 +1,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { formatUSDC, formatBps, formatAddress, getBaseScanUrl, calculateDDR, calculateLPP, calculateFeeSplit, calculateExpiresAt, formatDuration, isMissionExpired } from '../src/utils/index';
+import { getNetwork } from '../src/constants';
 
 describe('Security Validation across utils', () => {
   it('formatBps should handle NaN and Infinity securely', () => {
@@ -40,5 +41,10 @@ describe('Security Validation across utils', () => {
     expect(() => calculateLPP('100' as any)).toThrow('Reward amount must be a bigint');
     expect(() => calculateFeeSplit('100' as any, 100)).toThrow('Reward amount must be a bigint');
     expect(() => isMissionExpired('100' as any)).toThrow('Expiration timestamp must be a bigint');
+  });
+
+  it('getNetwork should prevent prototype pollution', () => {
+    expect(getNetwork('__proto__' as any)).toBeUndefined();
+    expect(getNetwork('constructor' as any)).toBeUndefined();
   });
 });
