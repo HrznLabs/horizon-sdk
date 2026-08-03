@@ -621,25 +621,15 @@ export function toBytes32(str: string): `0x${string}` {
 
   // If already a hex string with 0x prefix
   // Optimization: charCodeAt check is faster than startsWith
-  if (len >= 2 && str.charCodeAt(0) === 48 && str.charCodeAt(1) === 120) {
+  if (len >= 2 && str.charCodeAt(0) === 48 && (str.charCodeAt(1) | 32) === 120) {
     if (len > 66) {
       throw new Error(
         `String too long for bytes32: ${Math.ceil((len - 2) / 2)} bytes (max 32)`
       );
     }
     // Validate hex characters
-    // Optimization: Loop with charCodeAt and bitwise operators is ~15% faster than bounds checking.
-    // (code ^ 48) > 9 checks for 0-9 digits.
-    // (((code | 32) - 97) >>> 0) > 5 converts A-F to a-f, subtracts 'a', and uses unsigned right shift
-    // to correctly identify non-hex characters including those with character codes < 97.
-    let i = 2;
-    for (; i < len; i++) {
-      const code = str.charCodeAt(i);
-      if ((code ^ 48) > 9 && (((code | 32) - 97) >>> 0) > 5) {
-        break;
-      }
-    }
-    if (i !== len) {
+    // Optimization: Pre-compiled regex is faster than manual charCodeAt loop in V8 for short hex strings
+    if (!HEX_REGEX.test(str)) {
       throw new Error('Invalid hex string.');
     }
     // Optimization: substring and string concat is faster than padEnd
@@ -734,7 +724,8 @@ export function formatAddress(
 }
 
 // Optimization: Hoisted regex for hex validation to avoid instantiation on every call
-const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
+// Modified to use * instead of + to support valid '0x' empty hex strings and i flag for 0X
+const HEX_REGEX = /^0x[0-9a-fA-F]*$/i;
 
 /**
  * Get BaseScan URL for address or transaction
