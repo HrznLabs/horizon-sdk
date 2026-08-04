@@ -96,7 +96,3 @@
 **Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` validated string lengths via `options.prefix.length`, allowing attackers to bypass limits by passing objects with a custom `length` property and an overridden `toString` method that returned an unbounded string (e.g., `{ length: 255, toString: () => "a".repeat(1000) }`).
 **Learning:** Type checking in TypeScript does not prevent an attacker from passing objects with crafted properties that circumvent length checks but are implicitly coerced into unbounded strings during string concatenation.
 **Prevention:** Always coerce options explicitly to strings (e.g., `String(options.prefix)`) *before* applying length limits in utility functions.
-## 2026-08-04 - Fix Prototype Pollution in Dictionary Lookups
-**Vulnerability:** `getNetwork` function accessed dictionary properties directly (`NETWORKS[chainId]`), returning prototype methods/objects (like `__proto__` or `toString`) instead of `undefined` when maliciously crafted string IDs were passed.
-**Learning:** Even strongly typed numerical keys in TypeScript (like `chainId: number`) don't prevent runtime string type coercion when accessing objects, leading to potential prototype leakage.
-**Prevention:** Always use `Object.prototype.hasOwnProperty.call(dict, key)` to safely perform dictionary lookups on user-provided keys, which supports both string and number representations safely without introducing type-coercion regressions.
