@@ -41,4 +41,9 @@ describe('Security Validation across utils', () => {
     expect(() => calculateFeeSplit('100' as any, 100)).toThrow('Reward amount must be a bigint');
     expect(() => isMissionExpired('100' as any)).toThrow('Expiration timestamp must be a bigint');
   });
+  it('getNetwork should handle prototype pollution securely', async () => {
+    const { getNetwork } = await import('../src/constants.ts');
+    expect(getNetwork('__proto__' as any)).toBeUndefined();
+    expect(getNetwork('constructor' as any)).toBeUndefined();
+  });
 });

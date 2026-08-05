@@ -96,3 +96,8 @@
 **Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` validated string lengths via `options.prefix.length`, allowing attackers to bypass limits by passing objects with a custom `length` property and an overridden `toString` method that returned an unbounded string (e.g., `{ length: 255, toString: () => "a".repeat(1000) }`).
 **Learning:** Type checking in TypeScript does not prevent an attacker from passing objects with crafted properties that circumvent length checks but are implicitly coerced into unbounded strings during string concatenation.
 **Prevention:** Always coerce options explicitly to strings (e.g., `String(options.prefix)`) *before* applying length limits in utility functions.
+
+## 2024-05-10 - Secure Object Lookup for Web3 Chain IDs
+**Vulnerability:** Prototype pollution on dictionary lookups (e.g. NETWORKS[chainId]) where chainId could be maliciously provided as a string (like `__proto__` or `constructor`).
+**Learning:** Web3 chain IDs are often represented as strings at runtime. Adding strict `typeof === 'number'` checks introduces type-coercion regressions.
+**Prevention:** Use `Object.prototype.hasOwnProperty.call(dict, key)` to safely check for keys without strict type enforcement on Web3 network lookups.
