@@ -181,6 +181,11 @@ export const NETWORKS = {
  * Get network configuration by chain ID
  */
 export function getNetwork(chainId: number): NetworkConfig | undefined {
+  // Own-property check: JS callers (no TS checking) can pass '__proto__' or
+  // 'toString', which would otherwise resolve up the prototype chain.
+  if (!Object.prototype.hasOwnProperty.call(NETWORKS, chainId as PropertyKey)) {
+    return undefined;
+  }
   return NETWORKS[chainId as keyof typeof NETWORKS];
 }
 
