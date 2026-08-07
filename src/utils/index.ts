@@ -45,6 +45,10 @@ for (let i = 0; i < 256; i++) {
 }
 
 // Performance optimization: 16-bit lookup table halves string concatenations in toBytes32
+// Hex validation for 0x-prefixed input. `*` (not `+`) preserves the previous
+// loop's behaviour, which accepted a bare '0x' since its body never ran.
+const HEX_REGEX_ALLOW_EMPTY = /^0x[0-9a-fA-F]*$/;
+
 const HEX_STRINGS_16: string[] = new Array(65536);
 for (let i = 0; i < 256; i++) {
   for (let j = 0; j < 256; j++) {
@@ -634,19 +638,9 @@ export function toBytes32(str: string): `0x${string}` {
         `String too long for bytes32: ${Math.ceil((len - 2) / 2)} bytes (max 32)`
       );
     }
-    // Validate hex characters
-    // Optimization: Loop with charCodeAt and bitwise operators is ~15% faster than bounds checking.
-    // (code ^ 48) > 9 checks for 0-9 digits.
-    // (((code | 32) - 97) >>> 0) > 5 converts A-F to a-f, subtracts 'a', and uses unsigned right shift
-    // to correctly identify non-hex characters including those with character codes < 97.
-    let i = 2;
-    for (; i < len; i++) {
-      const code = str.charCodeAt(i);
-      if ((code ^ 48) > 9 && (((code | 32) - 97) >>> 0) > 5) {
-        break;
-      }
-    }
-    if (i !== len) {
+    // Validate hex characters (pre-compiled regex; equivalent to the previous
+    // hand-rolled charCodeAt loop, including accepting a bare '0x')
+    if (!HEX_REGEX_ALLOW_EMPTY.test(str)) {
       throw new Error('Invalid hex string.');
     }
     // Optimization: substring and string concat is faster than padEnd
