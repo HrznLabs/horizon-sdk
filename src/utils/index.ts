@@ -556,7 +556,9 @@ export function isMissionExpired(expiresAt: bigint): boolean {
   }
   // Security: Avoid casting BigInt to Number for time comparisons to prevent
   // silent precision loss vulnerabilities with exceedingly large timestamps.
-  return BigInt(Math.floor(Date.now() / 1000)) > expiresAt;
+  // Optimization: Multiply expiresAt by 1000n instead of dividing Date.now()
+  // to avoid slow Math.floor and floating-point division in V8.
+  return BigInt(Date.now()) > expiresAt * 1000n;
 }
 
 /**
