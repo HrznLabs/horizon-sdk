@@ -45,6 +45,10 @@ for (let i = 0; i < 256; i++) {
 }
 
 // Performance optimization: 16-bit lookup table halves string concatenations in toBytes32
+// Hex validation for 0x-prefixed input. `*` (not `+`) preserves the previous
+// loop's behaviour, which accepted a bare '0x' since its body never ran.
+const HEX_REGEX_ALLOW_EMPTY = /^0x[0-9a-fA-F]*$/;
+
 const HEX_STRINGS_16: string[] = new Array(65536);
 for (let i = 0; i < 256; i++) {
   for (let j = 0; j < 256; j++) {
@@ -198,11 +202,13 @@ export function formatUSDC(
     throw new Error('Amount must be a bigint');
   }
 
-  const prefix = options?.prefix !== undefined ? String(options.prefix) : '';
+  if (options?.prefix !== undefined && typeof options.prefix !== 'string') throw new Error('Prefix must be a string');
+  const prefix = options?.prefix !== undefined ? options.prefix : '';
   if (prefix.length > 256) {
     throw new Error('Prefix too long: exceeds maximum length');
   }
-  const suffix = options?.suffix !== undefined ? String(options.suffix) : '';
+  if (options?.suffix !== undefined && typeof options.suffix !== 'string') throw new Error('Suffix must be a string');
+  const suffix = options?.suffix !== undefined ? options.suffix : '';
   if (suffix.length > 256) {
     throw new Error('Suffix too long: exceeds maximum length');
   }
@@ -365,12 +371,17 @@ export function formatBps(
   if (!Number.isFinite(bps)) {
     throw new Error('Basis points must be a finite number');
   }
+  if (bps > Number.MAX_SAFE_INTEGER || bps < Number.MIN_SAFE_INTEGER) {
+    throw new Error('Basis points exceed safe integer limits.');
+  }
 
-  const prefix = options?.prefix !== undefined ? String(options.prefix) : '';
+  if (options?.prefix !== undefined && typeof options.prefix !== 'string') throw new Error('Prefix must be a string');
+  const prefix = options?.prefix !== undefined ? options.prefix : '';
   if (prefix.length > 256) {
     throw new Error('Prefix too long: exceeds maximum length');
   }
-  const suffix = options?.suffix !== undefined ? String(options.suffix) : '%';
+  if (options?.suffix !== undefined && typeof options.suffix !== 'string') throw new Error('Suffix must be a string');
+  const suffix = options?.suffix !== undefined ? options.suffix : '%';
   if (suffix.length > 256) {
     throw new Error('Suffix too long: exceeds maximum length');
   }
@@ -627,19 +638,9 @@ export function toBytes32(str: string): `0x${string}` {
         `String too long for bytes32: ${Math.ceil((len - 2) / 2)} bytes (max 32)`
       );
     }
-    // Validate hex characters
-    // Optimization: Loop with charCodeAt and bitwise operators is ~15% faster than bounds checking.
-    // (code ^ 48) > 9 checks for 0-9 digits.
-    // (((code | 32) - 97) >>> 0) > 5 converts A-F to a-f, subtracts 'a', and uses unsigned right shift
-    // to correctly identify non-hex characters including those with character codes < 97.
-    let i = 2;
-    for (; i < len; i++) {
-      const code = str.charCodeAt(i);
-      if ((code ^ 48) > 9 && (((code | 32) - 97) >>> 0) > 5) {
-        break;
-      }
-    }
-    if (i !== len) {
+    // Validate hex characters (pre-compiled regex; equivalent to the previous
+    // hand-rolled charCodeAt loop, including accepting a bare '0x')
+    if (!HEX_REGEX_ALLOW_EMPTY.test(str)) {
       throw new Error('Invalid hex string.');
     }
     // Optimization: substring and string concat is faster than padEnd
@@ -714,7 +715,8 @@ export function formatAddress(
   if (options) {
     const start = options.start ?? 6;
     const end = options.end ?? 4;
-    const separator = options.separator !== undefined ? String(options.separator) : '...';
+    if (options.separator !== undefined && typeof options.separator !== 'string') throw new Error('Separator must be a string');
+    const separator = options.separator !== undefined ? options.separator : '...';
     if (separator.length > 256) {
       throw new Error('Separator too long: exceeds maximum length');
     }
