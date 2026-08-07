@@ -42,3 +42,29 @@ describe('Byte Utils Tests', () => {
     expect(() => toBytes32(input)).toThrow('String too long for bytes32: exceeds maximum input length');
   });
 });
+
+describe('toBytes32 hex validation edge cases', () => {
+  // The validation regex uses `*` not `+` on purpose: the hand-rolled
+  // charCodeAt loop it replaced also accepted a bare '0x' (its body never ran).
+  // Guards against "fixes" that flip this to `+` or add an `i` flag.
+  it('accepts a bare 0x prefix, matching pre-regex behaviour', () => {
+    expect(() => toBytes32('0x')).not.toThrow();
+  });
+
+  // Uppercase 0X is NOT treated as a hex prefix (the check is charCodeAt(1)===120,
+  // lowercase only), so it falls through and is encoded as a literal string.
+  // Documented deliberately: a "fix" adding an `i` flag would silently change this.
+  it('treats uppercase 0X as a literal string, not hex', () => {
+    expect(() => toBytes32('0Xdeadbeef')).not.toThrow();
+    expect(toBytes32('0Xdeadbeef')).not.toBe('0Xdeadbeef');
+  });
+
+  it('rejects non-hex characters after the prefix', () => {
+    expect(() => toBytes32('0xzz')).toThrow();
+    expect(() => toBytes32('0xdeadbeeg')).toThrow();
+  });
+
+  it('accepts mixed-case hex digits', () => {
+    expect(() => toBytes32('0xDeAdBeEf')).not.toThrow();
+  });
+});
