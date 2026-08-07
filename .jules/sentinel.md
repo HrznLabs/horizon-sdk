@@ -96,3 +96,8 @@
 **Vulnerability:** `formatUSDC`, `formatBps`, and `formatAddress` validated string lengths via `options.prefix.length`, allowing attackers to bypass limits by passing objects with a custom `length` property and an overridden `toString` method that returned an unbounded string (e.g., `{ length: 255, toString: () => "a".repeat(1000) }`).
 **Learning:** Type checking in TypeScript does not prevent an attacker from passing objects with crafted properties that circumvent length checks but are implicitly coerced into unbounded strings during string concatenation.
 **Prevention:** Always coerce options explicitly to strings (e.g., `String(options.prefix)`) *before* applying length limits in utility functions.
+
+## 2026-08-07 - Empty Hex String Validation
+**Vulnerability:** `HEX_REGEX` used `+` instead of `*` for the hex character class (`/^0x[0-9a-fA-F]+$/`), rejecting valid empty hex strings (`0x`) representing zero bytes.
+**Learning:** Web3 ecosystems often use the empty hex string (`0x`) as a valid representation of zero bytes or empty data. Strict regex validation using `+` incorrectly rejects these valid inputs, causing unintended errors and breaking downstream logic.
+**Prevention:** Always use `*` instead of `+` in regex validations targeting hex strings in Web3 contexts to permit valid empty `0x` values.

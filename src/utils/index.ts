@@ -734,7 +734,7 @@ export function formatAddress(
 }
 
 // Optimization: Hoisted regex for hex validation to avoid instantiation on every call
-const HEX_REGEX = /^0x[0-9a-fA-F]+$/;
+const HEX_REGEX = /^0x[0-9a-fA-F]*$/;
 
 /**
  * Get BaseScan URL for address or transaction
