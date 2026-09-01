@@ -4,10 +4,38 @@ on:
   push:
     branches:
       - staging
+  workflow_dispatch:
 
 jobs:
+  # Gate: staging must build before it can reach main. Previously merge-to-main
+  # ran unguarded, so anything landing on staging was promoted unverified.
+  # Steps mirror this repo's own ci.yml so the gate is known-good.
+  pre-merge-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type check
+        run: yarn type-check
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: yarn test
+
   merge-to-main:
     runs-on: ubuntu-latest
+    needs: [pre-merge-build]
     permissions:
       contents: write
       pull-requests: write
@@ -18,7 +46,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Skip the whole promotion cleanly when staging has nothing main doesn't.
+      # Without this, `gh pr create` errors ("No commits between main and staging")
+      # and the run shows a spurious red X on every push where staging == main.
+      - name: Check for commits to promote
+        id: diff
+        run: |
+          AHEAD=$(git rev-list --count origin/main..origin/staging)
+          echo "ahead=$AHEAD" >> $GITHUB_OUTPUT
+          if [ "$AHEAD" = "0" ]; then
+            echo "staging is not ahead of main — nothing to promote."
+          fi
+
       - name: Check for existing PR
+        if: steps.diff.outputs.ahead != '0'
         id: check-pr
         env:
           GH_TOKEN: ${{ github.token }}
@@ -27,7 +68,7 @@ jobs:
           echo "existing_pr=$EXISTING_PR" >> $GITHUB_OUTPUT
 
       - name: Create PR from staging to main
-        if: steps.check-pr.outputs.existing_pr == ''
+        if: steps.diff.outputs.ahead != '0' && steps.check-pr.outputs.existing_pr == ''
         id: create-pr
         env:
           GH_TOKEN: ${{ github.token }}
@@ -39,6 +80,7 @@ jobs:
           echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Set PR number
+        if: steps.diff.outputs.ahead != '0'
         id: pr-number
         run: |
           if [ -n "${{ steps.check-pr.outputs.existing_pr }}" ]; then
@@ -48,7 +90,19 @@ jobs:
           fi
 
       - name: Merge PR
+        if: steps.diff.outputs.ahead != '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr merge ${{ steps.pr-number.outputs.number }} --merge --auto
+          PR="${{ steps.pr-number.outputs.number }}"
+          if [ -z "$PR" ]; then
+            echo "::error::No promotion PR number resolved; nothing to merge."
+            exit 1
+          fi
+          # NOTE: --auto is deliberately NOT used here.
+          # GitHub refuses to enable auto-merge when the base branch has no
+          # required status checks ("Pull request is in clean status"), and
+          # `main` is unprotected. That rejection failed this step on every
+          # promotion run across every HrznLabs repo.
+          # The pre-merge-build job that this job `needs:` is the gate instead.
+          gh pr merge "$PR" --merge
