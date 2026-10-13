@@ -92,12 +92,12 @@ export const BASE_SEPOLIA_CONTRACTS: ContractAddresses = {
   buybackExecutor: '0x57Bad3A5871BAEAB2e8aee1D5017Aa272f6564FA',
   teamVesting: '0x7ce88218e511af2A676d5e9992D985BCa067F284',
   advisorVesting: '0x2483829bd61Da59dF3eD728aE8Db778a7Af9eca7',
-  // iTake Vertical — deployed 2026-02-19
-  iTakeGuildFactory: '0xB54795f8049De1acf729160bcD9184e50E4f267E',
+  // iTake Vertical — deployed 2026-02-19; iTakeGuildFactory + delivery contracts redeployed 2026-10-13
+  iTakeGuildFactory: '0xB3720D5f3Ff1A6385aC0C1f54f88536F68a967F3',
   iTakePaymentRouter: '0x539408777865c7a3Ac702a350BEb4C04b8618eF2',
   reputationOracle: '0x7b2617a841B1c3c39Bba454387167A8948301CA8',
-  deliveryMissionFactory: '0x77DD51c63A3fEE0442f4383B5a9D91d470BD04F5',
-  deliveryEscrowImpl: '0x21Fd1D6f66BFf3B084FdA428C75b659A46446f4b',
+  deliveryMissionFactory: '0xf02Cdc9eD74E2fd63Cc98ED10e78A53512e25d53',
+  deliveryEscrowImpl: '0x0A2F4Eeed28D630f0592068054e974991eBFe08B',
   deliveriesDAO: '0xaB2F7787b72FcFfEA8E543375FE2db44D9C6ae53',
   iTakeMetaDAO: '0x883B7D8CA234912B82AC9718664c2dF224c98a67',
   atobaDAO: '0x85fB5f85FeC3c18a47e21f22AB69A9bBB09d913f',
