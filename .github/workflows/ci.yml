@@ -1,28 +1,39 @@
 name: CI
 
+# Static checks (type-check, build) run locally in the husky pre-push hook.
+# CI runs unit tests only, and only when code that can affect them changes.
 on:
   pull_request:
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'tsconfig.json'
+      - 'tsup.config.ts'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HUSKY: '0'
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Type check
-        run: yarn type-check
-
-      - name: Build
-        run: yarn build
-
-      - name: Test
+      - name: Unit tests
         run: yarn test
