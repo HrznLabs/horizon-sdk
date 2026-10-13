@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+# Light checks only: secretlint on staged files (heavy checks live in pre-push).
+START=$(date +%s)
+echo "[pre-commit] running: secretlint on staged files"
+FILES=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -z "$FILES" ]; then
+  echo "[pre-commit] OK: no staged files to scan (0s)"
+  exit 0
+fi
+# NUL-safe so paths with spaces work
+if ! git diff --cached --name-only --diff-filter=ACM -z | xargs -0 npx --no-install secretlint --secretlintignore .secretlintignore; then
+  echo "[pre-commit] FAILED: secretlint found potential secrets (remove them; never bypass)"
+  exit 1
+fi
+echo "[pre-commit] OK: secretlint clean on $(echo "$FILES" | wc -l | tr -d ' ') staged file(s) ($(( $(date +%s) - START ))s)"
