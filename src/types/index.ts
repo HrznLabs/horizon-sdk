@@ -60,6 +60,8 @@ export interface MissionParams {
   guild: `0x${string}`;
   metadataHash: `0x${string}`;
   locationHash: `0x${string}`;
+  /** Minimum performer reputation required to accept (0 = no gate) */
+  minReputation: bigint;
 }
 
 /**
@@ -90,6 +92,66 @@ export interface GuildConfig {
   admin: `0x${string}`;
   treasury: `0x${string}`;
   guildFeeBps: number;
+  /** True when this guild is a MetaDAO (parent of vertical SubDAOs) */
+  isMetaDAO: boolean;
+  /** Parent MetaDAO address (zero address when none) */
+  parentMetaDAO: `0x${string}`;
+  /** MetaDAO fee share in basis points */
+  metaDAOFeeBps: number;
+}
+
+/**
+ * Delivery location (iTake delivery vertical). Coordinates are scaled by 1e6.
+ */
+export interface DeliveryLocation {
+  latitude: bigint;
+  longitude: bigint;
+  addressHash: `0x${string}`;
+  /** 0 = exact, 1 = block, 2 = neighborhood */
+  precision: number;
+  /** Geofence radius in meters */
+  geofenceRadius: bigint;
+  requirePresence: boolean;
+}
+
+/**
+ * Delivery package details (iTake delivery vertical)
+ */
+export interface PackageDetails {
+  itemType: number;
+  packageSize: number;
+  /** Estimated weight in grams */
+  estimatedWeight: number;
+  /** Bitmap: 1 = fragile, 2 = keepCold, 4 = keepWarm, 8 = thisSideUp */
+  specialHandling: number;
+}
+
+/**
+ * Delivery parameters, as returned by DeliveryEscrow.getDeliveryParams()
+ */
+export interface DeliveryParams {
+  pickup: DeliveryLocation;
+  dropoff: DeliveryLocation;
+  package: PackageDetails;
+  pickupWindowStart: bigint;
+  pickupWindowEnd: bigint;
+  deliveryDeadline: bigint;
+  realTimeTrackingEnabled: boolean;
+  tipAmount: bigint;
+}
+
+/**
+ * Escrowed order breakdown used at settlement, as returned by
+ * DeliveryEscrow.getSettlement(). foodCost goes to the restaurant in full;
+ * deliveryFee is split through the PaymentRouter fee hierarchy.
+ */
+export interface DeliverySettlement {
+  foodCost: bigint;
+  deliveryFee: bigint;
+  restaurantDAO: `0x${string}`;
+  subDAOFeeBps: number;
+  metaDAO: `0x${string}`;
+  metaDAOFeeBps: number;
 }
 
 /**
@@ -198,6 +260,66 @@ export interface CreateGuildParams {
   name: string;
   treasury: `0x${string}`;
   guildFeeBps: number;
+  /** True when this guild is a MetaDAO (parent of vertical SubDAOs) */
+  isMetaDAO: boolean;
+  /** Parent MetaDAO address (zero address when none) */
+  parentMetaDAO: `0x${string}`;
+  /** MetaDAO fee share in basis points */
+  metaDAOFeeBps: number;
+}
+
+/**
+ * Delivery location (iTake delivery vertical). Coordinates are scaled by 1e6.
+ */
+export interface DeliveryLocation {
+  latitude: bigint;
+  longitude: bigint;
+  addressHash: `0x${string}`;
+  /** 0 = exact, 1 = block, 2 = neighborhood */
+  precision: number;
+  /** Geofence radius in meters */
+  geofenceRadius: bigint;
+  requirePresence: boolean;
+}
+
+/**
+ * Delivery package details (iTake delivery vertical)
+ */
+export interface PackageDetails {
+  itemType: number;
+  packageSize: number;
+  /** Estimated weight in grams */
+  estimatedWeight: number;
+  /** Bitmap: 1 = fragile, 2 = keepCold, 4 = keepWarm, 8 = thisSideUp */
+  specialHandling: number;
+}
+
+/**
+ * Delivery parameters, as returned by DeliveryEscrow.getDeliveryParams()
+ */
+export interface DeliveryParams {
+  pickup: DeliveryLocation;
+  dropoff: DeliveryLocation;
+  package: PackageDetails;
+  pickupWindowStart: bigint;
+  pickupWindowEnd: bigint;
+  deliveryDeadline: bigint;
+  realTimeTrackingEnabled: boolean;
+  tipAmount: bigint;
+}
+
+/**
+ * Escrowed order breakdown used at settlement, as returned by
+ * DeliveryEscrow.getSettlement(). foodCost goes to the restaurant in full;
+ * deliveryFee is split through the PaymentRouter fee hierarchy.
+ */
+export interface DeliverySettlement {
+  foodCost: bigint;
+  deliveryFee: bigint;
+  restaurantDAO: `0x${string}`;
+  subDAOFeeBps: number;
+  metaDAO: `0x${string}`;
+  metaDAOFeeBps: number;
 }
 
 // ─── M5 Token Economics ─────────────────────────────────────────────────────

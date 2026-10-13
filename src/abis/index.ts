@@ -10,8 +10,123 @@ export const MissionFactoryABI = [
   {
     type: 'constructor',
     inputs: [
-      { name: '_usdc', type: 'address' },
-      { name: '_paymentRouter', type: 'address' },
+      {
+        name: '_paymentRouter',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'MAX_DURATION',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MAX_REWARD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MIN_DURATION',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MIN_REWARD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'PREMIUM_MISSION_THRESHOLD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'PROTOCOL_FLOOR_REPUTATION',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'createMission',
+    inputs: [
+      {
+        name: 'paymentToken',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'expiresAt',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'metadataHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'locationHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'minReputation',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
     ],
     stateMutability: 'nonpayable',
   },
@@ -19,40 +134,160 @@ export const MissionFactoryABI = [
     type: 'function',
     name: 'createMission',
     inputs: [
-      { name: 'paymentToken', type: 'address' },
-      { name: 'rewardAmount', type: 'uint256' },
-      { name: 'expiresAt', type: 'uint256' },
-      { name: 'guild', type: 'address' },
-      { name: 'metadataHash', type: 'bytes32' },
-      { name: 'locationHash', type: 'bytes32' },
-      { name: 'minReputation', type: 'uint256' },
+      {
+        name: 'paymentToken',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'expiresAt',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'metadataHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'locationHash',
+        type: 'bytes32',
+      },
     ],
-    outputs: [{ name: 'missionId', type: 'uint256' }],
+    outputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
+    name: 'disputeResolver',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'escrowImplementation',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'escrowToMission',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'getMission',
-    inputs: [{ name: 'missionId', type: 'uint256' }],
-    outputs: [{ name: 'escrow', type: 'address' }],
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: 'escrow',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMissionByEscrow',
+    inputs: [
+      {
+        name: 'escrow',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
     name: 'getMissionParams',
-    inputs: [{ name: 'missionId', type: 'uint256' }],
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
     outputs: [
       {
         name: 'params',
         type: 'tuple',
         components: [
-          { name: 'poster', type: 'address' },
-          { name: 'rewardAmount', type: 'uint256' },
-          { name: 'createdAt', type: 'uint256' },
-          { name: 'expiresAt', type: 'uint256' },
-          { name: 'guild', type: 'address' },
-          { name: 'metadataHash', type: 'bytes32' },
-          { name: 'locationHash', type: 'bytes32' },
+          {
+            name: 'poster',
+            type: 'address',
+          },
+          {
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'createdAt',
+            type: 'uint256',
+          },
+          {
+            name: 'expiresAt',
+            type: 'uint256',
+          },
+          {
+            name: 'guild',
+            type: 'address',
+          },
+          {
+            name: 'metadataHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'locationHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'minReputation',
+            type: 'uint256',
+          },
         ],
       },
     ],
@@ -61,17 +296,51 @@ export const MissionFactoryABI = [
   {
     type: 'function',
     name: 'getMissionRuntime',
-    inputs: [{ name: 'missionId', type: 'uint256' }],
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
     outputs: [
       {
         name: 'runtime',
         type: 'tuple',
         components: [
-          { name: 'performer', type: 'address' },
-          { name: 'state', type: 'uint8' },
-          { name: 'proofHash', type: 'bytes32' },
-          { name: 'disputeRaised', type: 'bool' },
+          {
+            name: 'performer',
+            type: 'address',
+          },
+          {
+            name: 'state',
+            type: 'uint8',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'disputeRaised',
+            type: 'bool',
+          },
         ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'guildMinReputation',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -80,36 +349,360 @@ export const MissionFactoryABI = [
     type: 'function',
     name: 'missionCount',
     inputs: [],
-    outputs: [{ name: '', type: 'uint256' }],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
     name: 'missions',
-    inputs: [{ name: '', type: 'uint256' }],
-    outputs: [{ name: '', type: 'address' }],
+    inputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
     name: 'owner',
     inputs: [],
-    outputs: [{ name: '', type: 'address' }],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pauseRegistry',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'paymentRouter',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'renounceOwnership',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'reputationOracle',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'setDisputeResolver',
+    inputs: [
+      {
+        name: '_disputeResolver',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setGuildMinReputation',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'minReputation',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setPauseRegistry',
+    inputs: [
+      {
+        name: '_pauseRegistry',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setPaymentRouter',
+    inputs: [
+      {
+        name: '_paymentRouter',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setReputationOracle',
+    inputs: [
+      {
+        name: '_reputationOracle',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'transferOwnership',
+    inputs: [
+      {
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'GuildMinReputationUpdated',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'minReputation',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
   },
   {
     type: 'event',
     name: 'MissionCreated',
     inputs: [
-      { name: 'id', type: 'uint256', indexed: true },
-      { name: 'poster', type: 'address', indexed: true },
-      { name: 'escrow', type: 'address', indexed: false },
-      { name: 'reward', type: 'uint256', indexed: false },
-      { name: 'expiresAt', type: 'uint256', indexed: false },
-      { name: 'metadataHash', type: 'bytes32', indexed: false },
-      { name: 'guild', type: 'address', indexed: false },
-      { name: 'locationHash', type: 'bytes32', indexed: false },
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'poster',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'escrow',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'reward',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'expiresAt',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'metadataHash',
+        type: 'bytes32',
+        indexed: false,
+      },
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'locationHash',
+        type: 'bytes32',
+        indexed: false,
+      },
     ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'OwnershipTransferred',
+    inputs: [
+      {
+        name: 'previousOwner',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PaymentRouterUpdated',
+    inputs: [
+      {
+        name: 'newRouter',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'ReputationOracleUpdated',
+    inputs: [
+      {
+        name: 'oracle',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'FailedDeployment',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientBalance',
+    inputs: [
+      {
+        name: 'balance',
+        type: 'uint256',
+      },
+      {
+        name: 'needed',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InvalidDuration',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidPaymentRouter',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRewardAmount',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissionNotFound',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'OwnableInvalidOwner',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'OwnableUnauthorizedAccount',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'Paused',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ReentrancyGuardReentrantCall',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'TokenNotAccepted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'TransferFailed',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ZeroAddress',
+    inputs: [],
   },
 ] as const;
 
@@ -119,16 +712,26 @@ export const MissionFactoryABI = [
  */
 export const MissionEscrowABI = [
   {
-    type: 'function',
-    name: 'acceptMission',
+    type: 'constructor',
     inputs: [],
-    outputs: [],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    name: 'submitProof',
-    inputs: [{ name: 'proofHash', type: 'bytes32' }],
+    name: 'SUBMISSION_GRACE_PERIOD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'acceptMission',
+    inputs: [],
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -148,13 +751,6 @@ export const MissionEscrowABI = [
   },
   {
     type: 'function',
-    name: 'raiseDispute',
-    inputs: [{ name: 'disputeHash', type: 'bytes32' }],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
     name: 'claimExpired',
     inputs: [],
     outputs: [],
@@ -162,13 +758,15 @@ export const MissionEscrowABI = [
   },
   {
     type: 'function',
-    name: 'settleDispute',
-    inputs: [
-      { name: 'outcome', type: 'uint8' },
-      { name: 'splitPercentage', type: 'uint256' },
+    name: 'getMissionId',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
     ],
-    outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -179,13 +777,38 @@ export const MissionEscrowABI = [
         name: '',
         type: 'tuple',
         components: [
-          { name: 'poster', type: 'address' },
-          { name: 'rewardAmount', type: 'uint256' },
-          { name: 'createdAt', type: 'uint256' },
-          { name: 'expiresAt', type: 'uint256' },
-          { name: 'guild', type: 'address' },
-          { name: 'metadataHash', type: 'bytes32' },
-          { name: 'locationHash', type: 'bytes32' },
+          {
+            name: 'poster',
+            type: 'address',
+          },
+          {
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'createdAt',
+            type: 'uint256',
+          },
+          {
+            name: 'expiresAt',
+            type: 'uint256',
+          },
+          {
+            name: 'guild',
+            type: 'address',
+          },
+          {
+            name: 'metadataHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'locationHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'minReputation',
+            type: 'uint256',
+          },
         ],
       },
     ],
@@ -200,10 +823,22 @@ export const MissionEscrowABI = [
         name: '',
         type: 'tuple',
         components: [
-          { name: 'performer', type: 'address' },
-          { name: 'state', type: 'uint8' },
-          { name: 'proofHash', type: 'bytes32' },
-          { name: 'disputeRaised', type: 'bool' },
+          {
+            name: 'performer',
+            type: 'address',
+          },
+          {
+            name: 'state',
+            type: 'uint8',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'disputeRaised',
+            type: 'bool',
+          },
         ],
       },
     ],
@@ -211,45 +846,328 @@ export const MissionEscrowABI = [
   },
   {
     type: 'function',
-    name: 'getMissionId',
+    name: 'getToken',
     inputs: [],
-    outputs: [{ name: '', type: 'uint256' }],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'initialize',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'poster',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'expiresAt',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'metadataHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'locationHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'paymentRouter',
+        type: 'address',
+      },
+      {
+        name: 'paymentToken',
+        type: 'address',
+      },
+      {
+        name: 'disputeResolver',
+        type: 'address',
+      },
+      {
+        name: 'pauseRegistryAddr',
+        type: 'address',
+      },
+      {
+        name: 'minReputation',
+        type: 'uint256',
+      },
+      {
+        name: 'reputationOracle',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'raiseDispute',
+    inputs: [
+      {
+        name: 'disputeHash',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'settleDispute',
+    inputs: [
+      {
+        name: 'outcome',
+        type: 'uint8',
+      },
+      {
+        name: 'splitPercentage',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'submitProof',
+    inputs: [
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'DisputeSettled',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'outcome',
+        type: 'uint8',
+        indexed: false,
+      },
+      {
+        name: 'posterAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'performerAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Initialized',
+    inputs: [
+      {
+        name: 'version',
+        type: 'uint64',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
   },
   {
     type: 'event',
     name: 'MissionAccepted',
     inputs: [
-      { name: 'id', type: 'uint256', indexed: true },
-      { name: 'performer', type: 'address', indexed: true },
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
     ],
-  },
-  {
-    type: 'event',
-    name: 'MissionSubmitted',
-    inputs: [
-      { name: 'id', type: 'uint256', indexed: true },
-      { name: 'proofHash', type: 'bytes32', indexed: false },
-    ],
-  },
-  {
-    type: 'event',
-    name: 'MissionCompleted',
-    inputs: [{ name: 'id', type: 'uint256', indexed: true }],
+    anonymous: false,
   },
   {
     type: 'event',
     name: 'MissionCancelled',
-    inputs: [{ name: 'id', type: 'uint256', indexed: true }],
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MissionCompleted',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
   },
   {
     type: 'event',
     name: 'MissionDisputed',
     inputs: [
-      { name: 'id', type: 'uint256', indexed: true },
-      { name: 'by', type: 'address', indexed: true },
-      { name: 'disputeHash', type: 'bytes32', indexed: false },
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'by',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'disputeHash',
+        type: 'bytes32',
+        indexed: false,
+      },
     ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MissionSubmitted',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AlreadyAccepted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'DisputeAlreadyRaised',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientReputation',
+    inputs: [
+      {
+        name: 'actual',
+        type: 'uint256',
+      },
+      {
+        name: 'required',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InvalidInitialization',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidState',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissionExpired',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissionNotExpired',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotDisputeResolver',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotInitializing',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotPerformer',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotPoster',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Paused',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ProofAlreadySubmitted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ReentrancyGuardReentrantCall',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'SubmissionWindowClosed',
+    inputs: [],
   },
 ] as const;
 
@@ -316,52 +1234,169 @@ export const GuildFactoryABI = [
  */
 export const GuildDAOABI = [
   {
-    type: 'function',
-    name: 'addMember',
-    inputs: [{ name: 'member', type: 'address' }],
-    outputs: [],
+    type: 'constructor',
+    inputs: [],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    name: 'removeMember',
-    inputs: [{ name: 'member', type: 'address' }],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'grantCuratorRole',
-    inputs: [{ name: 'member', type: 'address' }],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'grantOfficerRole',
-    inputs: [{ name: 'member', type: 'address' }],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'publishToBoard',
-    inputs: [{ name: 'missionId', type: 'uint256' }],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'isMember',
-    inputs: [{ name: 'account', type: 'address' }],
-    outputs: [{ name: '', type: 'bool' }],
+    name: 'ADMIN_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    name: 'isCurator',
-    inputs: [{ name: 'account', type: 'address' }],
-    outputs: [{ name: '', type: 'bool' }],
+    name: 'CURATOR_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'DEFAULT_ADMIN_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'OFFICER_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'addMember',
+    inputs: [
+      {
+        name: 'member',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'adminCount',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'canAcceptPremiumMission',
+    inputs: [
+      {
+        name: 'performer',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'config',
+    inputs: [],
+    outputs: [
+      {
+        name: 'name',
+        type: 'string',
+      },
+      {
+        name: 'admin',
+        type: 'address',
+      },
+      {
+        name: 'treasury',
+        type: 'address',
+      },
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'isMetaDAO',
+        type: 'bool',
+      },
+      {
+        name: 'parentMetaDAO',
+        type: 'address',
+      },
+      {
+        name: 'metaDAOFeeBps',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'defaultAdminCount',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'defaultEligibility',
+    inputs: [],
+    outputs: [
+      {
+        name: 'minGuildXP',
+        type: 'uint256',
+      },
+      {
+        name: 'minGlobalXP',
+        type: 'uint256',
+      },
+      {
+        name: 'minReputation',
+        type: 'uint256',
+      },
+      {
+        name: 'requiredBadge',
+        type: 'bytes32',
+      },
+    ],
     stateMutability: 'view',
   },
   {
@@ -373,11 +1408,376 @@ export const GuildDAOABI = [
         name: '',
         type: 'tuple',
         components: [
-          { name: 'name', type: 'string' },
-          { name: 'admin', type: 'address' },
-          { name: 'treasury', type: 'address' },
-          { name: 'guildFeeBps', type: 'uint16' },
+          {
+            name: 'name',
+            type: 'string',
+          },
+          {
+            name: 'admin',
+            type: 'address',
+          },
+          {
+            name: 'treasury',
+            type: 'address',
+          },
+          {
+            name: 'guildFeeBps',
+            type: 'uint16',
+          },
+          {
+            name: 'isMetaDAO',
+            type: 'bool',
+          },
+          {
+            name: 'parentMetaDAO',
+            type: 'address',
+          },
+          {
+            name: 'metaDAOFeeBps',
+            type: 'uint16',
+          },
         ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getDefaultEligibility',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'minGuildXP',
+            type: 'uint256',
+          },
+          {
+            name: 'minGlobalXP',
+            type: 'uint256',
+          },
+          {
+            name: 'minReputation',
+            type: 'uint256',
+          },
+          {
+            name: 'requiredBadge',
+            type: 'bytes32',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getFeeHierarchy',
+    inputs: [],
+    outputs: [
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'parentMetaDAO',
+        type: 'address',
+      },
+      {
+        name: 'metaDAOFeeBps',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMetaDAOFeeBps',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getParentMetaDAO',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getRoleAdmin',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getSubDAOs',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'grantCuratorRole',
+    inputs: [
+      {
+        name: 'member',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'grantOfficerRole',
+    inputs: [
+      {
+        name: 'member',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'grantRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'hasRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'initialize',
+    inputs: [
+      {
+        name: 'name',
+        type: 'string',
+      },
+      {
+        name: 'admin',
+        type: 'address',
+      },
+      {
+        name: 'treasury',
+        type: 'address',
+      },
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'initializeAsMetaDAO',
+    inputs: [
+      {
+        name: 'name',
+        type: 'string',
+      },
+      {
+        name: 'admin',
+        type: 'address',
+      },
+      {
+        name: 'treasury',
+        type: 'address',
+      },
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'initializeAsSubDAO',
+    inputs: [
+      {
+        name: 'name',
+        type: 'string',
+      },
+      {
+        name: 'admin',
+        type: 'address',
+      },
+      {
+        name: 'treasury',
+        type: 'address',
+      },
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'parentMetaDAO',
+        type: 'address',
+      },
+      {
+        name: 'metaDAOFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'isAdmin',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isCurator',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isMember',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isMetaDAO',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isOfficer',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isSubDAO',
+    inputs: [
+      {
+        name: 'subDAO',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
       },
     ],
     stateMutability: 'view',
@@ -386,33 +1786,544 @@ export const GuildDAOABI = [
     type: 'function',
     name: 'memberCount',
     inputs: [],
-    outputs: [{ name: '', type: 'uint256' }],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
   },
   {
-    type: 'event',
-    name: 'GuildMemberAdded',
+    type: 'function',
+    name: 'members',
     inputs: [
-      { name: 'guild', type: 'address', indexed: true },
-      { name: 'member', type: 'address', indexed: true },
+      {
+        name: '',
+        type: 'address',
+      },
     ],
+    outputs: [
+      {
+        name: 'isMember',
+        type: 'bool',
+      },
+      {
+        name: 'joinedAt',
+        type: 'uint256',
+      },
+      {
+        name: 'leftAt',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
   },
   {
-    type: 'event',
-    name: 'GuildMemberRemoved',
-    inputs: [
-      { name: 'guild', type: 'address', indexed: true },
-      { name: 'member', type: 'address', indexed: true },
+    type: 'function',
+    name: 'minStakeForPremium',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'publishToBoard',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'registerSubDAO',
+    inputs: [
+      {
+        name: 'subDAO',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'registeredSubDAOs',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'removeMember',
+    inputs: [
+      {
+        name: 'member',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'renounceRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'callerConfirmation',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'revokeRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'sHrznVault',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'setSHrznVault',
+    inputs: [
+      {
+        name: '_vault',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setStakeRequirement',
+    inputs: [
+      {
+        name: '_minStake',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'subDAOList',
+    inputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'supportsInterface',
+    inputs: [
+      {
+        name: 'interfaceId',
+        type: 'bytes4',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'updateConfig',
+    inputs: [
+      {
+        name: 'name',
+        type: 'string',
+      },
+      {
+        name: 'treasury',
+        type: 'address',
+      },
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'updateEligibility',
+    inputs: [
+      {
+        name: 'minGuildXP',
+        type: 'uint256',
+      },
+      {
+        name: 'minGlobalXP',
+        type: 'uint256',
+      },
+      {
+        name: 'minReputation',
+        type: 'uint256',
+      },
+      {
+        name: 'requiredBadge',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'event',
     name: 'GuildBoardEntryAdded',
     inputs: [
-      { name: 'guild', type: 'address', indexed: true },
-      { name: 'missionId', type: 'uint256', indexed: true },
-      { name: 'curator', type: 'address', indexed: true },
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'curator',
+        type: 'address',
+        indexed: true,
+      },
     ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'GuildConfigUpdated',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'GuildMemberAdded',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'member',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'GuildMemberRemoved',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'member',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'GuildRoleGranted',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'member',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'role',
+        type: 'string',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Initialized',
+    inputs: [
+      {
+        name: 'version',
+        type: 'uint64',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MetaDAORegistered',
+    inputs: [
+      {
+        name: 'metaDAO',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'name',
+        type: 'string',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleAdminChanged',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'previousAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'newAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleGranted',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleRevoked',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'SHrznVaultSet',
+    inputs: [
+      {
+        name: 'vault',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'StakeRequirementUpdated',
+    inputs: [
+      {
+        name: 'minStake',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'SubDAORegistered',
+    inputs: [
+      {
+        name: 'subDAO',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'metaDAO',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AccessControlBadConfirmation',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AccessControlUnauthorizedAccount',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+      {
+        name: 'neededRole',
+        type: 'bytes32',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'AlreadyMember',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AlreadySubDAO',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'CannotRemoveLastAdmin',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidFee',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidInitialization',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidMetaDAO',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotInitializing',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotMember',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotMetaDAO',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ZeroAddress',
+    inputs: [],
   },
 ] as const;
 
@@ -422,35 +2333,289 @@ export const GuildDAOABI = [
  */
 export const PaymentRouterABI = [
   {
-    type: 'function',
-    name: 'settlePayment',
+    type: 'constructor',
     inputs: [
-      { name: 'missionId', type: 'uint256' },
-      { name: 'performer', type: 'address' },
-      { name: 'rewardAmount', type: 'uint256' },
-      { name: 'guild', type: 'address' },
+      {
+        name: '_usdc',
+        type: 'address',
+      },
+      {
+        name: '_protocolTreasury',
+        type: 'address',
+      },
+      {
+        name: '_resolverTreasury',
+        type: 'address',
+      },
+      {
+        name: '_labsTreasury',
+        type: 'address',
+      },
+      {
+        name: '_admin',
+        type: 'address',
+      },
     ],
-    outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'BASE_PERFORMER_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'BPS_DENOMINATOR',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'DEFAULT_ADMIN_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'FEE_MANAGER_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'HRZN_DISCOUNT_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'LABS_FEE_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MAX_METADAO_FEE_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MAX_SUBDAO_FEE_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MIN_PERFORMER_FLOOR_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'PAUSER_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'PROTOCOL_FEE_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'RESOLVER_FEE_BPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'SETTLER_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'acceptedTokens',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
   },
   {
     type: 'function',
     name: 'getFeeSplit',
     inputs: [
-      { name: 'rewardAmount', type: 'uint256' },
-      { name: 'guild', type: 'address' },
-      { name: 'guildFeeBps', type: 'uint16' },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'hasGuild',
+        type: 'bool',
+      },
     ],
     outputs: [
       {
         name: 'split',
         type: 'tuple',
         components: [
-          { name: 'performerAmount', type: 'uint256' },
-          { name: 'protocolAmount', type: 'uint256' },
-          { name: 'guildAmount', type: 'uint256' },
-          { name: 'resolverAmount', type: 'uint256' },
-          { name: 'labsAmount', type: 'uint256' },
+          {
+            name: 'performerAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'protocolAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'guildAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'resolverAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'labsAmount',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getFeeSplit',
+    inputs: [
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [
+      {
+        name: 'split',
+        type: 'tuple',
+        components: [
+          {
+            name: 'performerAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'protocolAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'guildAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'resolverAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'labsAmount',
+            type: 'uint256',
+          },
         ],
       },
     ],
@@ -461,24 +2626,964 @@ export const PaymentRouterABI = [
     name: 'getFixedFees',
     inputs: [],
     outputs: [
-      { name: 'protocolFeeBps', type: 'uint16' },
-      { name: 'labsFeeBps', type: 'uint16' },
-      { name: 'resolverFeeBps', type: 'uint16' },
+      {
+        name: 'protocolFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'labsFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'resolverFeeBps',
+        type: 'uint16',
+      },
     ],
     stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    name: 'getGuildFeeBps',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getHrznDiscountedFee',
+    inputs: [
+      {
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: 'discountedFee',
+        type: 'uint256',
+      },
+      {
+        name: 'discount',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getRoleAdmin',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'grantRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'guildTreasuries',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'hasRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'hrzn',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'labsTreasury',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'maxGuildFeeBPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'missionFactory',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'paused',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'performerFloorBPS',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'protocolTreasury',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'renounceRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'callerConfirmation',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'resolverTreasury',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'revokeRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setAcceptedToken',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+      {
+        name: 'accepted',
+        type: 'bool',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setGuildTreasury',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'treasury',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setHRZNToken',
+    inputs: [
+      {
+        name: '_hrzn',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setLabsTreasury',
+    inputs: [
+      {
+        name: '_treasury',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setMissionFactory',
+    inputs: [
+      {
+        name: '_factory',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setPerformerFloor',
+    inputs: [
+      {
+        name: 'newFloorBPS',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setProtocolTreasury',
+    inputs: [
+      {
+        name: '_treasury',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setResolverTreasury',
+    inputs: [
+      {
+        name: '_treasury',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'settlePayment',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'performer',
+        type: 'address',
+      },
+      {
+        name: 'token',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'settlePaymentWithGuildFee',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'performer',
+        type: 'address',
+      },
+      {
+        name: 'token',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'guildFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'settlePaymentWithHierarchy',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'performer',
+        type: 'address',
+      },
+      {
+        name: 'token',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'subDAO',
+        type: 'address',
+      },
+      {
+        name: 'metaDAO',
+        type: 'address',
+      },
+      {
+        name: 'subDAOFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'metaDAOFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'settleRestaurantOrder',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'performer',
+        type: 'address',
+      },
+      {
+        name: 'token',
+        type: 'address',
+      },
+      {
+        name: 'foodCost',
+        type: 'uint256',
+      },
+      {
+        name: 'deliveryFee',
+        type: 'uint256',
+      },
+      {
+        name: 'restaurantDAO',
+        type: 'address',
+      },
+      {
+        name: 'metaDAO',
+        type: 'address',
+      },
+      {
+        name: 'subDAOFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'metaDAOFeeBps',
+        type: 'uint16',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'supportsInterface',
+    inputs: [
+      {
+        name: 'interfaceId',
+        type: 'bytes4',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'unpause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'AcceptedTokenUpdated',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'accepted',
+        type: 'bool',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'GuildFeeCapped',
+    inputs: [
+      {
+        name: 'requested',
+        type: 'uint16',
+        indexed: false,
+      },
+      {
+        name: 'effective',
+        type: 'uint16',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Paused',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
   },
   {
     type: 'event',
     name: 'PaymentSettled',
     inputs: [
-      { name: 'missionId', type: 'uint256', indexed: true },
-      { name: 'performer', type: 'address', indexed: true },
-      { name: 'performerAmount', type: 'uint256', indexed: false },
-      { name: 'protocolAmount', type: 'uint256', indexed: false },
-      { name: 'guildAmount', type: 'uint256', indexed: false },
-      { name: 'resolverAmount', type: 'uint256', indexed: false },
-      { name: 'labsAmount', type: 'uint256', indexed: false },
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'performerAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'protocolAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'guildAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'resolverAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'labsAmount',
+        type: 'uint256',
+        indexed: false,
+      },
     ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PaymentSettledWithDiscount',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'discountAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'hrznBurned',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PaymentSettledWithHierarchy',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'performerAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'protocolAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'labsAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'resolverAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'metaDAOAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'subDAOAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PerformerFloorUpdated',
+    inputs: [
+      {
+        name: 'oldFloor',
+        type: 'uint16',
+        indexed: false,
+      },
+      {
+        name: 'newFloor',
+        type: 'uint16',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RestaurantOrderSettled',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'foodCostToRestaurant',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'performerAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'protocolAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'labsAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'resolverAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'metaDAOAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'subDAOAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleAdminChanged',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'previousAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'newAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleGranted',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleRevoked',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'TreasuryUpdated',
+    inputs: [
+      {
+        name: 'treasuryType',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'newAddress',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Unpaused',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AccessControlBadConfirmation',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AccessControlUnauthorizedAccount',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+      {
+        name: 'neededRole',
+        type: 'bytes32',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'EnforcedPause',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ExpectedPause',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'FloorBelowMinimum',
+    inputs: [
+      {
+        name: 'requested',
+        type: 'uint16',
+      },
+      {
+        name: 'minimum',
+        type: 'uint16',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InvalidFeeConfig',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidTreasury',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'OnlyMissionEscrow',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'PerformerFloorViolation',
+    inputs: [
+      {
+        name: 'actual',
+        type: 'uint16',
+      },
+      {
+        name: 'minimum',
+        type: 'uint16',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ReentrancyGuardReentrantCall',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'TokenNotAccepted',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'TransferFailed',
+    inputs: [],
   },
 ] as const;
 
@@ -549,50 +3654,192 @@ export const ReputationAttestationsABI = [
  */
 export const HorizonAchievementsABI = [
   {
-    type: 'function',
-    name: 'mintAchievement',
+    type: 'constructor',
     inputs: [
-      { name: 'to', type: 'address' },
-      { name: 'typeId', type: 'uint256' },
-      { name: 'proofHash', type: 'bytes32' },
+      {
+        name: 'name',
+        type: 'string',
+      },
+      {
+        name: 'symbol',
+        type: 'string',
+      },
+      {
+        name: 'baseURI',
+        type: 'string',
+      },
     ],
-    outputs: [{ name: 'tokenId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'ADMIN_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'DEFAULT_ADMIN_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MINTER_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'approve',
+    inputs: [
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'balanceOf',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'batchMintAchievements',
+    inputs: [
+      {
+        name: 'recipients',
+        type: 'address[]',
+      },
+      {
+        name: 'typeId',
+        type: 'uint256',
+      },
+      {
+        name: 'proofHashes',
+        type: 'bytes32[]',
+      },
+    ],
+    outputs: [
+      {
+        name: 'tokenIds',
+        type: 'uint256[]',
+      },
+    ],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
     name: 'createAchievementType',
     inputs: [
-      { name: 'name', type: 'string' },
-      { name: 'description', type: 'string' },
-      { name: 'category', type: 'uint8' },
-      { name: 'isSoulbound', type: 'bool' },
-      { name: 'maxSupply', type: 'uint256' },
-      { name: 'tokenURI', type: 'string' },
-      { name: 'xpReward', type: 'uint256' },
+      {
+        name: 'name',
+        type: 'string',
+      },
+      {
+        name: 'description',
+        type: 'string',
+      },
+      {
+        name: 'category',
+        type: 'uint8',
+      },
+      {
+        name: 'isSoulbound',
+        type: 'bool',
+      },
+      {
+        name: 'maxSupply',
+        type: 'uint256',
+      },
+      {
+        name: 'tokenURI',
+        type: 'string',
+      },
+      {
+        name: 'xpReward',
+        type: 'uint256',
+      },
     ],
-    outputs: [{ name: 'typeId', type: 'uint256' }],
+    outputs: [
+      {
+        name: 'typeId',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'nonpayable',
   },
   {
     type: 'function',
-    name: 'getAchievementType',
-    inputs: [{ name: 'typeId', type: 'uint256' }],
+    name: 'getAchievement',
+    inputs: [
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
     outputs: [
       {
         name: '',
         type: 'tuple',
         components: [
-          { name: 'typeId', type: 'uint256' },
-          { name: 'name', type: 'string' },
-          { name: 'description', type: 'string' },
-          { name: 'category', type: 'uint8' },
-          { name: 'isSoulbound', type: 'bool' },
-          { name: 'isActive', type: 'bool' },
-          { name: 'maxSupply', type: 'uint256' },
-          { name: 'currentSupply', type: 'uint256' },
-          { name: 'baseTokenURI', type: 'string' },
-          { name: 'xpReward', type: 'uint256' },
+          {
+            name: 'tokenId',
+            type: 'uint256',
+          },
+          {
+            name: 'typeId',
+            type: 'uint256',
+          },
+          {
+            name: 'originalOwner',
+            type: 'address',
+          },
+          {
+            name: 'mintedAt',
+            type: 'uint256',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
         ],
       },
     ],
@@ -600,56 +3847,917 @@ export const HorizonAchievementsABI = [
   },
   {
     type: 'function',
+    name: 'getAchievementType',
+    inputs: [
+      {
+        name: 'typeId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'typeId',
+            type: 'uint256',
+          },
+          {
+            name: 'name',
+            type: 'string',
+          },
+          {
+            name: 'description',
+            type: 'string',
+          },
+          {
+            name: 'category',
+            type: 'uint8',
+          },
+          {
+            name: 'isSoulbound',
+            type: 'bool',
+          },
+          {
+            name: 'isActive',
+            type: 'bool',
+          },
+          {
+            name: 'maxSupply',
+            type: 'uint256',
+          },
+          {
+            name: 'currentSupply',
+            type: 'uint256',
+          },
+          {
+            name: 'baseTokenURI',
+            type: 'string',
+          },
+          {
+            name: 'xpReward',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getApproved',
+    inputs: [
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getRoleAdmin',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getUserAchievementToken',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+      {
+        name: 'typeId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'grantRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'hasAchievement',
     inputs: [
-      { name: 'user', type: 'address' },
-      { name: 'typeId', type: 'uint256' },
+      {
+        name: 'user',
+        type: 'address',
+      },
+      {
+        name: 'typeId',
+        type: 'uint256',
+      },
     ],
-    outputs: [{ name: '', type: 'bool' }],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'hasRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isApprovedForAll',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        name: 'operator',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
     name: 'isSoulbound',
-    inputs: [{ name: 'tokenId', type: 'uint256' }],
-    outputs: [{ name: '', type: 'bool' }],
+    inputs: [
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
-    name: 'balanceOf',
-    inputs: [{ name: 'owner', type: 'address' }],
-    outputs: [{ name: '', type: 'uint256' }],
+    name: 'mintAchievement',
+    inputs: [
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'typeId',
+        type: 'uint256',
+      },
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'name',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'ownerOf',
+    inputs: [
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'renounceRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'callerConfirmation',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'revokeRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'safeTransferFrom',
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+      },
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'safeTransferFrom',
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+      },
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setAchievementTypeActive',
+    inputs: [
+      {
+        name: 'typeId',
+        type: 'uint256',
+      },
+      {
+        name: 'isActive',
+        type: 'bool',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setApprovalForAll',
+    inputs: [
+      {
+        name: 'operator',
+        type: 'address',
+      },
+      {
+        name: 'approved',
+        type: 'bool',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setBaseURI',
+    inputs: [
+      {
+        name: 'baseURI',
+        type: 'string',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'supportsInterface',
+    inputs: [
+      {
+        name: 'interfaceId',
+        type: 'bytes4',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'symbol',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'tokenByIndex',
+    inputs: [
+      {
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
   },
   {
     type: 'function',
     name: 'tokenOfOwnerByIndex',
     inputs: [
-      { name: 'owner', type: 'address' },
-      { name: 'index', type: 'uint256' },
+      {
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        name: 'index',
+        type: 'uint256',
+      },
     ],
-    outputs: [{ name: '', type: 'uint256' }],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'tokenURI',
+    inputs: [
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'totalAchievementTypes',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'totalSupply',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'transferFrom',
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+      },
+      {
+        name: 'to',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'event',
     name: 'AchievementMinted',
     inputs: [
-      { name: 'tokenId', type: 'uint256', indexed: true },
-      { name: 'typeId', type: 'uint256', indexed: true },
-      { name: 'recipient', type: 'address', indexed: true },
-      { name: 'proofHash', type: 'bytes32', indexed: false },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'typeId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'recipient',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+        indexed: false,
+      },
     ],
+    anonymous: false,
   },
   {
     type: 'event',
     name: 'AchievementTypeCreated',
     inputs: [
-      { name: 'typeId', type: 'uint256', indexed: true },
-      { name: 'name', type: 'string', indexed: false },
-      { name: 'category', type: 'uint8', indexed: false },
+      {
+        name: 'typeId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'name',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'category',
+        type: 'uint8',
+        indexed: false,
+      },
+      {
+        name: 'isSoulbound',
+        type: 'bool',
+        indexed: false,
+      },
+      {
+        name: 'maxSupply',
+        type: 'uint256',
+        indexed: false,
+      },
     ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'AchievementTypeUpdated',
+    inputs: [
+      {
+        name: 'typeId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'isActive',
+        type: 'bool',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Approval',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'approved',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'ApprovalForAll',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'operator',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'approved',
+        type: 'bool',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BatchMetadataUpdate',
+    inputs: [
+      {
+        name: '_fromTokenId',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: '_toTokenId',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MetadataUpdate',
+    inputs: [
+      {
+        name: '_tokenId',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleAdminChanged',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'previousAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'newAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleGranted',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleRevoked',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Transfer',
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'to',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AccessControlBadConfirmation',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AccessControlUnauthorizedAccount',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+      {
+        name: 'neededRole',
+        type: 'bytes32',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'AchievementTypeInactive',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AchievementTypeNotFound',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AlreadyHasAchievement',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ERC721EnumerableForbiddenBatchMint',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ERC721IncorrectOwner',
+    inputs: [
+      {
+        name: 'sender',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721InsufficientApproval',
+    inputs: [
+      {
+        name: 'operator',
+        type: 'address',
+      },
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721InvalidApprover',
+    inputs: [
+      {
+        name: 'approver',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721InvalidOperator',
+    inputs: [
+      {
+        name: 'operator',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721InvalidOwner',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721InvalidReceiver',
+    inputs: [
+      {
+        name: 'receiver',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721InvalidSender',
+    inputs: [
+      {
+        name: 'sender',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721NonexistentToken',
+    inputs: [
+      {
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ERC721OutOfBoundsIndex',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRecipient',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MaxSupplyReached',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotOriginalOwner',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'SoulboundTransferNotAllowed',
+    inputs: [],
   },
 ] as const;
 
@@ -3680,4 +7788,3745 @@ export const BuybackExecutorABI = [
     ],
   },
   { type: 'error', name: 'SafeERC20FailedOperation', inputs: [{ name: 'token', type: 'address' }] },
+] as const;
+
+/**
+ * DeliveryMissionFactory ABI
+ * iTake delivery vertical: factory deploying DeliveryEscrow clones — generated from artifact
+ */
+export const DeliveryMissionFactoryABI = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_paymentRouter',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'MIN_DURATION',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MIN_REWARD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'createDeliveryMission',
+    inputs: [
+      {
+        name: 'paymentToken',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'expiresAt',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'metadataHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'locationHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'deliveryParams',
+        type: 'tuple',
+        components: [
+          {
+            name: 'pickup',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'dropoff',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'package',
+            type: 'tuple',
+            components: [
+              {
+                name: 'itemType',
+                type: 'uint8',
+              },
+              {
+                name: 'packageSize',
+                type: 'uint8',
+              },
+              {
+                name: 'estimatedWeight',
+                type: 'uint16',
+              },
+              {
+                name: 'specialHandling',
+                type: 'uint8',
+              },
+            ],
+          },
+          {
+            name: 'pickupWindowStart',
+            type: 'uint256',
+          },
+          {
+            name: 'pickupWindowEnd',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'realTimeTrackingEnabled',
+            type: 'bool',
+          },
+          {
+            name: 'tipAmount',
+            type: 'uint256',
+          },
+        ],
+      },
+      {
+        name: 'settlement',
+        type: 'tuple',
+        components: [
+          {
+            name: 'foodCost',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryFee',
+            type: 'uint256',
+          },
+          {
+            name: 'restaurantDAO',
+            type: 'address',
+          },
+          {
+            name: 'subDAOFeeBps',
+            type: 'uint16',
+          },
+          {
+            name: 'metaDAO',
+            type: 'address',
+          },
+          {
+            name: 'metaDAOFeeBps',
+            type: 'uint16',
+          },
+        ],
+      },
+      {
+        name: 'waypoints',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'addressHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'waypointType',
+            type: 'uint8',
+          },
+          {
+            name: 'arrivalDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'completed',
+            type: 'bool',
+          },
+          {
+            name: 'completedAt',
+            type: 'uint256',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+        ],
+      },
+    ],
+    outputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'deliveryEscrowImplementation',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'disputeResolver',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'escrowToMission',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getDeliveryParams',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'pickup',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'dropoff',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'package',
+            type: 'tuple',
+            components: [
+              {
+                name: 'itemType',
+                type: 'uint8',
+              },
+              {
+                name: 'packageSize',
+                type: 'uint8',
+              },
+              {
+                name: 'estimatedWeight',
+                type: 'uint16',
+              },
+              {
+                name: 'specialHandling',
+                type: 'uint8',
+              },
+            ],
+          },
+          {
+            name: 'pickupWindowStart',
+            type: 'uint256',
+          },
+          {
+            name: 'pickupWindowEnd',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'realTimeTrackingEnabled',
+            type: 'bool',
+          },
+          {
+            name: 'tipAmount',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMissionByEscrow',
+    inputs: [
+      {
+        name: 'escrow',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMissionParams',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'poster',
+            type: 'address',
+          },
+          {
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'createdAt',
+            type: 'uint256',
+          },
+          {
+            name: 'expiresAt',
+            type: 'uint256',
+          },
+          {
+            name: 'guild',
+            type: 'address',
+          },
+          {
+            name: 'metadataHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'locationHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'minReputation',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMissionRuntime',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'performer',
+            type: 'address',
+          },
+          {
+            name: 'state',
+            type: 'uint8',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'disputeRaised',
+            type: 'bool',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getSettlement',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'foodCost',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryFee',
+            type: 'uint256',
+          },
+          {
+            name: 'restaurantDAO',
+            type: 'address',
+          },
+          {
+            name: 'subDAOFeeBps',
+            type: 'uint16',
+          },
+          {
+            name: 'metaDAO',
+            type: 'address',
+          },
+          {
+            name: 'metaDAOFeeBps',
+            type: 'uint16',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getWaypoints',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'addressHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'waypointType',
+            type: 'uint8',
+          },
+          {
+            name: 'arrivalDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'completed',
+            type: 'bool',
+          },
+          {
+            name: 'completedAt',
+            type: 'uint256',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'missionCount',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'missions',
+    inputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'owner',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'paymentRouter',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'renounceOwnership',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setDisputeResolver',
+    inputs: [
+      {
+        name: '_disputeResolver',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'transferOwnership',
+    inputs: [
+      {
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'DeliveryMissionCreated',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'poster',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'escrow',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'reward',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'expiresAt',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'metadataHash',
+        type: 'bytes32',
+        indexed: false,
+      },
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'locationHash',
+        type: 'bytes32',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DisputeResolverUpdated',
+    inputs: [
+      {
+        name: 'disputeResolver',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'OwnershipTransferred',
+    inputs: [
+      {
+        name: 'previousOwner',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'DisputeResolverNotSet',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'FailedDeployment',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientBalance',
+    inputs: [
+      {
+        name: 'balance',
+        type: 'uint256',
+      },
+      {
+        name: 'needed',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientBalance',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidDuration',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidRewardAmount',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MetaDAOFeeTooHigh',
+    inputs: [
+      {
+        name: 'requested',
+        type: 'uint16',
+      },
+      {
+        name: 'maximum',
+        type: 'uint16',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'OwnableInvalidOwner',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'OwnableUnauthorizedAccount',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'PerformerFloorViolated',
+    inputs: [
+      {
+        name: 'totalFeeBps',
+        type: 'uint16',
+      },
+      {
+        name: 'maxFeeBps',
+        type: 'uint16',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ReentrancyGuardReentrantCall',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'SubDAOFeeTooHigh',
+    inputs: [
+      {
+        name: 'requested',
+        type: 'uint16',
+      },
+      {
+        name: 'maximum',
+        type: 'uint16',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'TokenNotAccepted',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ZeroAddress',
+    inputs: [],
+  },
+] as const;
+
+/**
+ * DeliveryEscrow ABI
+ * iTake delivery vertical: per-delivery escrow with tracking and settlement — generated from artifact
+ */
+export const DeliveryEscrowABI = [
+  {
+    type: 'function',
+    name: 'SUBMISSION_GRACE_PERIOD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'acceptMission',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'addTip',
+    inputs: [
+      {
+        name: 'tipAmount',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'addTrackingCheckpoint',
+    inputs: [
+      {
+        name: 'latitude',
+        type: 'int256',
+      },
+      {
+        name: 'longitude',
+        type: 'int256',
+      },
+      {
+        name: 'checkpointType',
+        type: 'uint8',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'allWaypointsCompleted',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'approveCompletion',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'cancelMission',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'claimExpired',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'completeWaypoint',
+    inputs: [
+      {
+        name: 'waypointIndex',
+        type: 'uint256',
+      },
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getDeliveryParams',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'pickup',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'dropoff',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'package',
+            type: 'tuple',
+            components: [
+              {
+                name: 'itemType',
+                type: 'uint8',
+              },
+              {
+                name: 'packageSize',
+                type: 'uint8',
+              },
+              {
+                name: 'estimatedWeight',
+                type: 'uint16',
+              },
+              {
+                name: 'specialHandling',
+                type: 'uint8',
+              },
+            ],
+          },
+          {
+            name: 'pickupWindowStart',
+            type: 'uint256',
+          },
+          {
+            name: 'pickupWindowEnd',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'realTimeTrackingEnabled',
+            type: 'bool',
+          },
+          {
+            name: 'tipAmount',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getDropoffLocation',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'addressHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'precision',
+            type: 'uint8',
+          },
+          {
+            name: 'geofenceRadius',
+            type: 'uint256',
+          },
+          {
+            name: 'requirePresence',
+            type: 'bool',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getLatestCheckpoint',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'timestamp',
+            type: 'uint256',
+          },
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'checkpointType',
+            type: 'uint8',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getMissionId',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getPackageDetails',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'itemType',
+            type: 'uint8',
+          },
+          {
+            name: 'packageSize',
+            type: 'uint8',
+          },
+          {
+            name: 'estimatedWeight',
+            type: 'uint16',
+          },
+          {
+            name: 'specialHandling',
+            type: 'uint8',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getParams',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'poster',
+            type: 'address',
+          },
+          {
+            name: 'rewardAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'createdAt',
+            type: 'uint256',
+          },
+          {
+            name: 'expiresAt',
+            type: 'uint256',
+          },
+          {
+            name: 'guild',
+            type: 'address',
+          },
+          {
+            name: 'metadataHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'locationHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'minReputation',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getPickupLocation',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'addressHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'precision',
+            type: 'uint8',
+          },
+          {
+            name: 'geofenceRadius',
+            type: 'uint256',
+          },
+          {
+            name: 'requirePresence',
+            type: 'bool',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getRuntime',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'performer',
+            type: 'address',
+          },
+          {
+            name: 'state',
+            type: 'uint8',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'disputeRaised',
+            type: 'bool',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getSettlement',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'foodCost',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryFee',
+            type: 'uint256',
+          },
+          {
+            name: 'restaurantDAO',
+            type: 'address',
+          },
+          {
+            name: 'subDAOFeeBps',
+            type: 'uint16',
+          },
+          {
+            name: 'metaDAO',
+            type: 'address',
+          },
+          {
+            name: 'metaDAOFeeBps',
+            type: 'uint16',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getTipAmount',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getToken',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getTrackingHistory',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'timestamp',
+            type: 'uint256',
+          },
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'checkpointType',
+            type: 'uint8',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getWaypoint',
+    inputs: [
+      {
+        name: 'waypointIndex',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'addressHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'waypointType',
+            type: 'uint8',
+          },
+          {
+            name: 'arrivalDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'completed',
+            type: 'bool',
+          },
+          {
+            name: 'completedAt',
+            type: 'uint256',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getWaypoints',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'addressHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'waypointType',
+            type: 'uint8',
+          },
+          {
+            name: 'arrivalDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'completed',
+            type: 'bool',
+          },
+          {
+            name: 'completedAt',
+            type: 'uint256',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'initialize',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'poster',
+        type: 'address',
+      },
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'expiresAt',
+        type: 'uint256',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'metadataHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'locationHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'paymentRouter',
+        type: 'address',
+      },
+      {
+        name: 'paymentToken',
+        type: 'address',
+      },
+      {
+        name: 'disputeResolver',
+        type: 'address',
+      },
+      {
+        name: 'pauseRegistryAddr',
+        type: 'address',
+      },
+      {
+        name: 'minReputation',
+        type: 'uint256',
+      },
+      {
+        name: 'reputationOracle',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'initializeDelivery',
+    inputs: [
+      {
+        name: 'deliveryParams',
+        type: 'tuple',
+        components: [
+          {
+            name: 'pickup',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'dropoff',
+            type: 'tuple',
+            components: [
+              {
+                name: 'latitude',
+                type: 'int256',
+              },
+              {
+                name: 'longitude',
+                type: 'int256',
+              },
+              {
+                name: 'addressHash',
+                type: 'bytes32',
+              },
+              {
+                name: 'precision',
+                type: 'uint8',
+              },
+              {
+                name: 'geofenceRadius',
+                type: 'uint256',
+              },
+              {
+                name: 'requirePresence',
+                type: 'bool',
+              },
+            ],
+          },
+          {
+            name: 'package',
+            type: 'tuple',
+            components: [
+              {
+                name: 'itemType',
+                type: 'uint8',
+              },
+              {
+                name: 'packageSize',
+                type: 'uint8',
+              },
+              {
+                name: 'estimatedWeight',
+                type: 'uint16',
+              },
+              {
+                name: 'specialHandling',
+                type: 'uint8',
+              },
+            ],
+          },
+          {
+            name: 'pickupWindowStart',
+            type: 'uint256',
+          },
+          {
+            name: 'pickupWindowEnd',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'realTimeTrackingEnabled',
+            type: 'bool',
+          },
+          {
+            name: 'tipAmount',
+            type: 'uint256',
+          },
+        ],
+      },
+      {
+        name: 'settlement',
+        type: 'tuple',
+        components: [
+          {
+            name: 'foodCost',
+            type: 'uint256',
+          },
+          {
+            name: 'deliveryFee',
+            type: 'uint256',
+          },
+          {
+            name: 'restaurantDAO',
+            type: 'address',
+          },
+          {
+            name: 'subDAOFeeBps',
+            type: 'uint16',
+          },
+          {
+            name: 'metaDAO',
+            type: 'address',
+          },
+          {
+            name: 'metaDAOFeeBps',
+            type: 'uint16',
+          },
+        ],
+      },
+      {
+        name: 'waypoints',
+        type: 'tuple[]',
+        components: [
+          {
+            name: 'addressHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'latitude',
+            type: 'int256',
+          },
+          {
+            name: 'longitude',
+            type: 'int256',
+          },
+          {
+            name: 'waypointType',
+            type: 'uint8',
+          },
+          {
+            name: 'arrivalDeadline',
+            type: 'uint256',
+          },
+          {
+            name: 'completed',
+            type: 'bool',
+          },
+          {
+            name: 'completedAt',
+            type: 'uint256',
+          },
+          {
+            name: 'proofHash',
+            type: 'bytes32',
+          },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'isWithinDeliveryWindow',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'raiseDispute',
+    inputs: [
+      {
+        name: 'disputeHash',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'settleDispute',
+    inputs: [
+      {
+        name: 'outcome',
+        type: 'uint8',
+      },
+      {
+        name: 'splitPercentage',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'submitProof',
+    inputs: [
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'DeliveryLocationVerified',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'locationType',
+        type: 'uint8',
+        indexed: false,
+      },
+      {
+        name: 'verified',
+        type: 'bool',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DeliveryOrderSettled',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'foodCostToRestaurant',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'deliveryFeeRouted',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'tipToPerformer',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DisputeSettled',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'outcome',
+        type: 'uint8',
+        indexed: false,
+      },
+      {
+        name: 'posterAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'performerAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'Initialized',
+    inputs: [
+      {
+        name: 'version',
+        type: 'uint64',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MissionAccepted',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MissionCancelled',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MissionCompleted',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MissionDisputed',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'by',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'disputeHash',
+        type: 'bytes32',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'MissionSubmitted',
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'TipAdded',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'tipAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'totalTip',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'TrackingUpdate',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'latitude',
+        type: 'int256',
+        indexed: false,
+      },
+      {
+        name: 'longitude',
+        type: 'int256',
+        indexed: false,
+      },
+      {
+        name: 'checkpointType',
+        type: 'uint8',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'WaypointCompleted',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'waypointIndex',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'proofHash',
+        type: 'bytes32',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AlreadyAccepted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'DeadlineExceeded',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'DeliveryAlreadyInitialized',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'DisputeAlreadyRaised',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientReputation',
+    inputs: [
+      {
+        name: 'actual',
+        type: 'uint256',
+      },
+      {
+        name: 'required',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InvalidInitialization',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidSplitPercentage',
+    inputs: [
+      {
+        name: 'splitPercentage',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InvalidState',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidTipAmount',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InvalidWaypointIndex',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissingMetaDAO',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissingRestaurantDAO',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissionExpired',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissionNotExpired',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotDeliveryMission',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotDisputeResolver',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotFactory',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotInitializing',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotPerformer',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotPoster',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'Paused',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ProofAlreadySubmitted',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ReentrancyGuardReentrantCall',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'SettlementBreakdownMismatch',
+    inputs: [
+      {
+        name: 'expected',
+        type: 'uint256',
+      },
+      {
+        name: 'provided',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'SubmissionWindowClosed',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'TrackingNotEnabled',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'WaypointAlreadyCompleted',
+    inputs: [],
+  },
+] as const;
+
+/**
+ * ReputationOracle ABI
+ * Reputation oracle used for mission/delivery reputation gating — generated from artifact
+ */
+export const ReputationOracleABI = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: 'admin',
+        type: 'address',
+      },
+      {
+        name: 'relayer',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'ADMIN_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'BRONZE_THRESHOLD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'DEFAULT_ADMIN_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'DIAMOND_THRESHOLD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'GOLD_THRESHOLD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MAX_BATCH_SIZE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'MAX_SCORE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'RELAYER_ROLE',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'SILVER_THRESHOLD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'addRelayer',
+    inputs: [
+      {
+        name: 'relayer',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'batchUpdateScores',
+    inputs: [
+      {
+        name: 'users',
+        type: 'address[]',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'scores',
+        type: 'uint256[]',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getGlobalScore',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getRoleAdmin',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getScore',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getScoreWithTier',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: 'score',
+        type: 'uint256',
+      },
+      {
+        name: 'tier',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getTier',
+    inputs: [
+      {
+        name: 'score',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'pure',
+  },
+  {
+    type: 'function',
+    name: 'globalScores',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'grantRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'guildScores',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'hasRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'paused',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'removeRelayer',
+    inputs: [
+      {
+        name: 'relayer',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'renounceRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'callerConfirmation',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'revokeRole',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+      },
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'supportsInterface',
+    inputs: [
+      {
+        name: 'interfaceId',
+        type: 'bytes4',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'unpause',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'updateGlobalScore',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+      {
+        name: 'score',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'updateScore',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+      {
+        name: 'guild',
+        type: 'address',
+      },
+      {
+        name: 'score',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'BatchScoresUpdated',
+    inputs: [
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'usersUpdated',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'GlobalScoreUpdated',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'oldScore',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'newScore',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleAdminChanged',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'previousAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'newAdminRole',
+        type: 'bytes32',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleGranted',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleRevoked',
+    inputs: [
+      {
+        name: 'role',
+        type: 'bytes32',
+        indexed: true,
+      },
+      {
+        name: 'account',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'sender',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'ScoreUpdated',
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'guild',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'oldScore',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'newScore',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'AccessControlBadConfirmation',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AccessControlUnauthorizedAccount',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+      {
+        name: 'neededRole',
+        type: 'bytes32',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ArrayLengthMismatch',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ScoreOutOfRange',
+    inputs: [
+      {
+        name: 'score',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ZeroAddress',
+    inputs: [],
+  },
+] as const;
+
+/**
+ * DeliveriesDAO ABI
+ * iTake delivery vertical: courier insurance DAO (NOT a GuildDAO) — generated from artifact
+ */
+export const DeliveriesDAOABI = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: '_usdc',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'availableSurplus',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'claimCounter',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'claims',
+    inputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'claimant',
+        type: 'address',
+      },
+      {
+        name: 'evidenceHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'requestedAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'paidAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'approved',
+        type: 'bool',
+      },
+      {
+        name: 'processed',
+        type: 'bool',
+      },
+      {
+        name: 'submittedAt',
+        type: 'uint256',
+      },
+      {
+        name: 'processedAt',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'closePolicy',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'createInsurancePolicy',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'coverageAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'curated',
+        type: 'bool',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'curatePerformer',
+    inputs: [
+      {
+        name: 'performer',
+        type: 'address',
+      },
+      {
+        name: 'rating',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'curatedInsuranceFee',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'curatedPerformers',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'fundPool',
+    inputs: [
+      {
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'getClaim',
+    inputs: [
+      {
+        name: 'claimId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'missionId',
+            type: 'uint256',
+          },
+          {
+            name: 'claimant',
+            type: 'address',
+          },
+          {
+            name: 'evidenceHash',
+            type: 'bytes32',
+          },
+          {
+            name: 'requestedAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'paidAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'approved',
+            type: 'bool',
+          },
+          {
+            name: 'processed',
+            type: 'bool',
+          },
+          {
+            name: 'submittedAt',
+            type: 'uint256',
+          },
+          {
+            name: 'processedAt',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getInsuranceFee',
+    inputs: [
+      {
+        name: 'rewardAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'curated',
+        type: 'bool',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getPolicy',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'tuple',
+        components: [
+          {
+            name: 'missionId',
+            type: 'uint256',
+          },
+          {
+            name: 'poster',
+            type: 'address',
+          },
+          {
+            name: 'coverageAmount',
+            type: 'uint256',
+          },
+          {
+            name: 'premium',
+            type: 'uint256',
+          },
+          {
+            name: 'active',
+            type: 'bool',
+          },
+          {
+            name: 'claimed',
+            type: 'bool',
+          },
+          {
+            name: 'createdAt',
+            type: 'uint256',
+          },
+        ],
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'getPoolStats',
+    inputs: [],
+    outputs: [
+      {
+        name: 'poolBalance',
+        type: 'uint256',
+      },
+      {
+        name: 'totalClaims',
+        type: 'uint256',
+      },
+      {
+        name: 'totalPremiums',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'insurancePoolBalance',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'isPerformerCurated',
+    inputs: [
+      {
+        name: 'performer',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'owner',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'performerRating',
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'policies',
+    inputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    outputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'poster',
+        type: 'address',
+      },
+      {
+        name: 'coverageAmount',
+        type: 'uint256',
+      },
+      {
+        name: 'premium',
+        type: 'uint256',
+      },
+      {
+        name: 'active',
+        type: 'bool',
+      },
+      {
+        name: 'claimed',
+        type: 'bool',
+      },
+      {
+        name: 'createdAt',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'processInsuranceClaim',
+    inputs: [
+      {
+        name: 'claimId',
+        type: 'uint256',
+      },
+      {
+        name: 'approved',
+        type: 'bool',
+      },
+      {
+        name: 'payoutAmount',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'publicInsuranceFee',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'removePerformer',
+    inputs: [
+      {
+        name: 'performer',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'renounceOwnership',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'reservedCoverage',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'submitInsuranceClaim',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+      {
+        name: 'evidenceHash',
+        type: 'bytes32',
+      },
+      {
+        name: 'requestedAmount',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'sync',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'totalClaimsPaid',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'totalPremiumsCollected',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'transferOwnership',
+    inputs: [
+      {
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'updateFees',
+    inputs: [
+      {
+        name: '_curatedFee',
+        type: 'uint256',
+      },
+      {
+        name: '_publicFee',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'updatePerformerRating',
+    inputs: [
+      {
+        name: 'performer',
+        type: 'address',
+      },
+      {
+        name: 'rating',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'usdc',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'withdrawFunds',
+    inputs: [
+      {
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        name: 'recipient',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'event',
+    name: 'FeesUpdated',
+    inputs: [
+      {
+        name: 'curatedFee',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'publicFee',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'FundsWithdrawn',
+    inputs: [
+      {
+        name: 'recipient',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'InsuranceClaimProcessed',
+    inputs: [
+      {
+        name: 'claimId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'approved',
+        type: 'bool',
+        indexed: false,
+      },
+      {
+        name: 'paidAmount',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'InsuranceClaimSubmitted',
+    inputs: [
+      {
+        name: 'claimId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'claimant',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'InsurancePolicyCreated',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'poster',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'premium',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'coverage',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'OwnershipTransferred',
+    inputs: [
+      {
+        name: 'previousOwner',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PerformerCurated',
+    inputs: [
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'rating',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PerformerRemoved',
+    inputs: [
+      {
+        name: 'performer',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PolicyClosed',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'coverageReleased',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PoolFunded',
+    inputs: [
+      {
+        name: 'from',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'error',
+    name: 'ClaimAlreadyProcessed',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ExceedsCoverage',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientPoolBalance',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'InsufficientSolvency',
+    inputs: [
+      {
+        name: 'available',
+        type: 'uint256',
+      },
+      {
+        name: 'required',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'InvalidFeeRate',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotAuthorized',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'OwnableInvalidOwner',
+    inputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'OwnableUnauthorizedAccount',
+    inputs: [
+      {
+        name: 'account',
+        type: 'address',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'PolicyNotActive',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'SafeERC20FailedOperation',
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+  },
 ] as const;
