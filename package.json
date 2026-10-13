@@ -56,8 +56,10 @@
     "viem": "^2.0.0"
   },
   "devDependencies": {
+    "@secretlint/secretlint-rule-preset-recommend": "^13.0.7",
     "@types/node": "^22.0.0",
     "husky": "^9.1.7",
+    "secretlint": "^13.0.7",
     "tsup": "^8.0.0",
     "typescript": "^5.7.0",
     "viem": "^2.21.0",

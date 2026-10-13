@@ -1,1 +1,8 @@
-yarn type-check && yarn build
+#!/usr/bin/env sh
+# Heavy checks run locally: type-check + build + unit tests (GitHub CI stays light).
+START=$(date +%s)
+echo "[pre-push] running: yarn type-check && yarn build && yarn test"
+if ! yarn type-check; then echo "[pre-push] FAILED at type-check"; exit 1; fi
+if ! yarn build; then echo "[pre-push] FAILED at build"; exit 1; fi
+if ! yarn test; then echo "[pre-push] FAILED at unit tests"; exit 1; fi
+echo "[pre-push] OK: type-check, build, tests passed ($(( $(date +%s) - START ))s)"
