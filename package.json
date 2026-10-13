@@ -1,10 +1,11 @@
 {
   "name": "horizon-protocol-sdk",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "SDK for integrating with Horizon Protocol - decentralized mission coordination on Base",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -21,6 +22,12 @@
     "dist",
     "src"
   ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -28,7 +35,9 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist",
-    "prepare": "husky"
+    "prepare": "husky || true",
+    "prepublishOnly": "yarn clean && yarn type-check && yarn test && yarn build",
+    "sync-abis": "node scripts/sync-abis.mjs"
   },
   "keywords": [
     "horizon",
@@ -46,11 +55,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/horizon-labs/horizon-sdk.git"
+    "url": "https://github.com/HrznLabs/horizon-sdk.git"
   },
-  "homepage": "https://horizon.xyz",
+  "homepage": "https://github.com/HrznLabs/horizon-sdk#readme",
   "bugs": {
-    "url": "https://github.com/horizon-labs/horizon-sdk/issues"
+    "url": "https://github.com/HrznLabs/horizon-sdk/issues"
   },
   "peerDependencies": {
     "viem": "^2.0.0"

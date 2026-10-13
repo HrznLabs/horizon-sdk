@@ -1,6 +1,12 @@
 # Horizon Protocol SDK
 
-**What's new in v0.2.0** (2026-05-10): Base Sepolia addresses synced to Phase 13 redeployment (2026-03-10); `MissionFactory.createMission` ABI now includes `paymentToken` (first arg) and `minReputation` (last arg); `ContractAddresses` expanded with iTake vertical, treasury, and full M5 token fields.
+**What's new in v0.3.0** (2026-10-13) — breaking vs 0.2.x types:
+- **ABI sync with deployed contracts** (regenerated from the monorepo's compiled artifacts): `PaymentRouter.settlePayment` now takes the `address token` param (5 args, selector `0xd764208a`); `MissionParams` gains `minReputation` (`MissionFactory.getMissionParams` / `MissionEscrow.getParams`); `GuildConfig` gains the MetaDAO hierarchy fields `isMetaDAO`, `parentMetaDAO`, `metaDAOFeeBps` (`GuildDAO.getConfig`). `HorizonAchievements` events also fixed.
+- **New delivery / iTake ABIs**: `DeliveryMissionFactoryABI`, `DeliveryEscrowABI`, `ReputationOracleABI`, `DeliveriesDAOABI`, plus `DeliveryParams` / `DeliverySettlement` types.
+- **Base Sepolia redeploy (2026-10-13)** of the iTake guild factory and delivery contracts: iTakeGuildFactory `0xB3720D5f3Ff1A6385aC0C1f54f88536F68a967F3`, DeliveryMissionFactory `0xf02Cdc9eD74E2fd63Cc98ED10e78A53512e25d53`, DeliveryEscrow impl `0x0A2F4Eeed28D630f0592068054e974991eBFe08B`.
+- A drift test now fails CI if any shipped ABI diverges from the compiled contracts (`yarn sync-abis <horizon>/packages/contracts/out` regenerates).
+
+Previously, **v0.2.0** (2026-05-10): Base Sepolia addresses synced to Phase 13 redeployment; `MissionFactory.createMission` gained `paymentToken` and `minReputation`; `ContractAddresses` expanded with iTake, treasury, and M5 token fields.
 
 **TypeScript SDK** for developers integrating Horizon Protocol into applications on Base L2.
 
@@ -16,7 +22,7 @@ The SDK provides contract ABIs, type definitions, network helpers, and utility f
 
 ## Features
 
-- **8 Contract ABIs** for all core contracts
+- **20 Contract ABIs**: core, token/governance (M5), iTake delivery vertical, and ERC20
 - **Typed constants** (addresses, fee config, chain IDs)
 - **Utility helpers** (USDC parsing, fee splits, time helpers)
 - **Type definitions** for protocol entities
@@ -61,18 +67,28 @@ const fees = calculateFeeSplit(parseUSDC(100), 300); // 3% guild fee
 
 ## ABIs
 
-All 8 core contract ABIs are exported:
+20 contract ABIs are exported (from the root and from the `horizon-protocol-sdk/abis` subpath):
 
 ```ts
 import {
+  // Core
   MissionFactoryABI,    // Mission creation and management
   MissionEscrowABI,     // Individual mission escrow
   GuildFactoryABI,      // Guild deployment
-  GuildDAOABI,          // Guild governance and roles
-  PaymentRouterABI,     // Fee distribution
+  GuildDAOABI,          // Guild governance, roles, MetaDAO hierarchy
+  PaymentRouterABI,     // Fee distribution and settlement
+  DisputeResolverABI,   // Disputes and appeals
   ReputationAttestationsABI,  // On-chain ratings
   HorizonAchievementsABI,     // NFT achievements
-  ERC20ABI,             // USDC token interactions
+  ERC20ABI,             // USDC / EURC token interactions
+  // Token economics (M5)
+  HorizonTokenABI, SHRZNVaultABI, FeeDistributorABI, HorizonVestingABI,
+  HorizonGovernorABI, HorizonTimelockABI, BuybackExecutorABI,
+  // iTake delivery vertical
+  DeliveryMissionFactoryABI,  // Delivery mission creation
+  DeliveryEscrowABI,          // Per-delivery escrow, tracking, settlement
+  ReputationOracleABI,        // Reputation gating
+  DeliveriesDAOABI,           // Courier insurance DAO — NOT a GuildDAO, don't use GuildDAOABI on it
 } from 'horizon-protocol-sdk';
 ```
 
@@ -97,7 +113,7 @@ console.log(BASE_SEPOLIA.contracts.missionFactory);
 
 ## Contract Addresses (Base Sepolia)
 
-Phase 13 redeployment (2026-03-10). Source of truth: `src/constants.ts`.
+Core contracts only (Phase 13 redeployment 2026-03-10) plus the 2026-10-13 iTake/delivery redeploy. **`src/constants.ts` is canonical** — it also holds the remaining iTake, treasury, and vesting addresses (`BASE_SEPOLIA.contracts.*`).
 
 | Contract | Address |
 |----------|---------|
@@ -115,6 +131,10 @@ Phase 13 redeployment (2026-03-10). Source of truth: `src/constants.ts`.
 | BuybackExecutor | `0x57Bad3A5871BAEAB2e8aee1D5017Aa272f6564FA` |
 | USDC (Base Sepolia) | `0x036CbD53842c5426634e7929541eC2318f3dCF7e` |
 | EURC (Base Sepolia) | `0x808456652fdb597867f38412077A9182bf77359F` |
+| iTakeGuildFactory (2026-10-13) | `0xB3720D5f3Ff1A6385aC0C1f54f88536F68a967F3` |
+| DeliveryMissionFactory (2026-10-13) | `0xf02Cdc9eD74E2fd63Cc98ED10e78A53512e25d53` |
+| DeliveryEscrow impl (2026-10-13) | `0x0A2F4Eeed28D630f0592068054e974991eBFe08B` |
+| DeliveriesDAO (insurance, not a GuildDAO) | `0xaB2F7787b72FcFfEA8E543375FE2db44D9C6ae53` |
 
 ## Utilities
 
@@ -159,15 +179,16 @@ const short = formatAddress('0x1234...5678');  // "0x1234...5678"
 ## Types
 
 ```ts
-import type {
-  Mission,
+import {
   MissionState,
-  Guild,
-  GuildRole,
-  Rating,
-  Achievement,
-  FeeSplit,
-  NetworkConfig,
+  type Mission,
+  type MissionParams,     // includes minReputation
+  type GuildConfig,       // includes isMetaDAO / parentMetaDAO / metaDAOFeeBps
+  type DeliveryParams,
+  type DeliverySettlement,
+  type Rating,
+  type FeeSplit,
+  type NetworkConfig,
 } from 'horizon-protocol-sdk';
 ```
 

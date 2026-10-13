@@ -6,7 +6,7 @@
 // coordination on Base.
 //
 // Usage:
-//   import { BASE_SEPOLIA, MissionFactoryABI, parseUSDC } from '@horizon-protocol/sdk';
+//   import { BASE_SEPOLIA, MissionFactoryABI, parseUSDC } from 'horizon-protocol-sdk';
 //
 // =============================================================================
 
@@ -28,6 +28,10 @@ export {
   HorizonTimelockABI,
   DisputeResolverABI,
   BuybackExecutorABI,
+  DeliveryMissionFactoryABI,
+  DeliveryEscrowABI,
+  ReputationOracleABI,
+  DeliveriesDAOABI,
 } from './abis';
 
 // Types
@@ -41,6 +45,10 @@ export {
   type MissionRuntime,
   type Mission,
   type GuildConfig,
+  type DeliveryLocation,
+  type PackageDetails,
+  type DeliveryParams,
+  type DeliverySettlement,
   type FeeSplit,
   type Rating,
   type AchievementType,
