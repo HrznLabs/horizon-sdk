@@ -10682,6 +10682,63 @@ export const DeliveriesDAOABI = [
   },
   {
     type: 'function',
+    name: 'CLAIM_WINDOW',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'CONFIG_DELAY',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'PAYOUT_PERIOD',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'applyDeliveryFactory',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'applyMaxWithdrawPerPeriod',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'applyPayoutLimits',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'availableSurplus',
     inputs: [],
     outputs: [
@@ -10691,6 +10748,13 @@ export const DeliveriesDAOABI = [
       },
     ],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'cancelWithdraw',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -10832,6 +10896,25 @@ export const DeliveriesDAOABI = [
   },
   {
     type: 'function',
+    name: 'deliveryFactory',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'executeWithdraw',
+    inputs: [],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     name: 'fundPool',
     inputs: [
       {
@@ -10960,6 +11043,14 @@ export const DeliveriesDAOABI = [
             name: 'createdAt',
             type: 'uint256',
           },
+          {
+            name: 'factory',
+            type: 'address',
+          },
+          {
+            name: 'terminalAt',
+            type: 'uint256',
+          },
         ],
       },
     ],
@@ -11016,7 +11107,187 @@ export const DeliveriesDAOABI = [
   },
   {
     type: 'function',
+    name: 'maxCoveragePerPolicy',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'maxPayoutPerPeriod',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'maxWithdrawPerPeriod',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     name: 'owner',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'payoutPeriodPaid',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'payoutPeriodStart',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingDeliveryFactory',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingDeliveryFactoryEta',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingLimitsEta',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingMaxCoveragePerPolicy',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingMaxPayoutPerPeriod',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingMaxWithdrawEta',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingMaxWithdrawPerPeriod',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingWithdrawAmount',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingWithdrawEta',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'pendingWithdrawRecipient',
     inputs: [],
     outputs: [
       {
@@ -11081,6 +11352,14 @@ export const DeliveriesDAOABI = [
         name: 'createdAt',
         type: 'uint256',
       },
+      {
+        name: 'factory',
+        type: 'address',
+      },
+      {
+        name: 'terminalAt',
+        type: 'uint256',
+      },
     ],
     stateMutability: 'view',
   },
@@ -11107,6 +11386,70 @@ export const DeliveriesDAOABI = [
   {
     type: 'function',
     name: 'publicInsuranceFee',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'queueWithdraw',
+    inputs: [
+      {
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        name: 'recipient',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'recordPolicyTerminal',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'releasedThisPeriod',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'remainingPeriodPayout',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'remainingPeriodWithdraw',
     inputs: [],
     outputs: [
       {
@@ -11146,6 +11489,46 @@ export const DeliveriesDAOABI = [
       },
     ],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'setDeliveryFactory',
+    inputs: [
+      {
+        name: 'factory',
+        type: 'address',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setMaxWithdrawPerPeriod',
+    inputs: [
+      {
+        name: 'cap',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    name: 'setPayoutLimits',
+    inputs: [
+      {
+        name: 'perPolicy',
+        type: 'uint256',
+      },
+      {
+        name: 'perPeriod',
+        type: 'uint256',
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -11271,6 +11654,53 @@ export const DeliveriesDAOABI = [
     stateMutability: 'nonpayable',
   },
   {
+    type: 'function',
+    name: 'withdrawnThisPeriod',
+    inputs: [],
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'event',
+    name: 'DeliveryFactoryCancelled',
+    inputs: [],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DeliveryFactoryQueued',
+    inputs: [
+      {
+        name: 'factory',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'eta',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DeliveryFactoryUpdated',
+    inputs: [
+      {
+        name: 'factory',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    anonymous: false,
+  },
+  {
     type: 'event',
     name: 'FeesUpdated',
     inputs: [
@@ -11394,6 +11824,45 @@ export const DeliveriesDAOABI = [
   },
   {
     type: 'event',
+    name: 'PayoutLimitsQueued',
+    inputs: [
+      {
+        name: 'maxCoveragePerPolicy',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'maxPayoutPerPeriod',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'eta',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'PayoutLimitsUpdated',
+    inputs: [
+      {
+        name: 'maxCoveragePerPolicy',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'maxPayoutPerPeriod',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
     name: 'PerformerCurated',
     inputs: [
       {
@@ -11440,6 +11909,23 @@ export const DeliveriesDAOABI = [
   },
   {
     type: 'event',
+    name: 'PolicyTerminalRecorded',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'closableAt',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
     name: 'PoolFunded',
     inputs: [
       {
@@ -11456,8 +11942,80 @@ export const DeliveriesDAOABI = [
     anonymous: false,
   },
   {
+    type: 'event',
+    name: 'WithdrawCancelled',
+    inputs: [],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'WithdrawLimitQueued',
+    inputs: [
+      {
+        name: 'maxWithdrawPerPeriod',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'eta',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'WithdrawLimitUpdated',
+    inputs: [
+      {
+        name: 'maxWithdrawPerPeriod',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'WithdrawQueued',
+    inputs: [
+      {
+        name: 'recipient',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'amount',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'eta',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    anonymous: false,
+  },
+  {
     type: 'error',
     name: 'ClaimAlreadyProcessed',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ClaimWindowOpen',
+    inputs: [
+      {
+        name: 'closableAt',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'DeliveryFactoryNotSet',
     inputs: [],
   },
   {
@@ -11486,12 +12044,46 @@ export const DeliveriesDAOABI = [
   },
   {
     type: 'error',
+    name: 'InvalidCoverage',
+    inputs: [
+      {
+        name: 'coverage',
+        type: 'uint256',
+      },
+      {
+        name: 'maxAllowed',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
     name: 'InvalidFeeRate',
     inputs: [],
   },
   {
     type: 'error',
+    name: 'InvalidLimits',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'MissionNotInsurable',
+    inputs: [],
+  },
+  {
+    type: 'error',
     name: 'NotAuthorized',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NotMissionPoster',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'NothingQueued',
     inputs: [],
   },
   {
@@ -11516,7 +12108,31 @@ export const DeliveriesDAOABI = [
   },
   {
     type: 'error',
+    name: 'PeriodPayoutCapExceeded',
+    inputs: [
+      {
+        name: 'requested',
+        type: 'uint256',
+      },
+      {
+        name: 'remaining',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
     name: 'PolicyNotActive',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'PolicyStillCovering',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ReentrancyGuardReentrantCall',
     inputs: [],
   },
   {
@@ -11528,5 +12144,30 @@ export const DeliveriesDAOABI = [
         type: 'address',
       },
     ],
+  },
+  {
+    type: 'error',
+    name: 'TooEarly',
+    inputs: [
+      {
+        name: 'eta',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'UnknownMission',
+    inputs: [
+      {
+        name: 'missionId',
+        type: 'uint256',
+      },
+    ],
+  },
+  {
+    type: 'error',
+    name: 'ZeroAddress',
+    inputs: [],
   },
 ] as const;

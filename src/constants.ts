@@ -70,7 +70,7 @@ export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as cons
 
 // Last synced: 2026-05-10 from monorepo packages/shared/src/constants/index.ts (Phase 13 redeploy 2026-03-10)
 /**
- * Base Sepolia testnet contract addresses (core set redeployed 2026-10-14; guild/delivery redeployed 2026-10-13)
+ * Base Sepolia testnet contract addresses (core set + DeliveriesDAO redeployed 2026-10-14; guild/delivery redeployed 2026-10-13)
  */
 export const BASE_SEPOLIA_CONTRACTS: ContractAddresses = {
   // Core v2.2
@@ -100,7 +100,7 @@ export const BASE_SEPOLIA_CONTRACTS: ContractAddresses = {
   reputationOracle: '0x7b2617a841B1c3c39Bba454387167A8948301CA8',
   deliveryMissionFactory: '0xf02Cdc9eD74E2fd63Cc98ED10e78A53512e25d53',
   deliveryEscrowImpl: '0x0A2F4Eeed28D630f0592068054e974991eBFe08B',
-  deliveriesDAO: '0xaB2F7787b72FcFfEA8E543375FE2db44D9C6ae53',
+  deliveriesDAO: '0x00C363a950CC39ab3c9623103cFB23bBB2303F0D',
   iTakeMetaDAO: '0x883B7D8CA234912B82AC9718664c2dF224c98a67',
   atobaDAO: '0x85fB5f85FeC3c18a47e21f22AB69A9bBB09d913f',
   lisboacafe: '0xAA0096E1038449220dB872c19BDF9CD6d619b7BA',
