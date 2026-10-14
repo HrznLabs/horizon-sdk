@@ -211,6 +211,8 @@ export interface ContractAddresses {
   missionEscrowImpl: `0x${string}`;
   guildFactory: `0x${string}`;
   disputeResolver: `0x${string}`;
+  /** Circuit breaker wired into MissionFactory. Optional so externally built address maps stay valid. */
+  pauseRegistry?: `0x${string}`;
   achievements: `0x${string}`;
   // Tokens
   usdc: `0x${string}`;

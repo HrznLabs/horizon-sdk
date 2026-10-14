@@ -108,20 +108,21 @@ const contracts = getContracts(84532);
 
 // Direct access
 console.log(BASE_SEPOLIA.contracts.missionFactory);
-// 0x6d97964E9BE016A8AABA2f99F0bA419464Fb88D9
+// 0x8D780F03206E6433c2e5F7E0aB40244Ee051a271
 ```
 
 ## Contract Addresses (Base Sepolia)
 
-Core contracts only (Phase 13 redeployment 2026-03-10) plus the 2026-10-13 iTake/delivery redeploy. **`src/constants.ts` is canonical** — it also holds the remaining iTake, treasury, and vesting addresses (`BASE_SEPOLIA.contracts.*`).
+Core contracts redeployed 2026-10-14 (PaymentRouter, MissionFactory, MissionEscrowImpl, DisputeResolver, PauseRegistry), plus the 2026-10-13 iTake/delivery redeploy. **`src/constants.ts` is canonical** — it also holds the remaining iTake, treasury, and vesting addresses (`BASE_SEPOLIA.contracts.*`).
 
 | Contract | Address |
 |----------|---------|
-| MissionFactory | `0x6d97964E9BE016A8AABA2f99F0bA419464Fb88D9` |
-| MissionEscrowImpl | `0x3b02a7eac30Bc4a800Eebd69Fed75c818dB92099` |
+| MissionFactory (2026-10-14) | `0x8D780F03206E6433c2e5F7E0aB40244Ee051a271` |
+| MissionEscrowImpl (2026-10-14) | `0x9aBe058635D961191571140948774cD829847406` |
 | GuildFactory | `0x7349Cd1A4f7C1a74Db730743d873de98A2f3a32F` |
-| PaymentRouter | `0x3013db6C92EF956f86EBC0aDFECe70b80FA73600` |
-| DisputeResolver | `0xdE37Ff10A487c852941DC842987dd8d5d8b9E855` |
+| PaymentRouter (2026-10-14) | `0x3a84718A90E03621526748A1721f10D32BEaf903` |
+| DisputeResolver (2026-10-14) | `0x073A3674FB09177fcD6615bD920Ca1Fc52Fbd156` |
+| PauseRegistry (2026-10-14) | `0x05Ec569d16Ac6b7B5dEB8B815976512CED645A87` |
 | HorizonAchievements | `0xfCC5971C3704C7a1F1c9E4acFdC7eEd60D4e4949` |
 | HorizonToken (HRZN) | `0xe4f29a413c24B6020FE344C412D9f82Df15809aF` |
 | sHRZNVault | `0xf3D693616d6b185b36D4a2e36663E5932d351758` |
