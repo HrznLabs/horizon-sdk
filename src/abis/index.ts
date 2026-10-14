@@ -7297,7 +7297,7 @@ export const HorizonTimelockABI = [
 /**
  * DisputeResolver ABI
  * Manages dispute lifecycle: DDR/LPP deposits, resolution, appeal, and payout
- * Deployed on Base Sepolia: 0xdE37Ff10A487c852941DC842987dd8d5d8b9E855
+ * Deployed on Base Sepolia: 0x073A3674FB09177fcD6615bD920Ca1Fc52Fbd156 (redeployed 2026-10-14)
  */
 export const DisputeResolverABI = [
   {
