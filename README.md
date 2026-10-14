@@ -1,5 +1,7 @@
 # Horizon Protocol SDK
 
+**v0.3.2** (2026-10-14): Base Sepolia `DeliveriesDAO` redeployed (`0x00C363a950CC39ab3c9623103cFB23bBB2303F0D`, owner still the deployer EOA) and `DeliveriesDAOABI` regenerated from the current contracts (monorepo #963/#968/#974: new functions and events).
+
 **What's new in v0.3.0** (2026-10-13) — breaking vs 0.2.x types:
 - **ABI sync with deployed contracts** (regenerated from the monorepo's compiled artifacts): `PaymentRouter.settlePayment` now takes the `address token` param (5 args, selector `0xd764208a`); `MissionParams` gains `minReputation` (`MissionFactory.getMissionParams` / `MissionEscrow.getParams`); `GuildConfig` gains the MetaDAO hierarchy fields `isMetaDAO`, `parentMetaDAO`, `metaDAOFeeBps` (`GuildDAO.getConfig`). `HorizonAchievements` events also fixed.
 - **New delivery / iTake ABIs**: `DeliveryMissionFactoryABI`, `DeliveryEscrowABI`, `ReputationOracleABI`, `DeliveriesDAOABI`, plus `DeliveryParams` / `DeliverySettlement` types.
@@ -113,7 +115,7 @@ console.log(BASE_SEPOLIA.contracts.missionFactory);
 
 ## Contract Addresses (Base Sepolia)
 
-Core contracts redeployed 2026-10-14 (PaymentRouter, MissionFactory, MissionEscrowImpl, DisputeResolver, PauseRegistry), plus the 2026-10-13 iTake/delivery redeploy. **`src/constants.ts` is canonical** — it also holds the remaining iTake, treasury, and vesting addresses (`BASE_SEPOLIA.contracts.*`).
+Core contracts redeployed 2026-10-14 (PaymentRouter, MissionFactory, MissionEscrowImpl, DisputeResolver, PauseRegistry), plus the 2026-10-13 iTake/delivery redeploy and the 2026-10-14 DeliveriesDAO redeploy. **`src/constants.ts` is canonical** — it also holds the remaining iTake, treasury, and vesting addresses (`BASE_SEPOLIA.contracts.*`).
 
 | Contract | Address |
 |----------|---------|
@@ -135,7 +137,7 @@ Core contracts redeployed 2026-10-14 (PaymentRouter, MissionFactory, MissionEscr
 | iTakeGuildFactory (2026-10-13) | `0xB3720D5f3Ff1A6385aC0C1f54f88536F68a967F3` |
 | DeliveryMissionFactory (2026-10-13) | `0xf02Cdc9eD74E2fd63Cc98ED10e78A53512e25d53` |
 | DeliveryEscrow impl (2026-10-13) | `0x0A2F4Eeed28D630f0592068054e974991eBFe08B` |
-| DeliveriesDAO (insurance, not a GuildDAO) | `0xaB2F7787b72FcFfEA8E543375FE2db44D9C6ae53` |
+| DeliveriesDAO (2026-10-14, insurance, not a GuildDAO) | `0x00C363a950CC39ab3c9623103cFB23bBB2303F0D` |
 
 ## Utilities
 
