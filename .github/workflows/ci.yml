@@ -3,7 +3,10 @@ name: CI
 # Static checks (type-check, build) run locally in the husky pre-push hook.
 # CI runs unit tests only, and only when code that can affect them changes.
 on:
+  # Not on PRs into main: the automated staging-to-main promotion PR is opened by the bot and merged at once,
+  # so its run would only wait for approval and expire. The promotion workflow has its own build gate.
   pull_request:
+    branches-ignore: [main]
     paths:
       - 'src/**'
       - 'test/**'
