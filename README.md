@@ -121,7 +121,7 @@ Core contracts redeployed 2026-10-14 (PaymentRouter, MissionFactory, MissionEscr
 |----------|---------|
 | MissionFactory (2026-10-14) | `0x8D780F03206E6433c2e5F7E0aB40244Ee051a271` |
 | MissionEscrowImpl (2026-10-14) | `0x9aBe058635D961191571140948774cD829847406` |
-| GuildFactory | `0x7349Cd1A4f7C1a74Db730743d873de98A2f3a32F` |
+| GuildFactory | `0xB3720D5f3Ff1A6385aC0C1f54f88536F68a967F3` |
 | PaymentRouter (2026-10-14) | `0x3a84718A90E03621526748A1721f10D32BEaf903` |
 | DisputeResolver (2026-10-14) | `0x073A3674FB09177fcD6615bD920Ca1Fc52Fbd156` |
 | PauseRegistry (2026-10-14) | `0x05Ec569d16Ac6b7B5dEB8B815976512CED645A87` |
